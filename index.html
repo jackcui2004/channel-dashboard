@@ -28,6 +28,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans G
 .langicon:active{transform:scale(.95)}
 .topbar{display:flex;align-items:center;justify-content:space-between;margin:6px 0 10px}
 .topbar h1{margin:0}
+[data-theme="dark"] .badge-new{background:transparent!important;box-shadow:none!important}
+[data-theme="dark"] .badge-new.c-purple{color:#C724FF;border:1.5px solid #C724FF}
+[data-theme="dark"] .badge-new.c-green{color:#39FF14;border:1.5px solid #39FF14}
+[data-theme="dark"] .badge-new.c-gray{color:#E8E8E8;border:1.5px solid #E8E8E8}
+[data-theme="dark"] .badge-new.c-red{color:#FF3131;border:1.5px solid #FF3131}
 [data-theme="dark"] .glassbar{background:rgba(30,30,30,.72);border-color:rgba(255,255,255,.12)}
 [data-theme="dark"] .glassbar .seg{background:rgba(255,255,255,.08)}
 [data-theme="dark"] .glassbar .seg .thumb{background:#2e2e2e}
@@ -88,12 +93,12 @@ h1{font-size:24px;font-weight:800;text-align:center;letter-spacing:1px;margin:6p
 .badge-new.c-green{background:#39FF14;color:#000;box-shadow:0 0 4px rgba(57,255,20,.6)}
 .badge-new.c-gray{background:#E8E8E8;color:#333;box-shadow:0 0 4px rgba(0,0,0,.15);border:1px solid #ccc}
 .badge-new.c-red{background:#FF3131;color:#fff;box-shadow:0 0 4px rgba(255,49,49,.6)}
-/* 频道 ID 底色（调灰版，低调区分） */
-.chan-tag{display:inline-block;font-size:12.5px;border-radius:6px;padding:2px 10px;margin-bottom:6px;font-weight:600}
-.chan-tag.c0{background:#E6D9F0;color:#5A3D7A}
-.chan-tag.c1{background:#D9E8D9;color:#3D6B3D}
-.chan-tag.c2{background:#E2E2E2;color:#555}
-.chan-tag.c3{background:#F0D9D9;color:#7A3D3D}
+/* 频道 ID：彩色字体 + 描边，无底色，深浅模式一致无色差 */
+.chan-tag{display:inline-block;font-size:12.5px;border-radius:6px;padding:2px 10px;margin-bottom:6px;font-weight:700;border:1.5px solid;background:transparent}
+.chan-tag.c0{color:#8B5CF6;border-color:#8B5CF6}
+.chan-tag.c1{color:#22C55E;border-color:#22C55E}
+.chan-tag.c2{color:#6B7280;border-color:#6B7280}
+.chan-tag.c3{color:#EF4444;border-color:#EF4444}
 .vmeta{font-size:14px;color:var(--muted);line-height:1.8}
 .vmeta b{color:var(--text);font-weight:700}
 .toggle{color:var(--red);font-weight:700;cursor:pointer;white-space:nowrap}
@@ -542,15 +547,54 @@ function applyLang(){
 }
 function renderAll(){renderTabs();renderStats();renderSort();renderList()}
 document.getElementById('langicon').onclick=()=>{lang=lang==='zh'?'en':'zh';applyLang()};
-// 深色模式切换
-let theme='light';
-try{theme=localStorage.getItem('dash-theme')||'light'}catch(e){}
+// 深色模式切换（含日出日落自动）
+// theme: 'light' | 'dark' | 'auto'
+let theme='auto';
+try{theme=localStorage.getItem('dash-theme')||'auto'}catch(e){}
+
+// 日出日落计算（简化版，按北京经纬度，足够判断昼夜）
+function getSunTimes(date){
+  // 北京：39.9°N, 116.4°E
+  const lat=39.9, lng=116.4;
+  const rad=Math.PI/180;
+  const dayOfYear=Math.floor((date-new Date(date.getFullYear(),0,0))/864e5);
+  // 太阳赤纬
+  const decl=-23.44*Math.cos(rad*(360/365*(dayOfYear+10)));
+  // 时角
+  const ha=Math.acos((Math.sin(rad*-0.83)-Math.sin(rad*lat)*Math.sin(rad*decl))/(Math.cos(rad*lat)*Math.cos(rad*decl)))/rad;
+  // 北京时区的正午（考虑经度修正）
+  const noon=12-(lng-120)/15;
+  const sunrise=noon-ha/15;
+  const sunset=noon+ha/15;
+  return {sunrise, sunset};
+}
+function isNightTime(){
+  const now=new Date();
+  const {sunrise, sunset}=getSunTimes(now);
+  const h=now.getHours()+now.getMinutes()/60;
+  return h<sunrise||h>=sunset;
+}
 function applyTheme(){
-  document.documentElement.setAttribute('data-theme',theme);
-  document.getElementById('themeicon').textContent=theme==='dark'?'☀️':'🌙';
+  let effective=theme;
+  if(theme==='auto'){
+    effective=isNightTime()?'dark':'light';
+  }
+  document.documentElement.setAttribute('data-theme',effective);
+  const icon=document.getElementById('themeicon');
+  if(theme==='auto'){
+    icon.textContent=isNightTime()?'🌙⏰':'☀️⏰';
+  }else{
+    icon.textContent=theme==='dark'?'☀️':'🌙';
+  }
   try{localStorage.setItem('dash-theme',theme)}catch(e){}
 }
-document.getElementById('themeicon').onclick=()=>{theme=theme==='dark'?'light':'dark';applyTheme()};
+// 每分钟检查一次（自动模式下跟随日出日落）
+setInterval(()=>{if(theme==='auto')applyTheme()},60000);
+document.getElementById('themeicon').onclick=()=>{
+  // 循环：auto -> light -> dark -> auto
+  theme=theme==='auto'?'light':theme==='light'?'dark':'auto';
+  applyTheme();
+};
 applyTheme();
 function moveThumb(){
   const seg=document.getElementById('g-seg');
