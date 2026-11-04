@@ -344,29 +344,36 @@ function renderSort(){
   document.querySelectorAll('.sortpill[data-s]').forEach(b=>b.onclick=()=>{sortMode=b.dataset.s;renderSort();renderList()});
   document.getElementById('btn-trans-title').onclick=toggleTitleTrans;
 }
-function toggleTitleTrans(){
+async function toggleTitleTrans(){
+  const btn=document.getElementById('btn-trans-title');
   titleTransOn=!titleTransOn;
-  if(titleTransOn){
-    // 服务端没有中文标题时，客户端兜底翻译（用用户 IP，不会被限）
-    const vs=filteredVideos();
-    const todo=vs.filter(v=>!v.title_zh&&!v._titleZh&&v.title);
-    if(todo.length){
-      const btn=document.getElementById('btn-trans-title');
-      if(btn){btn.textContent=t().translatingTitle;btn.disabled=true}
-      (async()=>{
-        const chunk=6;
-        for(let i=0;i<todo.length;i+=chunk){
-          await Promise.all(todo.slice(i,i+chunk).map(async v=>{
-            const tr=await translateText(v.title);
-            if(tr)v._titleZh=tr;
-          }));
-        }
-        renderSort();renderList();
-        if(curView==='rank')renderRank();
-      })();
-      return;
-    }
+  if(!titleTransOn){
+    renderSort();renderList();
+    if(curView==='rank')renderRank();
+    return;
   }
+  // 开启翻译：逐个翻译当前可见标题（跟简介翻译同一套逻辑）
+  if(btn){btn.textContent=t().translatingTitle;btn.disabled=true}
+  try{
+    const vs=filteredVideos();
+    for(const v of vs){
+      if(!v._titleZh && v.title){
+        const tr=await translateText(v.title);
+        if(tr)v._titleZh=tr;
+      }
+    }
+    // 涨幅榜的也翻译
+    if(curView==='rank'){
+      const ranked=allVideosWithDelta().slice(0,5);
+      for(const r of ranked){
+        const v=r.v;
+        if(!v._titleZh && v.title){
+          const tr=await translateText(v.title);
+          if(tr)v._titleZh=tr;
+        }
+      }
+    }
+  }catch(e){}
   renderSort();renderList();
   if(curView==='rank')renderRank();
 }
