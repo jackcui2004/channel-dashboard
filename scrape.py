@@ -15,6 +15,7 @@ import argparse
 import json
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone, timedelta
 
 import yt_dlp
@@ -239,40 +240,55 @@ def main():
             continue
 
         print(f"[info] {ch['name']}: {len(video_list)} 个视频，订阅 {subs}")
-        videos = []
-        for i, v in enumerate(video_list):
-            # 先抓详情（不带评论），用于判定爆款；flat 数据作兜底
-            detail = fetch_video_detail(ydl, v["id"], fetch_comments=False,
-                                        flat_fallback=v.get("flat"))
-            if detail is None:
-                detail = {"id": v["id"], "title": v.get("title"), "views": None,
-                          "likes": None, "comments": None, "comments_text": [],
-                          "duration": None, "published": None,
-                          "description": None, "tags": [], "hot": False,
-                          "error": "detail_fetch_failed"}
-            # flat 兜底：详情页没抓到的字段用列表页数据补
+        # 多线程并行抓视频详情（每个线程独立 YoutubeDL 实例，线程安全）
+        def _fetch_one(item):
+            v, idx = item
+            d = fetch_video_detail(yt_dlp.YoutubeDL(BASE_OPTS), v["id"],
+                                   fetch_comments=False, flat_fallback=v.get("flat"))
+            if d is None:
+                d = {"id": v["id"], "title": v.get("title"), "views": None,
+                     "likes": None, "comments": None, "comments_text": [],
+                     "duration": None, "published": None,
+                     "description": None, "tags": [], "hot": False,
+                     "error": "detail_fetch_failed"}
             flat = v.get("flat") or {}
             for k in ("views", "duration", "published"):
-                if detail.get(k) is None and flat.get(k) is not None:
-                    detail[k] = flat[k]
-            videos.append(detail)
-            print(f"  [{i+1}/{len(video_list)}] {detail['id']} views={detail['views']}")
+                if d.get(k) is None and flat.get(k) is not None:
+                    d[k] = flat[k]
+            return idx, d
+
+        videos = [None] * len(video_list)
+        with ThreadPoolExecutor(max_workers=5) as ex:
+            futs = {ex.submit(_fetch_one, (v, i)): i for i, v in enumerate(video_list)}
+            done = 0
+            for f in as_completed(futs):
+                idx, d = f.result()
+                videos[idx] = d
+                done += 1
+                print(f"  [{done}/{len(video_list)}] {d['id']} views={d['views']}")
 
         mark_hot(videos)
 
         if not args.skip_comments:
-            # 所有视频都抓评论正文（不再只限爆款），与第一版看板数据口径一致
-            print(f"[info] {ch['name']}: {len(videos)} 个视频，逐个抓评论...")
-            for v in videos:
-                vid = v["id"]
-                # 已有评论数的才抓，无评论的跳过
-                if v.get("comments") == 0:
-                    continue
-                detail = fetch_video_detail(ydl, vid, fetch_comments=True)
-                if detail and detail.get("comments_text"):
-                    v["comments_text"] = detail["comments_text"]
-                    print(f"  评论 {vid}: {len(detail['comments_text'])} 条顶层")
-                time.sleep(1)  # 评论接口限流保护
+            # 所有视频都抓评论正文（不再只限爆款），多线程并行
+            todo = [v for v in videos if v.get("comments") != 0]
+            print(f"[info] {ch['name']}: {len(todo)} 个视频并行抓评论...")
+
+            def _fetch_comments(v):
+                d = fetch_video_detail(yt_dlp.YoutubeDL(BASE_OPTS), v["id"],
+                                       fetch_comments=True)
+                n = len(d["comments_text"]) if d and d.get("comments_text") else 0
+                return v["id"], (d["comments_text"] if d and d.get("comments_text") else [])
+
+            with ThreadPoolExecutor(max_workers=4) as ex:
+                futs = {ex.submit(_fetch_comments, v): v["id"] for v in todo}
+                for f in as_completed(futs):
+                    vid, ct = f.result()
+                    for v in videos:
+                        if v["id"] == vid:
+                            v["comments_text"] = ct
+                            break
+                    print(f"  评论 {vid}: {len(ct)} 条顶层")
 
         result["channels"].append({
             "id": ch["id"],
