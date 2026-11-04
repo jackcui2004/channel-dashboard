@@ -459,6 +459,7 @@ function videoHtml(v){
     body+=`<div style="text-align:center;margin:10px 0"><button class="sortpill" data-cexpand="${esc(v.id)}">${cOpen?t().collapseAll:t().expandAll.replace('{n}',ct.length)}</button></div>`;
   }
   body+=`<a class="ytwatch" href="https://www.youtube.com/watch?v=${esc(v.id)}" target="_blank" rel="noopener">${t().watch}</a>`;
+  body+=`<div style="text-align:center;margin-top:12px"><span class="toggle" data-collapse="${esc(v.id)}">${t().collapse} ▲</span></div>`;
   body+='</div>';
   return `<div class="video${open?' open':''}" data-vid="${esc(v.id)}"><div class="vhead">${chanTag}<div class="vtitle" data-orig-title="${esc(v.title||'')}">${hot}${isNew}${titleShow}</div><div class="vmeta">${meta}</div></div>${body}${timeHtml}</div>`;
 }
@@ -480,6 +481,12 @@ function renderList(){
     openSet.has(id)?openSet.delete(id):openSet.add(id);
     renderList();
     if(openSet.has(id)&&lang==='zh'){const card=el.querySelector(`[data-vid="${CSS.escape(id)}"]`);if(card)translateOpen(card)}
+  });
+  el.querySelectorAll('[data-collapse]').forEach(b=>b.onclick=(e)=>{
+    e.stopPropagation();
+    const id=b.dataset.collapse;
+    openSet.delete(id);
+    renderList();
   });
   el.querySelectorAll('[data-cexpand]').forEach(b=>b.onclick=(e)=>{
     e.stopPropagation();
