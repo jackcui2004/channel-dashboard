@@ -66,6 +66,19 @@ h1{font-size:24px;font-weight:800;text-align:center;letter-spacing:1px;margin:6p
 .ytwatch{display:inline-block;margin-top:14px;color:var(--red);font-size:16px;font-weight:600;text-decoration:underline}
 .footer{margin-top:26px;color:var(--faint);font-size:12px;text-align:center;line-height:1.8}
 .noresult{text-align:center;color:var(--muted);padding:40px 0;font-size:15px}
+.delta{display:inline-block;font-size:11px;font-weight:700;color:var(--red);background:#fdeceb;border-radius:6px;padding:1px 6px;margin-left:4px;vertical-align:2px;white-space:nowrap}
+.viewseg{margin:6px 0 4px}
+.rankcard{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
+.ranknum{font-size:22px;font-weight:800;color:var(--red);min-width:28px;text-align:center}
+.ranknum.r1{color:#d43d2a}.ranknum.r2{color:#e0705a}.ranknum.r3{color:#e8a07a}
+.rankinfo{flex:1;min-width:0}
+.ranktitle{font-size:15px;font-weight:700;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.rankchan{font-size:12.5px;color:var(--muted);margin-top:2px}
+.rankdelta{text-align:right;white-space:nowrap}
+.rankdelta .d{font-size:18px;font-weight:800;color:var(--red)}
+.rankdelta .l{font-size:11.5px;color:var(--muted)}
+.rankhead{font-size:15px;font-weight:800;margin:14px 0 10px}
+.rankhead .sub{font-weight:400;color:var(--muted);font-size:12.5px;margin-left:8px}
 @media(max-width:480px){
   .vtitle{font-size:19px}
   .stat .num{font-size:20px}
@@ -85,6 +98,9 @@ h1{font-size:24px;font-weight:800;text-align:center;letter-spacing:1px;margin:6p
 </div>
 <input class="search" id="search" placeholder="🔍 搜索标题关键词...">
 <div class="tabs" id="tabs"></div>
+<div class="viewseg seg" role="group" aria-label="view">
+  <button id="btn-list" class="on">视频列表</button><button id="btn-rank">📈 涨幅榜</button>
+</div>
 <div class="stats" id="stats"></div>
 <div class="chanlink" id="chanlink"></div>
 <div class="sortrow" id="sortrow"></div>
@@ -96,8 +112,8 @@ const DATA = __DATA_JSON__;
 let lang = 'zh';
 try{ lang = localStorage.getItem('dash-lang') || 'zh'; }catch(e){}
 const T = {
-zh:{updated:'数据更新于',refresh:'刷新数据',search:'🔍 搜索标题关键词...',subs:'订阅者',videos:'视频数',totalViews:'总播放量',avgViews:'平均播放/视频',openChan:'在 YouTube 打开频道',sort:'排序',latest:'最新发布',byViews:'播放量',plays:'播放',likes:'点赞',comments:'评论',duration:'时长',detail:'详情',collapse:'收起',desc:'简介',tags:'标签',note:'备注',commentsTitle:'评论',captured:(a,b)=>`（已抓取 ${a} 条 / 共 ${b} 条）`,watch:'在 YouTube 观看 →',likeWord:'赞',noResult:'没有匹配的视频',footer:'数据来自 YouTube 公开页面 · 每小时自动更新 · 缺失数字标为「—」',hot:'🔥 爆款',translating:'正在翻译…',transFail:'（翻译暂不可用，显示英文原文）',translated:'已翻译',refreshNote:'数据每小时自动更新',pageTitle:'三频道数据看板'},
-en:{updated:'Updated',refresh:'Refresh',search:'🔍 Search titles...',subs:'Subscribers',videos:'Videos',totalViews:'Total views',avgViews:'Avg views/video',openChan:'Open channel on YouTube',sort:'Sort',latest:'Newest',byViews:'Views',plays:'Views',likes:'Likes',comments:'Comments',duration:'Duration',detail:'Details',collapse:'Collapse',desc:'Description',tags:'Tags',note:'Note',commentsTitle:'Comments',captured:(a,b)=>`(${a} of ${b} captured)`,watch:'Watch on YouTube →',likeWord:'likes',noResult:'No matching videos',footer:'Data from public YouTube pages · auto-updated hourly · missing values shown as "—"',hot:'🔥 HOT',translating:'',transFail:'',translated:'',refreshNote:'Data auto-updates every hour',pageTitle:'3-Channel Data Dashboard'}};
+zh:{updated:'数据更新于',refresh:'刷新数据',search:'🔍 搜索标题关键词...',subs:'订阅者',videos:'视频数',totalViews:'总播放量',avgViews:'平均播放/视频',openChan:'在 YouTube 打开频道',sort:'排序',latest:'最新发布',byViews:'播放量',plays:'播放',likes:'点赞',comments:'评论',duration:'时长',detail:'详情',collapse:'收起',desc:'简介',tags:'标签',note:'备注',commentsTitle:'评论',captured:(a,b)=>`（已抓取 ${a} 条 / 共 ${b} 条）`,watch:'在 YouTube 观看 →',likeWord:'赞',noResult:'没有匹配的视频',footer:'数据来自 YouTube 公开页面 · 每小时自动更新 · 缺失数字标为「—」',hot:'🔥 爆款',translating:'正在翻译…',transFail:'（翻译暂不可用，显示英文原文）',translated:'已翻译',refreshNote:'数据每小时自动更新',pageTitle:'三频道数据看板',listView:'视频列表',rankView:'📈 涨幅榜',rankTitle:'小时播放量涨幅榜',rankSub:'对比上一轮抓取',noDelta:'暂无上一轮数据'},
+en:{updated:'Updated',refresh:'Refresh',search:'🔍 Search titles...',subs:'Subscribers',videos:'Videos',totalViews:'Total views',avgViews:'Avg views/video',openChan:'Open channel on YouTube',sort:'Sort',latest:'Newest',byViews:'Views',plays:'Views',likes:'Likes',comments:'Comments',duration:'Duration',detail:'Details',collapse:'Collapse',desc:'Description',tags:'Tags',note:'Note',commentsTitle:'Comments',captured:(a,b)=>`(${a} of ${b} captured)`,watch:'Watch on YouTube →',likeWord:'likes',noResult:'No matching videos',footer:'Data from public YouTube pages · auto-updated hourly · missing values shown as "—"',hot:'🔥 HOT',translating:'',transFail:'',translated:'',refreshNote:'Data auto-updates every hour',pageTitle:'3-Channel Data Dashboard',listView:'Video List',rankView:'📈 Growth',rankTitle:'Hourly Growth Top 5',rankSub:'',noDelta:'No previous data yet'}};
 const t = ()=>T[lang];
 /* ---------- 翻译：内存 + localStorage 缓存，Google gtx 主通道，MyMemory 兜底 ---------- */
 const memCache = {}, inflight = {};
@@ -146,9 +162,53 @@ function fmtUpdated(s){
   return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${p(d.getHours())}:${p(d.getMinutes())}${tz}`;
 }
 /* ---------- 状态 ---------- */
-let curChan=0, sortMode='latest', query='';
+let curChan=0, sortMode='latest', query='', curView='list';
 const openSet=new Set();
 function chan(){return (DATA.channels||[])[curChan]||{videos:[]}}
+/* ---------- 环比差值 ---------- */
+function delta(v, key){
+  const cur=v[key], prev=v['prev_'+key];
+  if(cur==null||prev==null)return null;
+  const d=cur-prev;
+  return d;
+}
+function deltaHtml(v, key){
+  const d=delta(v,key);
+  if(d==null||d<=0)return '';
+  return `<span class="delta">+${fmtNum(d)}</span>`;
+}
+function allVideosWithDelta(){
+  const out=[];
+  (DATA.channels||[]).forEach(c=>{
+    (c.videos||[]).forEach(v=>{
+      const d=delta(v,'views');
+      if(d!=null&&d>0)out.push({v,chan:c.name,d,
+        dl:delta(v,'likes'),dc:delta(v,'comments')});
+    });
+  });
+  out.sort((a,b)=>b.d-a.d);
+  return out;
+}
+function renderRank(){
+  const el=document.getElementById('list');
+  const ranked=allVideosWithDelta().slice(0,5);
+  const hasPrev=!!DATA.prev_updated_at;
+  let h=`<div class="rankhead">${t().rankTitle}<span class="sub">${t().rankSub}${hasPrev?' · '+fmtUpdated(DATA.prev_updated_at):''}</span></div>`;
+  if(!hasPrev){h+=`<div class="noresult">${t().noDelta}</div>`}
+  else if(!ranked.length){h+=`<div class="noresult">${t().noResult}</div>`}
+  else{
+    h+=ranked.map((r,i)=>`
+      <div class="rankcard">
+        <div class="ranknum r${i+1}">${i+1}</div>
+        <div class="rankinfo">
+          <div class="ranktitle">${esc(r.v.title||'')}</div>
+          <div class="rankchan">${esc(r.chan||'')} · ${t().plays} ${fmtNum(r.v.views)} · ${t().likes} ${fmtNum(r.v.likes)}${r.dl>0?` <span class="delta">+${fmtNum(r.dl)}</span>`:''} · ${t().comments} ${fmtNum(r.v.comments)}${r.dc>0?` <span class="delta">+${fmtNum(r.dc)}</span>`:''}</div>
+        </div>
+        <div class="rankdelta"><div class="d">+${fmtNum(r.d)}</div><div class="l">${t().plays}</div></div>
+      </div>`).join('');
+  }
+  el.innerHTML=h;
+}
 function filteredVideos(){
   let vs=(chan().videos||[]).slice();
   if(query){const q=query.toLowerCase();vs=vs.filter(v=>(v.title||'').toLowerCase().includes(q))}
@@ -197,7 +257,7 @@ function commentHtml(c){
 function videoHtml(v){
   const open=openSet.has(v.id);
   const hot=v.hot?`<span class="badge-hot">${t().hot}</span>`:'';
-  const meta=`${t().plays} <b>${fmtNum(v.views)}</b> · ${t().likes} ${fmtNum(v.likes)} · ${t().comments} ${fmtNum(v.comments)} · ${t().duration} ${esc(v.duration||'—')} · ${esc(v.published||'—')} <span class="toggle" data-id="${esc(v.id)}">${open?t().collapse+' ▲':t().detail+' ▼'}</span>`;
+  const meta=`${t().plays} <b>${fmtNum(v.views)}</b>${deltaHtml(v,'views')} · ${t().likes} ${fmtNum(v.likes)}${deltaHtml(v,'likes')} · ${t().comments} ${fmtNum(v.comments)}${deltaHtml(v,'comments')} · ${t().duration} ${esc(v.duration||'—')} · ${esc(v.published||'—')} <span class="toggle" data-id="${esc(v.id)}">${open?t().collapse+' ▲':t().detail+' ▼'}</span>`;
   let body=`<div class="vbody">`;
   body+=`<div class="dlabel">${t().desc}</div><div class="dtext" data-translate data-orig="${esc(v.description||'')}">${v.description?esc(v.description):'—'}</div>`;
   if(v.tags&&v.tags.length)body+=`<div class="tags">${v.tags.map(x=>`<span class="tag">#${esc(x)}</span>`).join('')}</div>`;
@@ -210,6 +270,7 @@ function videoHtml(v){
   return `<div class="video${open?' open':''}" data-vid="${esc(v.id)}"><div class="vhead"><div class="vtitle">${hot}${esc(v.title||'')}</div><div class="vmeta">${meta}</div></div>${body}</div>`;
 }
 function renderList(){
+  if(curView==='rank'){renderRank();return}
   const vs=filteredVideos();
   const el=document.getElementById('list');
   if(!vs.length){el.innerHTML=`<div class="noresult">${t().noResult}</div>`;return}
@@ -253,6 +314,8 @@ function applyLang(){
   document.getElementById('updated-line').textContent=`${t().updated} ${fmtUpdated('__UPDATED_AT__')}`;
   document.getElementById('search').placeholder=t().search;
   document.getElementById('btn-refresh').textContent=t().refresh;
+  document.getElementById('btn-list').textContent=t().listView;
+  document.getElementById('btn-rank').textContent=t().rankView;
   document.getElementById('footer').textContent=t().footer;
   try{localStorage.setItem('dash-lang',lang)}catch(e){}
   renderAll();
@@ -261,6 +324,8 @@ function renderAll(){renderTabs();renderStats();renderSort();renderList()}
 document.getElementById('btn-zh').onclick=()=>{lang='zh';applyLang()};
 document.getElementById('btn-en').onclick=()=>{lang='en';applyLang()};
 document.getElementById('btn-refresh').onclick=()=>{alert(t().refreshNote);location.reload()};
+document.getElementById('btn-list').onclick=()=>{curView='list';document.getElementById('btn-list').classList.add('on');document.getElementById('btn-rank').classList.remove('on');renderList()};
+document.getElementById('btn-rank').onclick=()=>{curView='rank';document.getElementById('btn-rank').classList.add('on');document.getElementById('btn-list').classList.remove('on');renderList()};
 document.getElementById('search').oninput=(e)=>{query=e.target.value.trim();renderList()};
 applyLang();
 </script>
