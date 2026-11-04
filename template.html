@@ -27,9 +27,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans G
   border:1px solid rgba(255,255,255,.7);border-radius:28px;
   box-shadow:0 8px 32px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.8);
   user-select:none;-webkit-user-select:none}
-.glassbar .seg{display:flex;background:rgba(0,0,0,.06);border-radius:20px;padding:3px;border:0}
-.glassbar .seg button{border:0;background:transparent;padding:9px 18px;border-radius:17px;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap}
-.glassbar .seg button.on{background:#fff;color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.glassbar .seg{position:relative;display:flex;background:rgba(0,0,0,.06);border-radius:20px;padding:3px;border:0}
+.glassbar .seg .thumb{position:absolute;top:3px;bottom:3px;border-radius:17px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.12);transition:left .25s ease,width .25s ease;pointer-events:none}
+.glassbar .seg button{position:relative;z-index:1;border:0;background:transparent;padding:9px 18px;border-radius:17px;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap}
+.glassbar .seg button.on{color:var(--text);box-shadow:none;background:transparent}
 .glassbar .refresh{border:0;background:transparent;padding:9px 16px;border-radius:17px;font-size:14px;font-weight:600;color:var(--text);cursor:pointer;white-space:nowrap}
 .glassbar .refresh:active{background:rgba(0,0,0,.06)}
 h1{font-size:24px;font-weight:800;text-align:center;letter-spacing:1px;margin:6px 0 10px}
@@ -132,7 +133,8 @@ h1{font-size:24px;font-weight:800;text-align:center;letter-spacing:1px;margin:6p
 </div>
 <div class="footer" id="footer"></div>
 <div class="glassbar" id="glassbar">
-  <div class="seg">
+  <div class="seg" id="g-seg">
+    <div class="thumb" id="g-thumb"></div>
     <button id="g-list" class="on">列表</button>
     <button id="g-rank">📈 涨幅榜</button>
   </div>
@@ -436,11 +438,20 @@ function applyLang(){
 }
 function renderAll(){renderTabs();renderStats();renderSort();renderList()}
 document.getElementById('langicon').onclick=()=>{lang=lang==='zh'?'en':'zh';applyLang()};
+function moveThumb(){
+  const seg=document.getElementById('g-seg');
+  const thumb=document.getElementById('g-thumb');
+  const btn=curView==='rank'?document.getElementById('g-rank'):document.getElementById('g-list');
+  if(!seg||!thumb||!btn)return;
+  thumb.style.left=btn.offsetLeft+'px';
+  thumb.style.width=btn.offsetWidth+'px';
+}
 function showRank(){
   if(curView==='rank')return;
   curView='rank';
   document.getElementById('g-rank').classList.add('on');
   document.getElementById('g-list').classList.remove('on');
+  moveThumb();
   const main=document.getElementById('mainview'), rank=document.getElementById('rankview');
   main.classList.add('flip-out');
   setTimeout(()=>{
@@ -456,6 +467,7 @@ function showMain(){
   curView='list';
   document.getElementById('g-list').classList.add('on');
   document.getElementById('g-rank').classList.remove('on');
+  moveThumb();
   const main=document.getElementById('mainview'), rank=document.getElementById('rankview');
   rank.classList.add('flip-out');
   setTimeout(()=>{
@@ -468,37 +480,26 @@ function showMain(){
 }
 document.getElementById('g-list').onclick=showMain;
 document.getElementById('g-rank').onclick=showRank;
-// 悬浮条左右拖动翻页（跟着手指动）
+// 分段器：滑动 thumb 切换
 (function(){
-  const bar=document.getElementById('glassbar');
-  let startX=0, curX=0, dragging=false;
-  bar.style.touchAction='pan-y';
-  bar.addEventListener('touchstart',e=>{
-    dragging=true; startX=e.touches[0].clientX; curX=startX;
-    bar.style.transition='none';
+  const seg=document.getElementById('g-seg');
+  let startX=0, dragging=false;
+  // 初始化 thumb 位置
+  function init(){ moveThumb(); }
+  if(document.readyState==='complete')init();
+  else window.addEventListener('load',init);
+  setTimeout(init,100);
+  seg.addEventListener('touchstart',e=>{
+    dragging=true; startX=e.touches[0].clientX;
   },{passive:true});
-  bar.addEventListener('touchmove',e=>{
+  seg.addEventListener('touchmove',e=>{
     if(!dragging)return;
-    curX=e.touches[0].clientX;
-    const dx=curX-startX;
-    // 只跟随水平方向，限制范围
-    const clamped=Math.max(-80,Math.min(80,dx));
-    bar.style.transform=`translateX(calc(-50% + ${clamped}px))`;
+    const dx=e.touches[0].clientX-startX;
+    // 滑动超过 30px 就切换
+    if(dx<-30 && curView==='list'){dragging=false;showRank()}
+    else if(dx>30 && curView==='rank'){dragging=false;showMain()}
   },{passive:true});
-  bar.addEventListener('touchend',e=>{
-    if(!dragging)return;
-    dragging=false;
-    const dx=curX-startX;
-    bar.style.transition='transform .25s ease';
-    bar.style.transform='translateX(-50%)';
-    if(dx<-50 && curView==='list'){showRank()}
-    else if(dx>50 && curView==='rank'){showMain()}
-  },{passive:true});
-  bar.addEventListener('touchcancel',()=>{
-    dragging=false;
-    bar.style.transition='transform .25s ease';
-    bar.style.transform='translateX(-50%)';
-  },{passive:true});
+  seg.addEventListener('touchend',()=>{dragging=false},{passive:true});
 })();
 // 液态玻璃条：上下滑收起/出现（Apple Music 逻辑）
 (function(){
