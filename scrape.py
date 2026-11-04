@@ -123,14 +123,14 @@ def list_channel_videos(ydl, channel_url, limit=None):
 
 
 def fetch_video_detail(ydl, video_id, fetch_comments=False, flat_fallback=None):
-    """抓取单个视频详情；fetch_comments=True 时抓前 10 条顶层评论"""
+    """抓取单个视频详情；fetch_comments=True 时抓前 50 条顶层评论"""
     url = f"https://www.youtube.com/watch?v={video_id}"
     opts = dict(BASE_OPTS)
     if fetch_comments:
         opts["getcomments"] = True
         # max_comments, max_parents, max_replies, all（与 BASE 的 player_client 合并）
         yt_args = dict(opts.get("extractor_args", {}).get("youtube", {}))
-        yt_args["max_comments"] = ["10", "10", "5", "10"]
+        yt_args["max_comments"] = ["50", "50", "10", "50"]
         opts["extractor_args"] = {"youtube": yt_args}
     try:
         with yt_dlp.YoutubeDL(opts) as y:
