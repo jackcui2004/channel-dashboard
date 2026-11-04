@@ -36,6 +36,11 @@ CHANNELS = [
         "name": "Midnight Vows",
         "url": "https://www.youtube.com/@midnightvowstales/videos",
     },
+    {
+        "id": "myprettyrevenge",
+        "name": "My Pretty Revenge",
+        "url": "https://www.youtube.com/@myprettyrevenge/videos",
+    },
 ]
 
 # 反爬：请求间隔与重试
