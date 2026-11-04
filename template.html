@@ -62,7 +62,6 @@ h1{font-size:24px;font-weight:800;text-align:center;letter-spacing:1px;margin:6p
 .vhead{cursor:pointer}
 .vtitle{font-family:Georgia,"Songti SC","Noto Serif SC",serif;font-size:21px;font-weight:800;line-height:1.5;margin-bottom:8px}
 .badge-hot{display:inline-block;font-size:13px;background:var(--red);color:#fff;border-radius:8px;padding:3px 10px;margin-right:8px;font-weight:700;vertical-align:2px;font-family:-apple-system,"PingFang SC",sans-serif}
-.badge-new{display:inline-block;font-size:13px;background:#1a9e50;color:#fff;border-radius:8px;padding:3px 10px;margin-right:8px;font-weight:700;vertical-align:2px;font-family:-apple-system,"PingFang SC",sans-serif}
 .vmeta{font-size:14px;color:var(--muted);line-height:1.8}
 .vmeta b{color:var(--text);font-weight:700}
 .toggle{color:var(--red);font-weight:700;cursor:pointer;white-space:nowrap}
@@ -146,8 +145,8 @@ const DATA = __DATA_JSON__;
 let lang = 'zh';
 try{ lang = localStorage.getItem('dash-lang') || 'zh'; }catch(e){}
 const T = {
-zh:{updated:'数据更新于',refresh:'刷新数据',search:'🔍 搜索标题关键词...',subs:'订阅者',videos:'视频数',totalViews:'总播放量',avgViews:'平均播放/视频',openChan:'在 YouTube 打开频道',sort:'排序',latest:'最新发布',byViews:'播放量',plays:'播放',likes:'点赞',comments:'评论',duration:'时长',detail:'详情',collapse:'收起',desc:'简介',tags:'标签',note:'备注',commentsTitle:'评论',captured:(a,b)=>`（已抓取 ${a} 条 / 共 ${b} 条）`,watch:'在 YouTube 观看 →',likeWord:'赞',noResult:'没有匹配的视频',footer:'数据来自 YouTube 公开页面 · 每小时自动更新 · 缺失数字标为「—」',hot:'🔥 爆款',isNew:'🆕 新发布',translating:'正在翻译…',transFail:'（翻译暂不可用，显示英文原文）',translated:'已翻译',refreshNote:'数据每小时自动更新',pageTitle:'YouTube 数据看板',listView:'视频列表',rankView:'📈 涨幅榜',rankTitle:'小时播放量涨幅榜',rankSub:'对比上一轮抓取',noDelta:'暂无上一轮数据',transTitle:'🌐 标题翻译',transTitleOn:'🌐 已翻译',translatingTitle:'翻译中…',back:'← 返回',rankBtn:'📈 涨幅榜',expandAll:'展开查看全部 {n} 条 ▼',collapseAll:'收起 ▲'},
-en:{updated:'Updated',refresh:'Refresh',search:'🔍 Search titles...',subs:'Subscribers',videos:'Videos',totalViews:'Total views',avgViews:'Avg views/video',openChan:'Open channel on YouTube',sort:'Sort',latest:'Newest',byViews:'Views',plays:'Views',likes:'Likes',comments:'Comments',duration:'Duration',detail:'Details',collapse:'Collapse',desc:'Description',tags:'Tags',note:'Note',commentsTitle:'Comments',captured:(a,b)=>`(${a} of ${b} captured)`,watch:'Watch on YouTube →',likeWord:'likes',noResult:'No matching videos',footer:'Data from public YouTube pages · auto-updated hourly · missing values shown as "—"',hot:'🔥 HOT',isNew:'🆕 NEW',translating:'',transFail:'',translated:'',refreshNote:'Data auto-updates every hour',pageTitle:'YouTube Dashboard',listView:'Video List',rankView:'📈 Growth',rankTitle:'Hourly Growth Top 5',rankSub:'',noDelta:'No previous data yet',transTitle:'🌐 Translate Titles',transTitleOn:'🌐 Translated',translatingTitle:'Translating…',back:'← Back',rankBtn:'📈 Growth',expandAll:'Show all {n} ▼',collapseAll:'Collapse ▲'}};
+zh:{updated:'数据更新于',refresh:'刷新数据',search:'🔍 搜索标题关键词...',subs:'订阅者',videos:'视频数',totalViews:'总播放量',avgViews:'平均播放/视频',openChan:'在 YouTube 打开频道',sort:'排序',latest:'最新发布',byViews:'播放量',plays:'播放',likes:'点赞',comments:'评论',duration:'时长',detail:'详情',collapse:'收起',desc:'简介',tags:'标签',note:'备注',commentsTitle:'评论',captured:(a,b)=>`（已抓取 ${a} 条 / 共 ${b} 条）`,watch:'在 YouTube 观看 →',likeWord:'赞',noResult:'没有匹配的视频',footer:'数据来自 YouTube 公开页面 · 每小时自动更新 · 缺失数字标为「—」',hot:'🔥 爆款',translating:'正在翻译…',transFail:'（翻译暂不可用，显示英文原文）',translated:'已翻译',refreshNote:'数据每小时自动更新',pageTitle:'YouTube 数据看板',listView:'视频列表',rankView:'📈 涨幅榜',rankTitle:'小时播放量涨幅榜',rankSub:'对比上一轮抓取',noDelta:'暂无上一轮数据',transTitle:'🌐 标题翻译',transTitleOn:'🌐 已翻译',translatingTitle:'翻译中…',back:'← 返回',rankBtn:'📈 涨幅榜',expandAll:'展开查看全部 {n} 条 ▼',collapseAll:'收起 ▲'},
+en:{updated:'Updated',refresh:'Refresh',search:'🔍 Search titles...',subs:'Subscribers',videos:'Videos',totalViews:'Total views',avgViews:'Avg views/video',openChan:'Open channel on YouTube',sort:'Sort',latest:'Newest',byViews:'Views',plays:'Views',likes:'Likes',comments:'Comments',duration:'Duration',detail:'Details',collapse:'Collapse',desc:'Description',tags:'Tags',note:'Note',commentsTitle:'Comments',captured:(a,b)=>`(${a} of ${b} captured)`,watch:'Watch on YouTube →',likeWord:'likes',noResult:'No matching videos',footer:'Data from public YouTube pages · auto-updated hourly · missing values shown as "—"',hot:'🔥 HOT',translating:'',transFail:'',translated:'',refreshNote:'Data auto-updates every hour',pageTitle:'3-Channel Data Dashboard',listView:'Video List',rankView:'📈 Growth',rankTitle:'Hourly Growth Top 5',rankSub:'',noDelta:'No previous data yet',transTitle:'🌐 Translate Titles',transTitleOn:'🌐 Translated',translatingTitle:'Translating…',back:'← Back',rankBtn:'📈 Growth',expandAll:'Show all {n} ▼',collapseAll:'Collapse ▲'}};
 const t = ()=>T[lang];
 /* ---------- 翻译：内存 + localStorage 缓存，Google gtx 主通道，MyMemory 兜底 ---------- */
 const memCache = {}, inflight = {};
@@ -362,12 +361,8 @@ function commentHtml(c){
 function videoHtml(v){
   const open=openSet.has(v.id);
   const hot=v.hot?`<span class="badge-hot">${t().hot}</span>`:'';
-  // 今天发布的打新标签（数据只有日期精度）
-  let isNew='';
-  try{
-    const today=new Date().toISOString().slice(0,10);
-    if(v.published===today)isNew=`<span class="badge-new">${t().isNew}</span>`;
-  }catch(e){}
+  const chanTag=(curChan===-1&&v._chan)?`<div style="font-size:12.5px;color:var(--muted);margin-bottom:4px">${esc(v._chan)}</div>`:'';
+  const titleShow=(titleTransOn&&v.title_zh)?esc(v.title_zh):esc(v.title||'');
   const meta=`${t().plays} <b>${fmtNum(v.views)}</b>${deltaHtml(v,'views')} · ${t().likes} ${fmtNum(v.likes)}${deltaHtml(v,'likes')} · ${t().comments} ${fmtNum(v.comments)}${deltaHtml(v,'comments')} · ${t().duration} ${esc(v.duration||'—')} · ${esc(v.published||'—')} <span class="toggle" data-id="${esc(v.id)}">${open?t().collapse+' ▲':t().detail+' ▼'}</span>`;
   let body=`<div class="vbody">`;
   body+=`<div class="dlabel">${t().desc}</div><div class="dtext" data-translate data-orig="${esc(v.description||'')}">${v.description?esc(v.description):'—'}</div>`;
@@ -383,7 +378,7 @@ function videoHtml(v){
   }
   body+=`<a class="ytwatch" href="https://www.youtube.com/watch?v=${esc(v.id)}" target="_blank" rel="noopener">${t().watch}</a>`;
   body+='</div>';
-  return `<div class="video${open?' open':''}" data-vid="${esc(v.id)}"><div class="vhead">${chanTag}<div class="vtitle">${hot}${isNew}${titleShow}</div><div class="vmeta">${meta}</div></div>${body}</div>`;
+  return `<div class="video${open?' open':''}" data-vid="${esc(v.id)}"><div class="vhead">${chanTag}<div class="vtitle">${hot}${titleShow}</div><div class="vmeta">${meta}</div></div>${body}</div>`;
 }
 function renderList(){
   const vs=filteredVideos();
@@ -485,25 +480,26 @@ function showMain(){
 }
 document.getElementById('g-list').onclick=showMain;
 document.getElementById('g-rank').onclick=showRank;
-// 分段器：滑动切换（支持从按钮上起滑）
+// 分段器：滑动 thumb 切换
 (function(){
   const seg=document.getElementById('g-seg');
-  let startX=null;
+  let startX=0, dragging=false;
+  // 初始化 thumb 位置
   function init(){ moveThumb(); }
   if(document.readyState==='complete')init();
   else window.addEventListener('load',init);
-  setTimeout(init,200);
-  setTimeout(init,800);
+  setTimeout(init,100);
   seg.addEventListener('touchstart',e=>{
-    startX=e.touches[0].clientX;
+    dragging=true; startX=e.touches[0].clientX;
   },{passive:true});
-  seg.addEventListener('touchend',e=>{
-    if(startX===null)return;
-    const dx=e.changedTouches[0].clientX-startX;
-    startX=null;
-    if(dx<-24 && curView==='list')showRank();
-    else if(dx>24 && curView==='rank')showMain();
+  seg.addEventListener('touchmove',e=>{
+    if(!dragging)return;
+    const dx=e.touches[0].clientX-startX;
+    // 滑动超过 30px 就切换
+    if(dx<-30 && curView==='list'){dragging=false;showRank()}
+    else if(dx>30 && curView==='rank'){dragging=false;showMain()}
   },{passive:true});
+  seg.addEventListener('touchend',()=>{dragging=false},{passive:true});
 })();
 // 液态玻璃条：上下滑收起/出现（Apple Music 逻辑）
 (function(){
