@@ -261,16 +261,18 @@ def main():
         mark_hot(videos)
 
         if not args.skip_comments:
-            hot_ids = [v["id"] for v in videos if v.get("hot")]
-            print(f"[info] {ch['name']}: {len(hot_ids)} 个爆款，抓评论...")
-            for vid in hot_ids:
+            # 所有视频都抓评论正文（不再只限爆款），与第一版看板数据口径一致
+            print(f"[info] {ch['name']}: {len(videos)} 个视频，逐个抓评论...")
+            for v in videos:
+                vid = v["id"]
+                # 已有评论数的才抓，无评论的跳过
+                if v.get("comments") == 0:
+                    continue
                 detail = fetch_video_detail(ydl, vid, fetch_comments=True)
                 if detail and detail.get("comments_text"):
-                    for v in videos:
-                        if v["id"] == vid:
-                            v["comments_text"] = detail["comments_text"]
-                            break
+                    v["comments_text"] = detail["comments_text"]
                     print(f"  评论 {vid}: {len(detail['comments_text'])} 条顶层")
+                time.sleep(1)  # 评论接口限流保护
 
         result["channels"].append({
             "id": ch["id"],
