@@ -233,7 +233,7 @@ function renderRank(){
     h+=ranked.map((r,i)=>{
       const v=r.v;
       const open=openSet.has('rank_'+v.id);
-      const titleHtml = titleTransOn && (v.title_zh||v._titleZh) ? esc(v.title_zh||v._titleZh) : esc(v.title||'');
+      const titleHtml = esc(v.title||'');
       let card=`<div class="rankcard${open?' open':''}" style="flex-wrap:wrap;cursor:pointer" data-rankid="${esc(v.id)}">
         <div class="ranknum r${i+1}">${i+1}</div>
         <div class="rankinfo">
@@ -345,37 +345,42 @@ function renderSort(){
   document.getElementById('btn-trans-title').onclick=toggleTitleTrans;
 }
 async function toggleTitleTrans(){
-  const btn=document.getElementById('btn-trans-title');
   titleTransOn=!titleTransOn;
-  if(!titleTransOn){
-    renderSort();renderList();
-    if(curView==='rank')renderRank();
-    return;
-  }
-  // 开启翻译：逐个翻译当前可见标题（跟简介翻译同一套逻辑）
-  if(btn){btn.textContent=t().translatingTitle;btn.disabled=true}
-  try{
-    const vs=filteredVideos();
-    for(const v of vs){
-      if(!v._titleZh && v.title){
-        const tr=await translateText(v.title);
-        if(tr)v._titleZh=tr;
+  renderSort();renderList();
+  if(curView==='rank')renderRank();
+  if(titleTransOn){
+    // 跟简介翻译完全一样的逻辑：直接翻译页面上的标题元素
+    const els=document.querySelectorAll('.vtitle[data-orig-title]');
+    for(const el of els){
+      const orig=el.getAttribute('data-orig-title');
+      if(!orig)continue;
+      // 跳过已经翻译过的（有 data-translated 标记）
+      if(el.getAttribute('data-translated')==='1')continue;
+      const tr=await translateText(orig);
+      if(tr){
+        // 保留 hot badge，只替换标题文字
+        const hotEl=el.querySelector('.badge-hot');
+        const hotHtml=hotEl?hotEl.outerHTML:'';
+        el.innerHTML=hotHtml+esc(tr);
+        el.setAttribute('data-translated','1');
       }
     }
-    // 涨幅榜的也翻译
+    // 涨幅榜的标题也翻译
     if(curView==='rank'){
-      const ranked=allVideosWithDelta().slice(0,5);
-      for(const r of ranked){
-        const v=r.v;
-        if(!v._titleZh && v.title){
-          const tr=await translateText(v.title);
-          if(tr)v._titleZh=tr;
+      const rankEls=document.querySelectorAll('#rankview .vtitle[data-orig-title]');
+      for(const el of rankEls){
+        const orig=el.getAttribute('data-orig-title');
+        if(!orig||el.getAttribute('data-translated')==='1')continue;
+        const tr=await translateText(orig);
+        if(tr){
+          const hotEl=el.querySelector('.badge-hot');
+          const hotHtml=hotEl?hotEl.outerHTML:'';
+          el.innerHTML=hotHtml+esc(tr);
+          el.setAttribute('data-translated','1');
         }
       }
     }
-  }catch(e){}
-  renderSort();renderList();
-  if(curView==='rank')renderRank();
+  }
 }
 function commentHtml(c){
   const likeTxt=c.likes==null?'':` <span class="clike">${t().likeWord} ${c.likes}</span>`;
@@ -390,7 +395,7 @@ function videoHtml(v){
   const open=openSet.has(v.id);
   const hot=v.hot?`<span class="badge-hot">${t().hot}</span>`:'';
   const chanTag=(curChan===-1&&v._chan)?`<div style="font-size:12.5px;color:var(--muted);margin-bottom:4px">${esc(v._chan)}</div>`:'';
-  const titleShow=(titleTransOn&&(v.title_zh||v._titleZh))?esc(v.title_zh||v._titleZh):esc(v.title||'');
+  const titleShow=esc(v.title||'');
   const meta=`${t().plays} <b>${fmtNum(v.views)}</b>${deltaHtml(v,'views')} · ${t().likes} ${fmtNum(v.likes)}${deltaHtml(v,'likes')} · ${t().comments} ${fmtNum(v.comments)}${deltaHtml(v,'comments')} · ${t().duration} ${esc(v.duration||'—')} · ${esc(v.published||'—')} <span class="toggle" data-id="${esc(v.id)}">${open?t().collapse+' ▲':t().detail+' ▼'}</span>`;
   let body=`<div class="vbody">`;
   body+=`<div class="dlabel">${t().desc}</div><div class="dtext" data-translate data-orig="${esc(v.description||'')}">${v.description?esc(v.description):'—'}</div>`;
@@ -406,7 +411,7 @@ function videoHtml(v){
   }
   body+=`<a class="ytwatch" href="https://www.youtube.com/watch?v=${esc(v.id)}" target="_blank" rel="noopener">${t().watch}</a>`;
   body+='</div>';
-  return `<div class="video${open?' open':''}" data-vid="${esc(v.id)}"><div class="vhead">${chanTag}<div class="vtitle">${hot}${titleShow}</div><div class="vmeta">${meta}</div></div>${body}</div>`;
+  return `<div class="video${open?' open':''}" data-vid="${esc(v.id)}"><div class="vhead">${chanTag}<div class="vtitle" data-orig-title="${esc(v.title||'')}">${hot}${titleShow}</div><div class="vmeta">${meta}</div></div>${body}</div>`;
 }
 function renderList(){
   const vs=filteredVideos();
