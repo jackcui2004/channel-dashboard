@@ -463,26 +463,30 @@ function showMain(){
 }
 document.getElementById('g-list').onclick=showMain;
 document.getElementById('g-rank').onclick=showRank;
-// 整页左右滑动翻页
+// 悬浮条左右滑动翻页
 (function(){
+  const bar=document.getElementById('glassbar');
   let tx=0, ty=0, swiped=false;
-  const wrap=document.querySelector('.wrap');
-  wrap.addEventListener('touchstart',e=>{
-    // 在按钮/链接/输入框上不处理，避免干扰点击
-    if(e.target.closest('button,a,input'))return;
+  bar.addEventListener('touchstart',e=>{
     const t=e.touches[0];
     tx=t.clientX; ty=t.clientY; swiped=false;
   },{passive:true});
-  wrap.addEventListener('touchmove',e=>{
-    if(e.target.closest('button,a,input'))return;
+  bar.addEventListener('touchmove',e=>{
     const t=e.touches[0];
     const dx=t.clientX-tx, dy=t.clientY-ty;
-    if(!swiped && Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy)*1.5){
+    if(!swiped && Math.abs(dx)>40 && Math.abs(dx)>Math.abs(dy)*1.5){
       swiped=true;
       if(dx<0 && curView==='list')showRank();
       else if(dx>0 && curView==='rank')showMain();
     }
   },{passive:true});
+  bar.addEventListener('touchend',e=>{
+    if(swiped){e.preventDefault()}
+  },{passive:false});
+  // 滑动后屏蔽一次点击误触
+  let blockClick=false;
+  bar.addEventListener('touchend',()=>{ if(swiped)blockClick=true; setTimeout(()=>blockClick=false,300); },{passive:true});
+  bar.addEventListener('click',e=>{ if(blockClick){e.stopPropagation();e.preventDefault()} },true);
 })();
 // 液态玻璃条：上下滑收起/出现（Apple Music 逻辑）
 (function(){
