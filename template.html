@@ -7,305 +7,260 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0f1115; --card:#1a1e26; --card2:#222834; --border:#2a3140;
-  --text:#e8eaed; --muted:#9aa0ad; --accent:#5b9dff; --accent-dim:rgba(91,157,255,.12);
-  --hot-bg:rgba(255,82,82,.14); --hot:#ff6b6b;
-  --tag-bg:rgba(91,157,255,.14); --tag:#7db3ff;
+  --bg:#f5f5f4; --card:#ffffff; --border:#e8e6e3;
+  --text:#1a1a1a; --muted:#8a8a8a; --faint:#b5b5b5;
+  --red:#d43d2a; --red-dark:#b83224;
+  --tag-bg:#f0efed; --tag:#6b6b6b;
+  --pill:#f0efed;
 }
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans SC",sans-serif;background:var(--bg);color:var(--text);line-height:1.6;padding:20px;max-width:1200px;margin:0 auto}
-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:8px}
-h1{font-size:26px;font-weight:700;letter-spacing:.5px}
-.updated{color:var(--muted);font-size:13px;margin-bottom:20px}
-.lang-btn{padding:8px 20px;border-radius:20px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-size:14px;transition:all .2s}
-.lang-btn:hover{border-color:var(--accent);color:var(--accent)}
-.tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
-.tab{padding:10px 20px;border-radius:20px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-size:15px;transition:all .2s}
-.tab.active{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
-.tab .count{opacity:.7;font-size:13px;margin-left:4px}
-.controls{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
-.search{flex:1;min-width:200px;padding:12px 16px;border:1px solid var(--border);border-radius:12px;font-size:15px;background:var(--card);color:var(--text)}
-.search::placeholder{color:var(--muted)}
-.search:focus{outline:none;border-color:var(--accent)}
-.sortsel{padding:12px;border:1px solid var(--border);border-radius:12px;font-size:14px;background:var(--card);color:var(--text);cursor:pointer}
-.sortsel:focus{outline:none;border-color:var(--accent)}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px}
-.stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
-.stat .num{font-size:24px;font-weight:700;color:var(--accent)}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding:16px 14px 40px;max-width:680px;margin:0 auto;-webkit-font-smoothing:antialiased}
+h1{font-size:24px;font-weight:800;text-align:center;letter-spacing:1px;margin:6px 0 10px}
+.updated{color:var(--muted);font-size:13px;margin-bottom:12px}
+.langrow{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--card)}
+.seg button{border:0;background:transparent;padding:9px 22px;font-size:15px;font-weight:600;cursor:pointer;color:var(--muted)}
+.seg button.on{background:#1a1a1a;color:#fff}
+.refresh-btn{border:1px solid var(--border);background:var(--card);border-radius:12px;padding:9px 22px;font-size:15px;font-weight:600;cursor:pointer;color:var(--text)}
+.refresh-btn:active{background:#eee}
+.search{width:100%;padding:13px 16px;border:1px solid var(--border);border-radius:12px;font-size:15px;background:var(--card);color:var(--text);margin-bottom:6px}
+.search::placeholder{color:var(--faint)}
+.search:focus{outline:none;border-color:#cfcfcf}
+.tabs{display:flex;border-bottom:1px solid var(--border);margin:14px 0 4px}
+.tab{flex:1;text-align:center;padding:12px 4px 10px;font-size:16px;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px;line-height:1.4}
+.tab .n{font-size:15px}
+.tab.on{color:var(--text);font-weight:800;border-bottom-color:var(--red)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0 10px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 6px;text-align:center}
+.stat .num{font-size:24px;font-weight:800;letter-spacing:.3px}
 .stat .label{font-size:12px;color:var(--muted);margin-top:4px}
-.video{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:12px;overflow:hidden;transition:border-color .2s}
-.video:hover{border-color:#3a4358}
-.video-header{padding:16px 20px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px}
-.video-title{font-size:15px;font-weight:600;flex:1;line-height:1.5}
-.video-meta{font-size:12px;color:var(--muted);white-space:nowrap;flex-shrink:0}
-.video-body{display:none;padding:0 20px 20px;border-top:1px solid var(--border)}
-.video.open .video-body{display:block}
-.video.open{border-color:var(--accent)}
-.video.open .video-header{background:var(--accent-dim)}
-.chevron{color:var(--muted);font-size:12px;transition:transform .2s;flex-shrink:0}
-.video.open .chevron{transform:rotate(180deg)}
-.detail{margin-top:12px;font-size:14px}
-.detail-label{font-weight:600;color:var(--muted);margin-bottom:6px;font-size:13px}
-.detail-value{background:var(--card2);border-radius:8px;padding:10px 12px;white-space:pre-wrap;word-break:break-word;font-size:13px;line-height:1.7}
-.detail-value .translating{color:var(--muted);font-style:italic;font-size:12px}
-.translated-tag{display:inline-block;font-size:11px;color:var(--accent);border:1px solid var(--accent);border-radius:8px;padding:1px 8px;margin-left:8px;vertical-align:middle}
-.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
-.tag{background:var(--tag-bg);color:var(--tag);border-radius:12px;padding:2px 10px;font-size:12px}
-.comment{border-left:3px solid var(--border);padding:8px 12px;margin:8px 0;background:var(--card2);border-radius:0 8px 8px 0;font-size:13px}
-.comment .author{font-weight:600;color:var(--accent);font-size:12px}
-.comment .likes{color:var(--muted);font-size:11px;margin-left:8px}
-.comment .ctime{color:var(--muted);font-size:11px;margin-left:8px}
-.comment .reply{margin-top:8px;margin-left:12px;border-left:2px solid var(--accent);padding-left:10px}
-.badge-hot{display:inline-block;font-size:12px;background:var(--hot-bg);color:var(--hot);border-radius:10px;padding:2px 10px;margin-left:8px;vertical-align:middle;font-weight:600}
-.yt-link{display:inline-block;margin-top:4px;color:var(--accent);text-decoration:none;font-size:13px}
-.yt-link:hover{text-decoration:underline}
-.empty{color:var(--muted);text-align:center;padding:40px;font-size:14px}
-footer{margin-top:32px;color:var(--muted);font-size:12px;text-align:center;line-height:1.8}
-@media(max-width:640px){
-  body{padding:12px}
-  h1{font-size:20px}
-  .video-header{padding:12px 14px;flex-direction:column;align-items:flex-start}
-  .video-meta{white-space:normal}
-  .video-body{padding:0 14px 14px}
-  .stats{grid-template-columns:repeat(2,1fr)}
+.chanlink{color:var(--muted);font-size:13px;margin:2px 0 14px}
+.chanlink a{color:var(--muted);text-decoration:underline}
+.sortrow{display:flex;align-items:center;gap:10px;margin:6px 0 18px;flex-wrap:wrap}
+.sortrow .cap{color:var(--muted);font-size:15px}
+.sortpill{border:0;border-radius:20px;padding:8px 20px;font-size:15px;font-weight:600;cursor:pointer;background:var(--pill);color:var(--text)}
+.sortpill.on{background:#1a1a1a;color:#fff}
+.video{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 16px;margin-bottom:14px}
+.vhead{cursor:pointer}
+.vtitle{font-family:Georgia,"Songti SC","Noto Serif SC",serif;font-size:21px;font-weight:800;line-height:1.5;margin-bottom:8px}
+.badge-hot{display:inline-block;font-size:13px;background:var(--red);color:#fff;border-radius:8px;padding:3px 10px;margin-right:8px;font-weight:700;vertical-align:2px;font-family:-apple-system,"PingFang SC",sans-serif}
+.vmeta{font-size:14px;color:var(--muted);line-height:1.8}
+.vmeta b{color:var(--text);font-weight:700}
+.toggle{color:var(--red);font-weight:700;cursor:pointer;white-space:nowrap}
+.vbody{display:none;margin-top:6px}
+.video.open .vbody{display:block}
+.dlabel{color:var(--muted);font-size:14px;margin:14px 0 6px}
+.dtext{font-size:15.5px;line-height:1.9;white-space:pre-wrap;word-break:break-word}
+.dtext .translating{color:var(--faint);font-size:13px}
+.translated-tag{display:inline-block;font-size:11px;color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:1px 8px;margin-left:8px;vertical-align:middle}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.tag{background:var(--tag-bg);color:var(--tag);border-radius:14px;padding:4px 14px;font-size:13.5px}
+.note{color:var(--muted);font-size:13.5px;margin-top:12px;line-height:1.8}
+.ctitle{color:var(--muted);font-size:14.5px;margin:16px 0 10px;font-weight:600}
+.comment{margin:0 0 16px;font-size:15px}
+.comment .chead{margin-bottom:4px}
+.comment .author{font-weight:800}
+.comment .clike{color:var(--muted);font-size:13.5px;margin-left:10px;font-weight:400}
+.comment .ctext{line-height:1.8;word-break:break-word}
+.comment .reply{margin:10px 0 0 6px;padding-left:14px;border-left:3px solid #e0dedb}
+.comment .reply .ctext{line-height:1.8}
+.ytwatch{display:inline-block;margin-top:14px;color:var(--red);font-size:16px;font-weight:600;text-decoration:underline}
+.footer{margin-top:26px;color:var(--faint);font-size:12px;text-align:center;line-height:1.8}
+.noresult{text-align:center;color:var(--muted);padding:40px 0;font-size:15px}
+@media(max-width:480px){
+  .vtitle{font-size:19px}
+  .stat .num{font-size:20px}
+  .stats{gap:8px}
+  .stat{padding:12px 4px}
 }
 </style>
 </head>
 <body>
-<header>
-  <h1 id="page-title">三频道数据看板</h1>
-  <button class="lang-btn" id="lang-btn" onclick="toggleLang()">EN</button>
-</header>
+<h1 id="page-title">三频道数据看板</h1>
 <div class="updated" id="updated-line">数据更新于 __UPDATED_AT__</div>
-
-<div class="tabs" id="tabs"></div>
-
-<div class="controls">
-  <input class="search" id="search" placeholder="搜索标题…" oninput="applyFilter()">
-  <select class="sortsel" id="sort" onchange="applyFilter()">
-    <option value="published_desc">按发布时间 ↓</option>
-    <option value="views_desc">按播放量 ↓</option>
-    <option value="views_asc">按播放量 ↑</option>
-  </select>
+<div class="langrow">
+  <div class="seg" role="group" aria-label="language">
+    <button id="btn-zh" class="on">中文</button><button id="btn-en">EN</button>
+  </div>
+  <button class="refresh-btn" id="btn-refresh">刷新数据</button>
 </div>
-
-<div id="content"></div>
-
-<footer id="footer-note">数据来自 YouTube 公开页面 · 每天自动更新 · 缺失数字标为「—」</footer>
-
+<input class="search" id="search" placeholder="🔍 搜索标题关键词...">
+<div class="tabs" id="tabs"></div>
+<div class="stats" id="stats"></div>
+<div class="chanlink" id="chanlink"></div>
+<div class="sortrow" id="sortrow"></div>
+<div id="list"></div>
+<div class="footer" id="footer"></div>
 <script>
 const DATA = __DATA_JSON__;
-let lang = localStorage.getItem('dash-lang') || 'zh';
-let activeChannel = 0;
-
-/* ---------- 翻译缓存：内存 + localStorage，按文本哈希存 ---------- */
-const memCache = {};
-const inflight = {};  // 并发请求合并
-function hashStr(s){
-  let h = 5381;
-  for(let i=0;i<s.length;i++){ h = ((h<<5)+h+s.charCodeAt(i))|0; }
-  return 'tr_'+(h>>>0).toString(36)+'_'+s.length;
-}
-function cacheGet(key){
-  if(memCache[key]!==undefined) return memCache[key];
-  try{
-    const v = localStorage.getItem(key);
-    if(v!==null){ memCache[key]=v; return v; }
-  }catch(e){}
-  return undefined;
-}
-function cacheSet(key,val){
-  memCache[key]=val;
-  try{ localStorage.setItem(key,val); }catch(e){/* 配额满则只留内存 */}
-}
-
-const I18N = {
-  zh:{title:'三频道数据看板',subs:'订阅数',videos:'视频数',totalViews:'总播放',avgViews:'平均播放',
-    searchPh:'搜索标题…',sortDate:'按发布时间 ↓',sortViewsD:'按播放量 ↓',sortViewsA:'按播放量 ↑',
-    views:'播放',likes:'点赞',comments:'评论',published:'发布日期',
-    desc:'简介',tags:'标签',commentsTitle:'评论精选',
-    updated:'数据更新于',footer:'数据来自 YouTube 公开页面 · 每天自动更新 · 缺失数字标为「—」',
-    noResult:'没有匹配的视频',translating:'正在翻译…',transFail:'翻译暂不可用，显示英文原文',
-    translated:'已翻译',hot:'爆款',na:'—',btn:'EN'},
-  en:{title:'3-Channel Dashboard',subs:'Subscribers',videos:'Videos',totalViews:'Total views',avgViews:'Avg views',
-    searchPh:'Search titles…',sortDate:'Newest first',sortViewsD:'Most viewed',sortViewsA:'Least viewed',
-    views:'views',likes:'likes',comments:'comments',published:'Published',
-    desc:'Description',tags:'Tags',commentsTitle:'Top comments',
-    updated:'Updated at',footer:'Data from public YouTube pages · auto-updated daily · missing numbers shown as "—"',
-    noResult:'No matching videos',translating:'',transFail:'',translated:'',
-    hot:'HOT',na:'—',btn:'中文'}
-};
-const T = () => I18N[lang];
-
-function fmtNum(n){ return (n===null||n===undefined) ? T().na : Number(n).toLocaleString('en-US'); }
-function esc(s){ return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-/* ---------- 翻译：Google gtx 主通道，MyMemory 兜底 ---------- */
+/* ---------- 语言 ---------- */
+let lang = 'zh';
+try{ lang = localStorage.getItem('dash-lang') || 'zh'; }catch(e){}
+const T = {
+zh:{updated:'数据更新于',refresh:'刷新数据',search:'🔍 搜索标题关键词...',subs:'订阅者',videos:'视频数',totalViews:'总播放量',avgViews:'平均播放/视频',openChan:'在 YouTube 打开频道',sort:'排序',latest:'最新发布',byViews:'播放量',plays:'播放',likes:'点赞',comments:'评论',duration:'时长',detail:'详情',collapse:'收起',desc:'简介',tags:'标签',note:'备注',commentsTitle:'评论',captured:(a,b)=>`（已抓取 ${a} 条 / 共 ${b} 条）`,watch:'在 YouTube 观看 →',likeWord:'赞',noResult:'没有匹配的视频',footer:'数据来自 YouTube 公开页面 · 每天自动更新 · 缺失数字标为「—」',hot:'🔥 爆款',translating:'正在翻译…',transFail:'（翻译暂不可用，显示英文原文）',translated:'已翻译',refreshNote:'数据每天北京时间 8 点自动更新'},
+en:{updated:'Updated',refresh:'Refresh',search:'🔍 Search titles...',subs:'Subscribers',videos:'Videos',totalViews:'Total views',avgViews:'Avg views/video',openChan:'Open channel on YouTube',sort:'Sort',latest:'Newest',byViews:'Views',plays:'Views',likes:'Likes',comments:'Comments',duration:'Duration',detail:'Details',collapse:'Collapse',desc:'Description',tags:'Tags',note:'Note',commentsTitle:'Comments',captured:(a,b)=>`(${a} of ${b} captured)`,watch:'Watch on YouTube →',likeWord:'likes',noResult:'No matching videos',footer:'Data from public YouTube pages · auto-updated daily · missing values shown as 「—」',hot:'🔥 HOT',translating:'',transFail:'',translated:'',refreshNote:'Data auto-updates daily at 08:00 Beijing time'}};
+const t = ()=>T[lang];
+/* ---------- 翻译：内存 + localStorage 缓存，Google gtx 主通道，MyMemory 兜底 ---------- */
+const memCache = {}, inflight = {};
+function djb2(s){let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))>>>0;return h.toString(36)}
+function ckey(s){return 'tr_'+djb2(s)+'_'+s.length}
+function cacheGet(k){if(memCache[k]!==undefined)return memCache[k];try{const v=localStorage.getItem(k);if(v!==null){memCache[k]=v;return v}}catch(e){}return undefined}
+function cacheSet(k,v){memCache[k]=v;try{localStorage.setItem(k,v)}catch(e){}}
 async function translateText(text){
-  if(!text || lang==='en') return null;
-  const key = hashStr(text);
-  const hit = cacheGet(key);
-  if(hit!==undefined) return hit==='__FAIL__' ? null : hit;
-  if(inflight[key]) return inflight[key];
-  const p = (async()=>{
-    // 分片：单次请求不超过 1800 字符
-    const chunks=[]; let t=text;
-    while(t.length>1800){ let i=t.lastIndexOf('\n',1800); if(i<0) i=1800; chunks.push(t.slice(0,i)); t=t.slice(i); }
-    chunks.push(t);
+  if(!text||!text.trim())return text;
+  const key=ckey(text);
+  const hit=cacheGet(key);
+  if(hit!==undefined)return hit==='__FAIL__'?'':hit;
+  if(inflight[key])return inflight[key];
+  const p=(async()=>{
     try{
-      let out='';
+      const chunks=[];let s=text;
+      while(s.length>1800){let i=s.lastIndexOf('\n',1800);if(i<0)i=1800;chunks.push(s.slice(0,i));s=s.slice(i)}
+      chunks.push(s);
+      const out=[];
       for(const c of chunks){
         const url='https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t&q='+encodeURIComponent(c);
-        const r=await fetch(url); if(!r.ok) throw new Error('gtx '+r.status);
+        const r=await fetch(url);if(!r.ok)throw new Error('gtx '+r.status);
         const j=await r.json();
-        out+=j[0].map(x=>x[0]).join('');
+        out.push((j[0]||[]).map(x=>x[0]||'').join(''));
       }
-      cacheSet(key,out); return out;
+      const res=out.join('');cacheSet(key,res);return res;
     }catch(e){
       try{
         const url='https://api.mymemory.translated.net/get?q='+encodeURIComponent(text.slice(0,450))+'&langpair=en|zh-CN';
-        const r=await fetch(url); if(!r.ok) throw new Error('mm '+r.status);
-        const j=await r.json();
-        if(j.responseData && j.responseData.translatedText){
-          cacheSet(key,j.responseData.translatedText); return j.responseData.translatedText;
-        }
+        const r=await fetch(url);const j=await r.json();
+        if(j.responseData&&j.responseData.translatedText){cacheSet(key,j.responseData.translatedText);return j.responseData.translatedText}
       }catch(e2){}
-      cacheSet(key,'__FAIL__'); return null;
-    }finally{ delete inflight[key]; }
+      cacheSet(key,'__FAIL__');return '';
+    }finally{delete inflight[key]}
   })();
-  inflight[key]=p; return p;
+  inflight[key]=p;return p;
 }
-
-/* ---------- 渲染 ---------- */
-function renderTabs(){
-  document.getElementById('tabs').innerHTML = DATA.channels.map((c,i)=>
-    `<button class="tab${i===activeChannel?' active':''}" onclick="switchChannel(${i})">${esc(c.name)}<span class="count">${c.videos.length}</span></button>`
-  ).join('');
+/* ---------- 工具 ---------- */
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function fmtNum(v){return (v===null||v===undefined||isNaN(v))?'—':Number(v).toLocaleString('en-US')}
+function fmtUpdated(s){
+  if(!s||s==='—')return '—';
+  const d=new Date(s);if(isNaN(d))return esc(s);
+  const p=n=>n.toString().padStart(2,'0');
+  return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${p(d.getHours())}:${p(d.getMinutes())}（北京时间）`;
 }
-
-function channelStats(c){
-  const vs=c.videos.filter(v=>typeof v.views==='number');
-  const total=vs.reduce((a,v)=>a+v.views,0);
-  const avg=vs.length?Math.round(total/vs.length):null;
-  return {total: vs.length?total:null, avg};
-}
-
-function applyI18n(){
-  const t=T();
-  document.getElementById('page-title').textContent=t.title;
-  document.getElementById('lang-btn').textContent=t.btn;
-  document.getElementById('search').placeholder=t.searchPh;
-  const s=document.getElementById('sort');
-  s.options[0].text=t.sortDate; s.options[1].text=t.sortViewsD; s.options[2].text=t.sortViewsA;
-  document.getElementById('updated-line').textContent=t.updated+' '+DATA.updated_at;
-  document.getElementById('footer-note').textContent=t.footer;
-  document.documentElement.lang = lang==='zh'?'zh-CN':'en';
-  renderTabs(); renderList();
-}
-
-function toggleLang(){
-  lang = lang==='zh' ? 'en' : 'zh';
-  try{ localStorage.setItem('dash-lang',lang); }catch(e){}
-  applyI18n();
-}
-
-function switchChannel(i){ activeChannel=i; renderTabs(); applyFilter(); }
-
-function getFiltered(){
-  const q=document.getElementById('search').value.trim().toLowerCase();
-  const sort=document.getElementById('sort').value;
-  let vs=DATA.channels[activeChannel].videos.filter(v=>(v.title||'').toLowerCase().includes(q));
-  const key=(sort==='views_desc'||sort==='views_asc')?'views':'published';
-  vs=vs.slice().sort((a,b)=>{
-    const av=a[key], bv=b[key];
-    if(av==null) return 1; if(bv==null) return -1;
-    if(sort==='views_asc') return av-bv;
-    return av<bv?1:av>bv?-1:0;
-  });
+/* ---------- 状态 ---------- */
+let curChan=0, sortMode='latest', query='';
+const openSet=new Set();
+function chan(){return (DATA.channels||[])[curChan]||{videos:[]}}
+function filteredVideos(){
+  let vs=(chan().videos||[]).slice();
+  if(query){const q=query.toLowerCase();vs=vs.filter(v=>(v.title||'').toLowerCase().includes(q))}
+  if(sortMode==='views')vs.sort((a,b)=>(b.views||0)-(a.views||0));
+  else vs.sort((a,b)=>String(b.published||'').localeCompare(String(a.published||'')));
   return vs;
 }
-
-function applyFilter(){ renderList(); }
-
-function toggleVideo(header){
-  const card=header.closest('.video');
-  card.classList.toggle('open');
-  maybeTranslate(card);
+/* ---------- 渲染 ---------- */
+function renderTabs(){
+  const el=document.getElementById('tabs');
+  el.innerHTML=(DATA.channels||[]).map((c,i)=>{
+    const nm=esc(c.name||'');
+    const parts=nm.split(' ');
+    const shown=parts.length>1?parts[0]+'<br>'+parts.slice(1).join(' '):nm;
+    return `<div class="tab${i===curChan?' on':''}" data-i="${i}">${shown} <span class="n">(${(c.videos||[]).length})</span></div>`;
+  }).join('');
+  el.querySelectorAll('.tab').forEach(td=>td.onclick=()=>{curChan=+td.dataset.i;openSet.clear();renderAll()});
 }
-
-async function maybeTranslate(card){
-  if(lang==='en'||!card.classList.contains('open')) return;
-  const t=T();
-  const els=card.querySelectorAll('[data-translate]');
-  for(const el of els){
-    if(el.dataset.done) continue;
-    el.dataset.done='1';
-    const orig=el.dataset.orig||'';
-    if(!orig){ continue; }
-    const note=document.createElement('div');
-    note.className='translating'; note.textContent=t.translating;
-    el.appendChild(note);
-    const tr=await translateText(orig);
-    note.remove();
-    if(tr){
-      el.innerHTML=esc(tr);
-      if(t.translated){
-        const tag=document.createElement('span');
-        tag.className='translated-tag'; tag.textContent=t.translated;
-        el.appendChild(tag);
-      }
-    }else if(t.transFail){
-      const f=document.createElement('div'); f.className='translating'; f.textContent=t.transFail;
-      el.appendChild(f);
-    }
-  }
+function renderStats(){
+  const c=chan(),vs=c.videos||[];
+  const tot=vs.reduce((a,v)=>a+(v.views||0),0);
+  const avg=vs.length?Math.round(tot/vs.length):0;
+  document.getElementById('stats').innerHTML=`
+    <div class="stat"><div class="num">${fmtNum(c.subs)}</div><div class="label">${t().subs}</div></div>
+    <div class="stat"><div class="num">${vs.length}</div><div class="label">${t().videos}</div></div>
+    <div class="stat"><div class="num">${fmtNum(tot)}</div><div class="label">${t().totalViews}</div></div>
+    <div class="stat"><div class="num">${fmtNum(avg)}</div><div class="label">${t().avgViews}</div></div>`;
+  const handle='@'+String(c.url||'').split('/').pop();
+  document.getElementById('chanlink').innerHTML=`${esc(handle)} · <a href="${esc(c.url||'#')}" target="_blank" rel="noopener">${t().openChan}</a>`;
 }
-
+function renderSort(){
+  document.getElementById('sortrow').innerHTML=`<span class="cap">${t().sort}</span>
+    <button class="sortpill${sortMode==='latest'?' on':''}" data-s="latest">${t().latest}</button>
+    <button class="sortpill${sortMode==='views'?' on':''}" data-s="views">${t().byViews}</button>`;
+  document.querySelectorAll('.sortpill').forEach(b=>b.onclick=()=>{sortMode=b.dataset.s;renderList()});
+}
 function commentHtml(c){
-  let h=`<div class="comment"><span class="author">${esc(c.author||'?')}</span><span class="likes">👍 ${fmtNum(c.likes)}</span>${c.time?`<span class="ctime">${esc(c.time)}</span>`:''}<div data-translate data-orig="${esc(c.text||'')}">${esc(c.text||'')}</div>`;
-  for(const r of (c.replies||[])){
-    h+=`<div class="reply"><span class="author">${esc(r.author||'?')}</span><span class="likes">👍 ${fmtNum(r.likes)}</span><div data-translate data-orig="${esc(r.text||'')}">${esc(r.text||'')}</div></div>`;
-  }
+  const likeTxt=c.likes==null?'':` <span class="clike">${t().likeWord} ${c.likes}</span>`;
+  let h=`<div class="comment"><div class="chead"><span class="author">${esc(c.author||'?')}</span>${likeTxt}</div><div class="ctext" data-translate data-orig="${esc(c.text||'')}">${esc(c.text||'')}</div>`;
+  (c.replies||[]).forEach(r=>{
+    const rl=r.likes==null?'':` <span class="clike">${t().likeWord} ${r.likes}</span>`;
+    h+=`<div class="reply"><div class="chead"><span class="author">${esc(r.author||'?')}</span>${rl}</div><div class="ctext" data-translate data-orig="${esc(r.text||'')}">${esc(r.text||'')}</div></div>`;
+  });
   return h+'</div>';
 }
-
-function renderList(){
-  const t=T();
-  const vs=getFiltered();
-  const box=document.getElementById('content');
-  const c=DATA.channels[activeChannel];
-  const st=channelStats(c);
-  let html=`<div class="stats">
-      <div class="stat"><div class="num">${fmtNum(c.subs)}</div><div class="label">${t.subs}</div></div>
-      <div class="stat"><div class="num">${c.videos.length}</div><div class="label">${t.videos}</div></div>
-      <div class="stat"><div class="num">${fmtNum(st.total)}</div><div class="label">${t.totalViews}</div></div>
-      <div class="stat"><div class="num">${fmtNum(st.avg)}</div><div class="label">${t.avgViews}</div></div>
-    </div>`;
-  if(!vs.length){ box.innerHTML=html+`<div class="empty">${t.noResult}</div>`; return; }
-  html+=vs.map(v=>{
-    const hot=v.hot?`<span class="badge-hot">🔥 ${t.hot}</span>`:'';
-    const parts=[`${fmtNum(v.views)} ${t.views}`,`👍 ${fmtNum(v.likes)}`,`💬 ${fmtNum(v.comments)}`];
-    if(v.duration) parts.push(esc(v.duration));
-    if(v.published) parts.push(esc(v.published));
-    const meta=parts.join(' · ');
-    let body=`<div class="detail"><a class="yt-link" href="https://www.youtube.com/watch?v=${esc(v.id)}" target="_blank" rel="noopener">▶ YouTube</a></div>`;
-    body+=`<div class="detail"><div class="detail-label">${t.desc}</div><div class="detail-value" data-translate data-orig="${esc(v.description||'')}">${v.description?esc(v.description):t.na}</div></div>`;
-    if(v.tags&&v.tags.length)
-      body+=`<div class="detail"><div class="detail-label">${t.tags}</div><div class="tags">${v.tags.map(x=>`<span class="tag">${esc(x)}</span>`).join('')}</div></div>`;
-    if(v.comments_text&&v.comments_text.length)
-      body+=`<div class="detail"><div class="detail-label">${t.commentsTitle} (${v.comments_text.length})</div>${v.comments_text.map(commentHtml).join('')}</div>`;
-    return `<div class="video" data-vid="${esc(v.id)}">
-      <div class="video-header" onclick="toggleVideo(this)">
-        <div class="video-title">${esc(v.title||'(no title)')}${hot}</div>
-        <div class="video-meta">${meta}</div>
-        <span class="chevron">▼</span>
-      </div>
-      <div class="video-body">${body}</div>
-    </div>`;
-  }).join('');
-  box.innerHTML=html;
+function videoHtml(v){
+  const open=openSet.has(v.id);
+  const hot=v.hot?`<span class="badge-hot">${t().hot}</span>`:'';
+  const meta=`${t().plays} <b>${fmtNum(v.views)}</b> · ${t().likes} ${fmtNum(v.likes)} · ${t().comments} ${fmtNum(v.comments)} · ${t().duration} ${esc(v.duration||'—')} · ${esc(v.published||'—')} <span class="toggle" data-id="${esc(v.id)}">${open?t().collapse+' ▲':t().detail+' ▼'}</span>`;
+  let body=`<div class="vbody">`;
+  body+=`<div class="dlabel">${t().desc}</div><div class="dtext" data-translate data-orig="${esc(v.description||'')}">${v.description?esc(v.description):'—'}</div>`;
+  if(v.tags&&v.tags.length)body+=`<div class="tags">${v.tags.map(x=>`<span class="tag">#${esc(x)}</span>`).join('')}</div>`;
+  if(v.note)body+=`<div class="note">${t().note}：${esc(v.note)}</div>`;
+  const ct=v.comments_text||[];
+  body+=`<div class="ctitle">${t().commentsTitle} ${t().captured(ct.length, v.comments==null?'—':fmtNum(v.comments))}</div>`;
+  body+=ct.length?ct.map(commentHtml).join(''):`<div class="note">—</div>`;
+  body+=`<a class="ytwatch" href="https://www.youtube.com/watch?v=${esc(v.id)}" target="_blank" rel="noopener">${t().watch}</a>`;
+  body+='</div>';
+  return `<div class="video${open?' open':''}" data-vid="${esc(v.id)}"><div class="vhead"><div class="vtitle">${hot}${esc(v.title||'')}</div><div class="vmeta">${meta}</div></div>${body}</div>`;
 }
-
-applyI18n();
+function renderList(){
+  const vs=filteredVideos();
+  const el=document.getElementById('list');
+  if(!vs.length){el.innerHTML=`<div class="noresult">${t().noResult}</div>`;return}
+  el.innerHTML=vs.map(videoHtml).join('');
+  el.querySelectorAll('.vhead').forEach(h=>h.onclick=(e)=>{
+    if(e.target.closest('a'))return;
+    const id=h.parentElement.dataset.vid;
+    openSet.has(id)?openSet.delete(id):openSet.add(id);
+    renderList();
+    if(openSet.has(id)&&lang==='zh')translateOpen(h.parentElement);
+  });
+  el.querySelectorAll('.toggle').forEach(tg=>tg.onclick=(e)=>{
+    e.stopPropagation();
+    const id=tg.dataset.id;
+    openSet.has(id)?openSet.delete(id):openSet.add(id);
+    renderList();
+    if(openSet.has(id)&&lang==='zh'){const card=el.querySelector(`[data-vid="${CSS.escape(id)}"]`);if(card)translateOpen(card)}
+  });
+  if(lang==='zh')translateVisible();
+}
+async function translateOpen(card){
+  const els=card.querySelectorAll('[data-translate]');
+  for(const el of els){
+    const orig=el.getAttribute('data-orig')||'';
+    if(!orig||el.dataset.done)continue;
+    el.dataset.done='1';
+    el.innerHTML=esc(orig)+` <span class="translating">${t().translating}</span>`;
+    const tr=await translateText(orig);
+    if(tr){el.innerHTML=esc(tr)+` <span class="translated-tag">${t().translated}</span>`}
+    else{el.innerHTML=esc(orig)+(t().transFail?` <span class="translating">${esc(t().transFail)}</span>`:'')}
+  }
+}
+async function translateVisible(){
+  document.querySelectorAll('.video.open').forEach(translateOpen);
+}
+function applyLang(){
+  document.getElementById('btn-zh').classList.toggle('on',lang==='zh');
+  document.getElementById('btn-en').classList.toggle('on',lang==='en');
+  document.getElementById('page-title').textContent=lang==='zh'?'三频道数据看板':'Channel Dashboard';
+  document.getElementById('updated-line').textContent=`${t().updated} ${fmtUpdated('__UPDATED_AT__')}`;
+  document.getElementById('search').placeholder=t().search;
+  document.getElementById('btn-refresh').textContent=t().refresh;
+  document.getElementById('footer').textContent=t().footer;
+  try{localStorage.setItem('dash-lang',lang)}catch(e){}
+  renderAll();
+}
+function renderAll(){renderTabs();renderStats();renderSort();renderList()}
+document.getElementById('btn-zh').onclick=()=>{lang='zh';applyLang()};
+document.getElementById('btn-en').onclick=()=>{lang='en';applyLang()};
+document.getElementById('btn-refresh').onclick=()=>{alert(t().refreshNote);location.reload()};
+document.getElementById('search').oninput=(e)=>{query=e.target.value.trim();renderList()};
+applyLang();
 </script>
 </body>
 </html>
