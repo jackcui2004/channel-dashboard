@@ -103,8 +103,9 @@ h1{font-size:24px;font-weight:800;text-align:center;letter-spacing:1px;margin:6p
 .vmeta{font-size:14px;color:var(--muted);line-height:1.8}
 .vmeta b{color:var(--text);font-weight:700}
 .toggle{color:var(--red);font-weight:700;cursor:pointer;white-space:nowrap}
-.vbody{display:none;margin-top:6px}
+.vbody{display:none;margin-top:6px;overflow:hidden}
 .video.open .vbody{display:block}
+.vbody.collapsing{display:block !important;transition:height .3s ease,opacity .3s ease,margin .3s ease}
 .dlabel{color:var(--muted);font-size:14px;margin:14px 0 6px}
 .dtext{font-size:15.5px;line-height:1.9;white-space:pre-wrap;word-break:break-word}
 .dtext .translating{color:var(--faint);font-size:13px}
@@ -365,11 +366,10 @@ function renderRank(){
     const id=b.dataset.rcollapse;
     const key='rank_'+id;
     const card=b.closest('.rankcard');
-    const rect=card?card.getBoundingClientRect():null;
-    const scrollY=rect?window.scrollY+rect.top:null;
-    openSet.delete(key);
-    renderRank();
-    if(scrollY!==null){
+    const body=card?card.querySelector('.vbody'):null;
+    const doCollapse=()=>{
+      openSet.delete(key);
+      renderRank();
       requestAnimationFrame(()=>{
         const newCard=document.querySelector(`[data-rankid="${id}"]`);
         if(newCard){
@@ -377,6 +377,20 @@ function renderRank(){
           window.scrollTo(0, window.scrollY+nr.top-20);
         }
       });
+    };
+    if(body){
+      const h=body.offsetHeight;
+      body.style.height=h+'px';
+      body.style.overflow='hidden';
+      body.style.transition='height .3s ease,opacity .3s ease,margin .3s ease';
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        body.style.height='0px';
+        body.style.opacity='0';
+        body.style.marginTop='0';
+      }));
+      setTimeout(doCollapse, 320);
+    }else{
+      doCollapse();
     }
   });
   el.querySelectorAll('[data-rcexpand]').forEach(b=>b.onclick=(e)=>{
@@ -537,15 +551,34 @@ function renderList(){
   el.querySelectorAll('[data-collapse]').forEach(b=>b.onclick=(e)=>{
     e.stopPropagation();
     const id=b.dataset.collapse;
-    openSet.delete(id);
-    renderList();
-    requestAnimationFrame(()=>{
-      const card=document.querySelector(`[data-vid="${id}"]`);
-      if(card){
-        const r=card.getBoundingClientRect();
-        window.scrollTo(0, window.scrollY+r.top-20);
-      }
-    });
+    const card=b.closest('.video');
+    const body=card?card.querySelector('.vbody'):null;
+    if(body){
+      // 平滑收起动画
+      const h=body.offsetHeight;
+      body.style.height=h+'px';
+      body.classList.add('collapsing');
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        body.style.height='0px';
+        body.style.opacity='0';
+        body.style.marginTop='0';
+        body.style.marginBottom='0';
+      }));
+      setTimeout(()=>{
+        openSet.delete(id);
+        renderList();
+        requestAnimationFrame(()=>{
+          const nc=document.querySelector(`[data-vid="${id}"]`);
+          if(nc){
+            const r=nc.getBoundingClientRect();
+            window.scrollTo(0, window.scrollY+r.top-20);
+          }
+        });
+      },320);
+    }else{
+      openSet.delete(id);
+      renderList();
+    }
   });
   el.querySelectorAll('[data-cexpand]').forEach(b=>b.onclick=(e)=>{
     e.stopPropagation();
@@ -667,37 +700,92 @@ function moveThumb(){
     if(!dragging && Math.abs(dx)>DRAG_THRESHOLD){
       dragging=true;
       thumb.style.transition='none';
+      // 准备翻书：把目标视图放到下面
+      const main=document.getElementById('mainview'), rank=document.getElementById('rankview');
+      const incoming=curView==='list'?rank:main;
+      const outgoing=curView==='list'?main:rank;
+      if(incoming&&outgoing){
+        incoming.classList.remove('hidden');
+        incoming.style.position='absolute';
+        incoming.style.top='0';incoming.style.left='0';incoming.style.right='0';
+        incoming.style.zIndex='1';
+        incoming.style.opacity='0';
+        incoming.style.pointerEvents='none';
+        outgoing.style.position='relative';
+        outgoing.style.zIndex='2';
+        if(curView==='rank')renderList();
+        else renderRank();
+      }
     }
     if(dragging){
       const btn=curView==='rank'?document.getElementById('g-rank'):document.getElementById('g-list');
       const other=curView==='rank'?document.getElementById('g-list'):document.getElementById('g-rank');
       if(!btn||!other)return;
-      // 限制拖动范围在两个按钮之间
       const minL=Math.min(btn.offsetLeft, other.offsetLeft);
       const maxL=Math.max(btn.offsetLeft, other.offsetLeft);
       let newLeft=btn.offsetLeft+dx;
       newLeft=Math.max(minL, Math.min(maxL, newLeft));
       thumb.style.left=newLeft+'px';
+      // 翻书联动：根据拖动进度旋转当前页面
+      const totalDist=Math.abs(other.offsetLeft-btn.offsetLeft)||1;
+      const progress=Math.max(0,Math.min(1,Math.abs(newLeft-btn.offsetLeft)/totalDist));
+      const main=document.getElementById('mainview'), rank=document.getElementById('rankview');
+      const outgoing=curView==='list'?main:rank;
+      const incoming=curView==='list'?rank:main;
+      if(outgoing&&incoming){
+        const dir=curView==='list'?-1:1; // list->rank 向左翻，rank->list 向右翻
+        const angle=progress*55*dir;
+        outgoing.style.transform=`perspective(1200px) rotateY(${angle}deg)`;
+        outgoing.style.transformOrigin=dir<0?'left center':'right center';
+        outgoing.style.opacity=1-progress*0.4;
+        incoming.style.opacity=String(progress*0.9);
+      }
       e.preventDefault();
     }
   },{passive:false});
   seg.addEventListener('touchend',e=>{
     if(startX===null)return;
-    if(dragging){
+    const wasDragging=dragging;
+    const main=document.getElementById('mainview'), rank=document.getElementById('rankview');
+    const cleanup=()=>{
+      [main,rank].forEach(v=>{
+        if(!v)return;
+        v.style.position='';v.style.top='';v.style.left='';v.style.right='';
+        v.style.zIndex='';v.style.opacity='';v.style.pointerEvents='';
+        v.style.transform='';v.style.transformOrigin='';
+      });
+    };
+    if(wasDragging){
       suppressClick=true;
       const btn=curView==='rank'?document.getElementById('g-rank'):document.getElementById('g-list');
       const other=curView==='rank'?document.getElementById('g-list'):document.getElementById('g-rank');
       if(btn&&other){
         const curL=parseFloat(thumb.style.left)||btn.offsetLeft;
         const mid=(btn.offsetLeft+other.offsetLeft)/2;
-        // 松手时如果滑过中线就切换，否则弹回
         if((curView==='list'&&curL>mid)||(curView==='rank'&&curL<mid)){
+          // 翻过去：先清理再走正常切换动画
+          cleanup();
           curView==='list'?showRank():showMain();
         }else{
-          moveThumb();
+          // 弹回
+          const outgoing=curView==='list'?main:rank;
+          const incoming=curView==='list'?rank:main;
+          if(outgoing){
+            outgoing.style.transition='transform .25s ease,opacity .25s ease';
+            outgoing.style.transform='perspective(1200px) rotateY(0deg)';
+            outgoing.style.opacity='1';
+          }
+          if(incoming)incoming.style.opacity='0';
+          setTimeout(()=>{
+            cleanup();
+            if(outgoing)outgoing.style.transition='';
+            moveThumb();
+          },260);
         }
+      }else{
+        cleanup();moveThumb();
       }
-      setTimeout(()=>{suppressClick=false;},100);
+      setTimeout(()=>{suppressClick=false;},150);
     }
     startX=null;
     dragging=false;
