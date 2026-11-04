@@ -58,7 +58,17 @@ h1{font-size:24px;font-weight:800;text-align:center;letter-spacing:1px;margin:6p
 .sortrow .cap{color:var(--muted);font-size:15px}
 .sortpill{border:0;border-radius:20px;padding:8px 20px;font-size:15px;font-weight:600;cursor:pointer;background:var(--pill);color:var(--text)}
 .sortpill.on{background:#1a1a1a;color:#fff}
-.video{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 16px;margin-bottom:14px}
+.video{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 16px;margin-bottom:14px;position:relative}
+.vtime{position:absolute;bottom:10px;right:14px;font-size:12px;color:var(--muted)}
+/* 涨幅榜子标签 */
+.ranksubtabs{display:flex;gap:8px;margin-bottom:14px}
+.ranksubtab{border:1px solid var(--border);background:var(--card);border-radius:16px;padding:6px 16px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer}
+.ranksubtab.on{background:var(--text);color:var(--card);border-color:var(--text)}
+.wordrow{display:flex;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:8px}
+.wordrank{font-size:16px;font-weight:800;width:28px;color:var(--red)}
+.wordrank.w1{color:#d4a017}.wordrank.w2{color:#888}.wordrank.w3{color:#b87333}
+.wordtext{font-size:16px;font-weight:700;flex:1}
+.wordviews{font-size:13px;color:var(--muted)}
 .vhead{cursor:pointer}
 .vtitle{font-family:Georgia,"Songti SC","Noto Serif SC",serif;font-size:21px;font-weight:800;line-height:1.5;margin-bottom:8px}
 .badge-hot{display:inline-block;font-size:13px;background:var(--red);color:#fff;border-radius:8px;padding:3px 10px;margin-right:8px;font-weight:700;vertical-align:2px;font-family:-apple-system,"PingFang SC",sans-serif}
@@ -67,6 +77,12 @@ h1{font-size:24px;font-weight:800;text-align:center;letter-spacing:1px;margin:6p
 .badge-new.c-green{background:#39FF14;color:#000;box-shadow:0 0 4px rgba(57,255,20,.6)}
 .badge-new.c-gray{background:#E8E8E8;color:#333;box-shadow:0 0 4px rgba(0,0,0,.15);border:1px solid #ccc}
 .badge-new.c-red{background:#FF3131;color:#fff;box-shadow:0 0 4px rgba(255,49,49,.6)}
+/* 频道 ID 底色（调灰版，低调区分） */
+.chan-tag{display:inline-block;font-size:12.5px;border-radius:6px;padding:2px 10px;margin-bottom:6px;font-weight:600}
+.chan-tag.c0{background:#E6D9F0;color:#5A3D7A}
+.chan-tag.c1{background:#D9E8D9;color:#3D6B3D}
+.chan-tag.c2{background:#E2E2E2;color:#555}
+.chan-tag.c3{background:#F0D9D9;color:#7A3D3D}
 .vmeta{font-size:14px;color:var(--muted);line-height:1.8}
 .vmeta b{color:var(--text);font-weight:700}
 .toggle{color:var(--red);font-weight:700;cursor:pointer;white-space:nowrap}
@@ -150,8 +166,8 @@ const DATA = __DATA_JSON__;
 let lang = 'zh';
 try{ lang = localStorage.getItem('dash-lang') || 'zh'; }catch(e){}
 const T = {
-zh:{updated:'数据更新于',refresh:'刷新数据',search:'🔍 搜索标题关键词...',subs:'订阅者',videos:'视频数',totalViews:'总播放量',avgViews:'平均播放/视频',openChan:'在 YouTube 打开频道',sort:'排序',latest:'最新发布',byViews:'播放量',plays:'播放',likes:'点赞',comments:'评论',duration:'时长',detail:'详情',collapse:'收起',desc:'简介',tags:'标签',note:'备注',commentsTitle:'评论',captured:(a,b)=>`（已抓取 ${a} 条 / 共 ${b} 条）`,watch:'在 YouTube 观看 →',likeWord:'赞',noResult:'没有匹配的视频',footer:'数据来自 YouTube 公开页面 · 每小时自动更新 · 缺失数字标为「—」',hot:'🔥 爆款',translating:'正在翻译…',transFail:'（翻译暂不可用，显示英文原文）',translated:'已翻译',refreshNote:'数据每小时自动更新',pageTitle:'YouTube 数据看板',listView:'视频列表',rankView:'📈 涨幅榜',rankTitle:'小时播放量涨幅榜',rankSub:'对比上一轮抓取',noDelta:'暂无上一轮数据',transTitle:'🌐 标题翻译',transTitleOn:'🌐 已翻译',isNew:'🆕 新发布',translatingTitle:'翻译中…',back:'← 返回',rankBtn:'📈 涨幅榜',expandAll:'展开查看全部 {n} 条 ▼',collapseAll:'收起 ▲'},
-en:{updated:'Updated',refresh:'Refresh',search:'🔍 Search titles...',subs:'Subscribers',videos:'Videos',totalViews:'Total views',avgViews:'Avg views/video',openChan:'Open channel on YouTube',sort:'Sort',latest:'Newest',byViews:'Views',plays:'Views',likes:'Likes',comments:'Comments',duration:'Duration',detail:'Details',collapse:'Collapse',desc:'Description',tags:'Tags',note:'Note',commentsTitle:'Comments',captured:(a,b)=>`(${a} of ${b} captured)`,watch:'Watch on YouTube →',likeWord:'likes',noResult:'No matching videos',footer:'Data from public YouTube pages · auto-updated hourly · missing values shown as "—"',hot:'🔥 HOT',translating:'',transFail:'',translated:'',refreshNote:'Data auto-updates every hour',pageTitle:'3-Channel Data Dashboard',listView:'Video List',rankView:'📈 Growth',rankTitle:'Hourly Growth Top 5',rankSub:'',noDelta:'No previous data yet',transTitle:'🌐 Translate Titles',transTitleOn:'🌐 Translated',isNew:'🆕 NEW',translatingTitle:'Translating…',back:'← Back',rankBtn:'📈 Growth',expandAll:'Show all {n} ▼',collapseAll:'Collapse ▲'}};
+zh:{updated:'数据更新于',refresh:'刷新数据',search:'🔍 搜索标题关键词...',subs:'订阅者',videos:'视频数',totalViews:'总播放量',avgViews:'平均播放/视频',openChan:'在 YouTube 打开频道',sort:'排序',latest:'最新发布',byViews:'播放量',plays:'播放',likes:'点赞',comments:'评论',duration:'时长',detail:'详情',collapse:'收起',desc:'简介',tags:'标签',note:'备注',commentsTitle:'评论',captured:(a,b)=>`（已抓取 ${a} 条 / 共 ${b} 条）`,watch:'在 YouTube 观看 →',likeWord:'赞',noResult:'没有匹配的视频',footer:'数据来自 YouTube 公开页面 · 每小时自动更新 · 缺失数字标为「—」',hot:'🔥 爆款',translating:'正在翻译…',transFail:'（翻译暂不可用，显示英文原文）',translated:'已翻译',refreshNote:'数据每小时自动更新',pageTitle:'YouTube 数据看板',listView:'视频列表',rankView:'📈 涨幅榜',rankTitle:'小时播放量涨幅榜',rankSub:'对比上一轮抓取',noDelta:'暂无上一轮数据',transTitle:'🌐 标题翻译',transTitleOn:'🌐 已翻译',isNew:'新发布',translatingTitle:'翻译中…',back:'← 返回',rankBtn:'📈 涨幅榜',expandAll:'展开查看全部 {n} 条 ▼',collapseAll:'收起 ▲',rankTabGrowth:'播放量涨幅',rankTabWords:'热词排行',wordVideos:'个视频'},
+en:{updated:'Updated',refresh:'Refresh',search:'🔍 Search titles...',subs:'Subscribers',videos:'Videos',totalViews:'Total views',avgViews:'Avg views/video',openChan:'Open channel on YouTube',sort:'Sort',latest:'Newest',byViews:'Views',plays:'Views',likes:'Likes',comments:'Comments',duration:'Duration',detail:'Details',collapse:'Collapse',desc:'Description',tags:'Tags',note:'Note',commentsTitle:'Comments',captured:(a,b)=>`(${a} of ${b} captured)`,watch:'Watch on YouTube →',likeWord:'likes',noResult:'No matching videos',footer:'Data from public YouTube pages · auto-updated hourly · missing values shown as "—"',hot:'🔥 HOT',translating:'',transFail:'',translated:'',refreshNote:'Data auto-updates every hour',pageTitle:'YouTube Dashboard',listView:'Video List',rankView:'📈 Growth',rankTitle:'Hourly Growth Top 5',rankSub:'',noDelta:'No previous data yet',transTitle:'🌐 Translate Titles',transTitleOn:'🌐 Translated',isNew:'NEW',translatingTitle:'Translating…',back:'← Back',rankBtn:'📈 Growth',expandAll:'Show all {n} ▼',collapseAll:'Collapse ▲',rankTabGrowth:'View Growth',rankTabWords:'Hot Words',wordVideos:' videos'}};
 const t = ()=>T[lang];
 /* ---------- 翻译：内存 + localStorage 缓存，Google gtx 主通道，MyMemory 兜底 ---------- */
 const memCache = {}, inflight = {};
@@ -227,11 +243,45 @@ function allVideosWithDelta(){
   out.sort((a,b)=>b.d-a.d);
   return out;
 }
+let rankTab='growth';
+const STOPWORDS=new Set(['my','the','a','an','and','or','to','of','in','on','for','with','as','at','by','is','was','are','were','be','been','it','its','this','that','these','those','i','you','he','she','we','they','me','him','her','us','them','his','hers','our','your','their','so','but','not','no','yes','do','does','did','will','would','can','could','should','has','have','had','from','up','out','about','into','over','after','before','between','through','during','under','again','once','here','there','when','where','why','how','what','which','who','whom','all','any','both','each','few','more','most','other','some','such','only','own','same','than','too','very','just','don','t','s','re','ve','ll','d','m']);
+function hotWords(){
+  const map={};
+  (DATA.channels||[]).forEach(c=>{(c.videos||[]).forEach(v=>{
+    const title=(v.title||'').toLowerCase().replace(/[^a-z0-9\s']/g,' ');
+    const words=title.split(/\s+/).filter(w=>w.length>2&&!STOPWORDS.has(w));
+    // 单词
+    words.forEach(w=>{map[w]=map[w]||{views:0,count:0};map[w].views+=(v.views||0);map[w].count++});
+    // 词组（2-gram）
+    for(let i=0;i<words.length-1;i++){
+      const phrase=words[i]+' '+words[i+1];
+      map[phrase]=map[phrase]||{views:0,count:0};map[phrase].views+=(v.views||0);map[phrase].count++;
+    }
+  })});
+  return Object.entries(map)
+    .filter(([w,d])=>d.count>=2)
+    .sort((a,b)=>b[1].views-a[1].views)
+    .slice(0,20);
+}
 function renderRank(){
   const el=document.getElementById('ranklist');
-  const ranked=allVideosWithDelta().slice(0,5);
   const hasPrev=!!DATA.prev_updated_at;
   let h=`<div class="rankhead">${t().rankTitle}<span class="sub">${t().rankSub}${hasPrev?' · '+fmtUpdated(DATA.prev_updated_at):''}</span></div>`;
+  h+=`<div class="ranksubtabs"><div class="ranksubtab${rankTab==='growth'?' on':''}" data-rt="growth">${t().rankTabGrowth}</div><div class="ranksubtab${rankTab==='words'?' on':''}" data-rt="words">${t().rankTabWords}</div></div>`;
+  if(rankTab==='words'){
+    const words=hotWords();
+    if(!words.length){h+=`<div class="noresult">${t().noResult}</div>`}
+    else{
+      h+=words.map(([w,d],i)=>{
+        const rc=i===0?'w1':i===1?'w2':i===2?'w3':'';
+        return `<div class="wordrow"><div class="wordrank ${rc}">${i+1}</div><div class="wordtext">${esc(w)}</div><div class="wordviews">${d.count}${t().wordVideos} · ${fmtNum(d.views)}${t().plays}</div></div>`;
+      }).join('');
+    }
+    el.innerHTML=h;
+    el.querySelectorAll('[data-rt]').forEach(b=>b.onclick=()=>{rankTab=b.dataset.rt;renderRank()});
+    return;
+  }
+  const ranked=allVideosWithDelta().slice(0,5);
   if(!hasPrev){h+=`<div class="noresult">${t().noDelta}</div>`}
   else if(!ranked.length){h+=`<div class="noresult">${t().noResult}</div>`}
   else{
@@ -285,6 +335,7 @@ function renderRank(){
   });
   if(lang==='zh')el.querySelectorAll('.rankcard.open').forEach(translateOpen);
   if(titleTransOn)translateTitlesDom(el);
+  el.querySelectorAll('[data-rt]').forEach(b=>b.onclick=()=>{rankTab=b.dataset.rt;renderRank()});
 }
 function filteredVideos(){
   let vs=chanVideos();
@@ -310,7 +361,7 @@ function renderTabs(){
 function chanVideos(){
   if(curChan===-1){
     const out=[];
-    (DATA.channels||[]).forEach(c=>{(c.videos||[]).forEach(v=>{const cp=Object.assign({},v);cp._chan=c.name;out.push(cp)})});
+    (DATA.channels||[]).forEach((c,ci)=>{(c.videos||[]).forEach(v=>{const cp=Object.assign({},v);cp._chan=c.name;cp._chanIdx=ci;out.push(cp)})});
     return out;
   }
   return (chan().videos||[]).slice();
@@ -357,9 +408,9 @@ async function translateTitlesDom(scope){
     if(!orig)continue;
     const tr=await translateText(orig);
     if(tr){
-      const hotEl=el.querySelector('.badge-hot');
-      const hotHtml=hotEl?hotEl.outerHTML:'';
-      el.innerHTML=hotHtml+esc(tr);
+      // 保留所有徽章（爆款、新发布）
+      const badges=[...el.querySelectorAll('.badge-hot,.badge-new')].map(b=>b.outerHTML).join('');
+      el.innerHTML=badges+esc(tr);
       el.setAttribute('data-translated','1');
     }
   }
@@ -391,9 +442,10 @@ function videoHtml(v){
     const today=new Date().toISOString().slice(0,10);
     if(v.published===today)isNew=`<span class="badge-new c-purple">${t().isNew}</span>`;
   }catch(e){}
-  const chanTag=(curChan===-1&&v._chan)?`<div style="font-size:12.5px;color:var(--muted);margin-bottom:4px">${esc(v._chan)}</div>`:'';
+  const chanTag=(curChan===-1&&v._chan)?`<div class="chan-tag c${(v._chanIdx||0)%4}">${esc(v._chan)}</div>`:'';
   const titleShow=esc(v.title||'');
-  const meta=`${t().plays} <b>${fmtNum(v.views)}</b>${deltaHtml(v,'views')} · ${t().likes} ${fmtNum(v.likes)}${deltaHtml(v,'likes')} · ${t().comments} ${fmtNum(v.comments)}${deltaHtml(v,'comments')} · ${t().duration} ${esc(v.duration||'—')} · ${esc(v.published||'—')} <span class="toggle" data-id="${esc(v.id)}">${open?t().collapse+' ▲':t().detail+' ▼'}</span>`;
+  const meta=`${t().plays} <b>${fmtNum(v.views)}</b>${deltaHtml(v,'views')} · ${t().likes} ${fmtNum(v.likes)}${deltaHtml(v,'likes')} · ${t().comments} ${fmtNum(v.comments)}${deltaHtml(v,'comments')} · ${t().duration} ${esc(v.duration||'—')} <span class="toggle" data-id="${esc(v.id)}">${open?t().collapse+' ▲':t().detail+' ▼'}</span>`;
+  const timeHtml=`<div class="vtime">${esc(v.published||'—')}</div>`;
   let body=`<div class="vbody">`;
   body+=`<div class="dlabel">${t().desc}</div><div class="dtext" data-translate data-orig="${esc(v.description||'')}">${v.description?esc(v.description):'—'}</div>`;
   if(v.tags&&v.tags.length)body+=`<div class="tags">${v.tags.map(x=>`<span class="tag">#${esc(x)}</span>`).join('')}</div>`;
@@ -408,7 +460,7 @@ function videoHtml(v){
   }
   body+=`<a class="ytwatch" href="https://www.youtube.com/watch?v=${esc(v.id)}" target="_blank" rel="noopener">${t().watch}</a>`;
   body+='</div>';
-  return `<div class="video${open?' open':''}" data-vid="${esc(v.id)}"><div class="vhead">${chanTag}<div class="vtitle" data-orig-title="${esc(v.title||'')}">${hot}${isNew}${titleShow}</div><div class="vmeta">${meta}</div></div>${body}</div>`;
+  return `<div class="video${open?' open':''}" data-vid="${esc(v.id)}"><div class="vhead">${chanTag}<div class="vtitle" data-orig-title="${esc(v.title||'')}">${hot}${isNew}${titleShow}</div><div class="vmeta">${meta}</div></div>${body}${timeHtml}</div>`;
 }
 function renderList(){
   const vs=filteredVideos();
