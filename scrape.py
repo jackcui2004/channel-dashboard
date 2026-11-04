@@ -19,6 +19,23 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone, timedelta
 
 import yt_dlp
+import urllib.request
+import urllib.parse
+
+def translate_to_zh(text):
+    """用 Google 翻译免费接口把英文标题翻成中文，失败返回 None"""
+    if not text or not text.strip():
+        return None
+    try:
+        q = urllib.parse.quote(text[:1800])
+        url = f"https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t&q={q}"
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=15) as r:
+            data = json.loads(r.read().decode("utf-8"))
+        res = "".join(x[0] or "" for x in (data[0] or []))
+        return res.strip() or None
+    except Exception:
+        return None
 
 CHANNELS = [
     {
@@ -273,6 +290,20 @@ def main():
                 print(f"  [{done}/{len(video_list)}] {d['id']} views={d['views']}")
 
         mark_hot(videos)
+
+        # 标题预翻译成中文（服务端做，前端切换即时生效）
+        print(f"[info] {ch['name']}: 翻译 {len(videos)} 个标题...")
+        def _trans_one(v):
+            t = v.get("title")
+            if t:
+                zh = translate_to_zh(t)
+                if zh:
+                    v["title_zh"] = zh
+            return v["id"]
+        with ThreadPoolExecutor(max_workers=4) as ex:
+            list(ex.map(_trans_one, videos))
+        n_zh = sum(1 for v in videos if v.get("title_zh"))
+        print(f"[info] {ch['name']}: 标题翻译完成 {n_zh}/{len(videos)}")
 
         if not args.skip_comments:
             # 所有视频都抓评论正文（不再只限爆款），多线程并行
