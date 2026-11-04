@@ -688,43 +688,36 @@ function moveThumb(){
   if(!seg||!thumb)return;
   let startX=null, dragging=false, suppressClick=false, scrubDir=1;
   const DRAG_THRESHOLD=12;
-  // scrub 时间线：progress 0→0.5 是 outgoing 的 flip-out，0.5→1 是 incoming 的 flip-in
+  // scrub 时间线：outgoing 的 flip-out (0→0.6) 与 incoming 的 flip-in (0.4→1) 重叠，避免中间空白
   function scrub(progress){
     const main=document.getElementById('mainview'), rank=document.getElementById('rankview');
     const outgoing=curView==='list'?main:rank;
     const incoming=curView==='list'?rank:main;
     if(!outgoing||!incoming)return;
     const dir=curView==='list'?-1:1;
-    if(progress<0.5){
-      // 前半：outgoing 做 flip-out (normal → rotateY(-18deg), opacity 0)
-      const p=progress/0.5;
-      const angle=-18*p*dir;
-      outgoing.style.transform=`perspective(1200px) rotateY(${angle}deg)`;
-      outgoing.style.transformOrigin='top center';
-      outgoing.style.opacity=String(1-p);
-      outgoing.style.position='relative';outgoing.style.zIndex='2';
-      incoming.classList.remove('hidden');
-      incoming.style.position='absolute';incoming.style.top='0';
-      incoming.style.left='0';incoming.style.right='0';incoming.style.zIndex='1';
-      incoming.style.opacity='0';incoming.style.pointerEvents='none';
-      incoming.style.transform=`perspective(1200px) rotateY(${18*dir}deg)`;
-      incoming.style.transformOrigin='top center';
-    }else{
-      // 后半：incoming 做 flip-in (rotateY(18deg), opacity 0 → normal)
-      const p=(progress-0.5)/0.5;
-      const angle=18*(1-p)*dir;
-      incoming.classList.remove('hidden');
-      incoming.style.position='relative';incoming.style.zIndex='2';
-      incoming.style.opacity=String(p);
-      incoming.style.transform=`perspective(1200px) rotateY(${angle}deg)`;
-      incoming.style.transformOrigin='top center';
-      incoming.style.pointerEvents='';
-      outgoing.style.position='absolute';outgoing.style.top='0';
-      outgoing.style.left='0';outgoing.style.right='0';outgoing.style.zIndex='1';
-      outgoing.style.opacity='0';outgoing.style.pointerEvents='none';
-      outgoing.style.transform=`perspective(1200px) rotateY(${-18*dir}deg)`;
-      outgoing.style.transformOrigin='top center';
-    }
+    // outgoing: progress 0→0.6 做 flip-out
+    const pOut=Math.max(0,Math.min(1,progress/0.6));
+    const angleOut=-18*pOut*dir;
+    // incoming: progress 0.4→1 做 flip-in
+    const pIn=Math.max(0,Math.min(1,(progress-0.4)/0.6));
+    const angleIn=18*(1-pIn)*dir;
+    // 前半 outgoing 在上，后半 incoming 在上（0.5 为切换点）
+    const outOnTop=progress<0.5;
+    outgoing.style.transform=`perspective(1200px) rotateY(${angleOut}deg)`;
+    outgoing.style.transformOrigin='top center';
+    outgoing.style.opacity=String(1-pOut);
+    outgoing.style.position=outOnTop?'relative':'absolute';
+    if(!outOnTop){outgoing.style.top='0';outgoing.style.left='0';outgoing.style.right='0';}
+    outgoing.style.zIndex=outOnTop?'2':'1';
+    outgoing.style.pointerEvents='none';
+    incoming.classList.remove('hidden');
+    incoming.style.transform=`perspective(1200px) rotateY(${angleIn}deg)`;
+    incoming.style.transformOrigin='top center';
+    incoming.style.opacity=String(pIn);
+    incoming.style.position=outOnTop?'absolute':'relative';
+    if(outOnTop){incoming.style.top='0';incoming.style.left='0';incoming.style.right='0';}
+    incoming.style.zIndex=outOnTop?'1':'2';
+    incoming.style.pointerEvents='none';
   }
   function cleanupScrub(){
     const main=document.getElementById('mainview'), rank=document.getElementById('rankview');
@@ -780,9 +773,23 @@ function moveThumb(){
         const mid=(btn.offsetLeft+other.offsetLeft)/2;
         const goThrough=(curView==='list'&&curL>mid)||(curView==='rank'&&curL<mid);
         if(goThrough){
-          // 松手 = 点击动画的结束：直接完成切换
+          // 拖动已 scrub 到位，直接定格为结束态，不重播点击动画
+          const incoming=curView==='list'?rank:main;
+          const outgoing=curView==='list'?main:rank;
+          const newView=curView==='list'?'rank':'list';
+          curView=newView;
+          document.getElementById('g-rank').classList.toggle('on',newView==='rank');
+          document.getElementById('g-list').classList.toggle('on',newView==='list');
           cleanupScrub();
-          curView==='list'?showRank():showMain();
+          if(outgoing)outgoing.classList.add('hidden');
+          if(incoming){
+            incoming.classList.remove('hidden');
+            // 确保结束态干净：无 transform、无透明度残留
+            incoming.style.transform='';incoming.style.opacity='';
+          }
+          moveThumb();
+          if(newView==='rank')renderRank();else renderList();
+          window.scrollTo(0,0);
         }else{
           // 弹回开头
           [main,rank].forEach(v=>{if(v)v.style.transition='transform .25s ease,opacity .25s ease';});
