@@ -307,12 +307,14 @@ def main():
     print(f"[info] 完成，用时 {elapsed/60:.1f} 分钟")
     # ---- 环比：把上一轮 data.json 的 views/likes/comments 记为 prev_* ----
     prev_map = {}
+    prev_chan_map = {}
     prev_updated = None
     try:
         with open(args.out, encoding="utf-8") as f:
             old = json.load(f)
         prev_updated = old.get("updated_at")
         for ch in old.get("channels", []):
+            prev_chan_map[ch["id"]] = ch
             for v in ch.get("videos", []):
                 prev_map[v["id"]] = v
     except (FileNotFoundError, json.JSONDecodeError):
@@ -320,6 +322,9 @@ def main():
     if prev_updated:
         result["prev_updated_at"] = prev_updated
     for ch in result["channels"]:
+        pc = prev_chan_map.get(ch.get("id"))
+        if pc:
+            ch["prev_subs"] = pc.get("subs")
         for v in ch.get("videos", []):
             pv = prev_map.get(v["id"])
             if pv:
