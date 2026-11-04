@@ -131,7 +131,6 @@ h1{font-size:24px;font-weight:800;text-align:center;letter-spacing:1px;margin:6p
     <button id="g-list" class="on">列表</button>
     <button id="g-rank">📈 涨幅榜</button>
   </div>
-  <button class="refresh" id="g-refresh">↻ 刷新</button>
 </div>
 <script>
 const DATA = __DATA_JSON__;
@@ -422,7 +421,6 @@ function applyLang(){
   document.title=t().pageTitle;
   document.getElementById('updated-line').textContent=`${t().updated} ${fmtUpdated('__UPDATED_AT__')}`;
   document.getElementById('search').placeholder=t().search;
-  document.getElementById('g-refresh').textContent='↻ '+t().refresh;
   document.getElementById('g-list').textContent=t().listView;
   document.getElementById('g-rank').textContent=t().rankBtn;
   const btt=document.getElementById('btn-trans-title');
@@ -433,7 +431,6 @@ function applyLang(){
 }
 function renderAll(){renderTabs();renderStats();renderSort();renderList()}
 document.getElementById('langicon').onclick=()=>{lang=lang==='zh'?'en':'zh';applyLang()};
-document.getElementById('g-refresh').onclick=()=>{alert(t().refreshNote);location.reload()};
 function showRank(){
   if(curView==='rank')return;
   curView='rank';
@@ -466,32 +463,50 @@ function showMain(){
 }
 document.getElementById('g-list').onclick=showMain;
 document.getElementById('g-rank').onclick=showRank;
-// 液态玻璃条可拖动
+// 液态玻璃条：左右滑动翻页 + 上下滑收起/出现（Apple Music 逻辑）
 (function(){
   const bar=document.getElementById('glassbar');
-  let sx=0,sy=0,bx=0,by=0,dragging=false,moved=false;
+  let sx=0,sy=0,dragging=false,swiped=false;
+  let lastY=window.scrollY, barHidden=false, ticking=false;
+  // 上下滑收起/出现
+  function onScroll(){
+    const y=window.scrollY;
+    if(y>lastY+4 && y>120 && !barHidden){
+      barHidden=true;
+      bar.style.transition='transform .3s ease, opacity .3s ease';
+      bar.style.transform='translateX(-50%) translateY(90px)';
+      bar.style.opacity='0';
+      bar.style.pointerEvents='none';
+    }else if(y<lastY-4 && barHidden){
+      barHidden=false;
+      bar.style.transition='transform .3s ease, opacity .3s ease';
+      bar.style.transform='translateX(-50%)';
+      bar.style.opacity='1';
+      bar.style.pointerEvents='auto';
+    }
+    lastY=y; ticking=false;
+  }
+  window.addEventListener('scroll',()=>{
+    if(!ticking){ticking=true;requestAnimationFrame(onScroll)}
+  },{passive:true});
+  // 左右滑动翻页
   bar.addEventListener('pointerdown',e=>{
     if(e.target.tagName==='BUTTON')return;
-    dragging=true;moved=false;
+    dragging=true;swiped=false;
     sx=e.clientX;sy=e.clientY;
-    const r=bar.getBoundingClientRect();
-    bx=r.left;by=r.top;
-    bar.style.transition='none';
     bar.setPointerCapture(e.pointerId);
   });
   bar.addEventListener('pointermove',e=>{
     if(!dragging)return;
-    const dx=e.clientX-sx,dy=e.clientY-sy;
-    if(Math.abs(dx)+Math.abs(dy)>6)moved=true;
-    bar.style.left=(bx+dx)+'px';
-    bar.style.top=(by+dy)+'px';
-    bar.style.transform='none';
-    bar.style.bottom='auto';
+    const dx=e.clientX-sx;
+    if(Math.abs(dx)>50 && !swiped){
+      swiped=true;
+      if(dx<0 && curView==='list')showRank();
+      else if(dx>0 && curView==='rank')showMain();
+    }
   });
-  bar.addEventListener('pointerup',()=>{
-    dragging=false;
-    bar.style.transition='';
-  });
+  bar.addEventListener('pointerup',()=>{dragging=false});
+  bar.addEventListener('pointercancel',()=>{dragging=false});
 })();
 document.getElementById('search').oninput=(e)=>{query=e.target.value.trim();renderList()};
 applyLang();
