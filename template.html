@@ -21,7 +21,7 @@ h1{font-size:24px;font-weight:800;text-align:center;letter-spacing:1px;margin:6p
 .seg button{border:0;background:transparent;padding:9px 22px;font-size:15px;font-weight:600;cursor:pointer;color:var(--muted)}
 .seg button.on{background:#1a1a1a;color:#fff}
 .refresh-btn{border:1px solid var(--border);background:var(--card);border-radius:12px;padding:9px 22px;font-size:15px;font-weight:600;cursor:pointer;color:var(--text)}
-.refresh-btn:active{background:#eee}
+.refresh-btn.active{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
 .search{width:100%;padding:13px 16px;border:1px solid var(--border);border-radius:12px;font-size:15px;background:var(--card);color:var(--text);margin-bottom:6px}
 .search::placeholder{color:var(--faint)}
 .search:focus{outline:none;border-color:#cfcfcf}
@@ -113,10 +113,7 @@ h1{font-size:24px;font-weight:800;text-align:center;letter-spacing:1px;margin:6p
 <div id="list"></div>
 </div>
 <div id="rankview" class="pageview hidden">
-  <div style="display:flex;align-items:center;gap:10px;margin:6px 0 4px">
-    <button class="refresh-btn" id="btn-back" style="padding:9px 16px">← 返回</button>
-    <button class="sortpill" id="btn-trans-title">🌐 标题翻译</button>
-  </div>
+  <div style="margin:6px 0 4px"><button class="sortpill" id="btn-trans-title">🌐 标题翻译</button></div>
   <div id="ranklist"></div>
 </div>
 <div class="footer" id="footer"></div>
@@ -381,7 +378,6 @@ function applyLang(){
   document.getElementById('search').placeholder=t().search;
   document.getElementById('btn-refresh').textContent=t().refresh;
   document.getElementById('btn-rank-top').textContent=t().rankBtn;
-  document.getElementById('btn-back').textContent=t().back;
   document.getElementById('btn-trans-title').textContent=titleTransOn?t().transTitleOn:t().transTitle;
   document.getElementById('footer').textContent=t().footer;
   try{localStorage.setItem('dash-lang',lang)}catch(e){}
@@ -394,6 +390,7 @@ document.getElementById('btn-refresh').onclick=()=>{alert(t().refreshNote);locat
 function showRank(){
   if(curView==='rank')return;
   curView='rank';
+  document.getElementById('btn-rank-top').classList.add('active');
   const main=document.getElementById('mainview'), rank=document.getElementById('rankview');
   main.classList.add('flip-out');
   setTimeout(()=>{
@@ -407,6 +404,7 @@ function showRank(){
 function showMain(){
   if(curView==='list')return;
   curView='list';
+  document.getElementById('btn-rank-top').classList.remove('active');
   const main=document.getElementById('mainview'), rank=document.getElementById('rankview');
   rank.classList.add('flip-out');
   setTimeout(()=>{
@@ -417,8 +415,7 @@ function showMain(){
     window.scrollTo(0,0);
   },320);
 }
-document.getElementById('btn-rank-top').onclick=showRank;
-document.getElementById('btn-back').onclick=showMain;
+document.getElementById('btn-rank-top').onclick=()=>{curView==='rank'?showMain():showRank()};
 document.getElementById('btn-trans-title').onclick=async (e)=>{
   const btn=e.target;
   if(titleTransOn){titleTransOn=false;btn.classList.remove('on');btn.textContent=t().transTitle;renderRank();return}
