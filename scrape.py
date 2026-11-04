@@ -291,19 +291,20 @@ def main():
 
         mark_hot(videos)
 
-        # 标题预翻译成中文（服务端做，前端切换即时生效）
-        print(f"[info] {ch['name']}: 翻译 {len(videos)} 个标题...")
-        def _trans_one(v):
-            t = v.get("title")
-            if t:
-                zh = translate_to_zh(t)
-                if zh:
-                    v["title_zh"] = zh
-            return v["id"]
-        with ThreadPoolExecutor(max_workers=4) as ex:
-            list(ex.map(_trans_one, videos))
-        n_zh = sum(1 for v in videos if v.get("title_zh"))
-        print(f"[info] {ch['name']}: 标题翻译完成 {n_zh}/{len(videos)}")
+        # 标题翻译已移至前端客户端（用户 IP，不限流），服务端跳过以提速
+        # 如需服务端预翻译，取消下面注释：
+        # print(f"[info] {ch['name']}: 翻译 {len(videos)} 个标题...")
+        # def _trans_one(v):
+        #     t = v.get("title")
+        #     if t:
+        #         zh = translate_to_zh(t)
+        #         if zh:
+        #             v["title_zh"] = zh
+        #     return v["id"]
+        # with ThreadPoolExecutor(max_workers=4) as ex:
+        #     list(ex.map(_trans_one, videos))
+        # n_zh = sum(1 for v in videos if v.get("title_zh"))
+        # print(f"[info] {ch['name']}: 标题翻译完成 {n_zh}/{len(videos)}")
 
         if not args.skip_comments:
             # 所有视频都抓评论正文（不再只限爆款），多线程并行
