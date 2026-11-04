@@ -688,18 +688,18 @@ function moveThumb(){
   if(!seg||!thumb)return;
   let startX=null, dragging=false, suppressClick=false, scrubDir=1;
   const DRAG_THRESHOLD=12;
-  // scrub 时间线：outgoing 的 flip-out (0→0.6) 与 incoming 的 flip-in (0.4→1) 重叠，避免中间空白
+  // scrub 时间线：outgoing 的 flip-out (0→0.7) 与 incoming 的 flip-in (0.3→1) 重叠，中间叠化更慢
   function scrub(progress){
     const main=document.getElementById('mainview'), rank=document.getElementById('rankview');
     const outgoing=curView==='list'?main:rank;
     const incoming=curView==='list'?rank:main;
     if(!outgoing||!incoming)return;
     const dir=curView==='list'?-1:1;
-    // outgoing: progress 0→0.6 做 flip-out
-    const pOut=Math.max(0,Math.min(1,progress/0.6));
+    // outgoing: progress 0→0.7 做 flip-out（拉长，中间更慢）
+    const pOut=Math.max(0,Math.min(1,progress/0.7));
     const angleOut=-18*pOut*dir;
-    // incoming: progress 0.4→1 做 flip-in
-    const pIn=Math.max(0,Math.min(1,(progress-0.4)/0.6));
+    // incoming: progress 0.3→1 做 flip-in（提前开始，重叠更多）
+    const pIn=Math.max(0,Math.min(1,(progress-0.3)/0.7));
     const angleIn=18*(1-pIn)*dir;
     // 前半 outgoing 在上，后半 incoming 在上（0.5 为切换点）
     const outOnTop=progress<0.5;
@@ -791,10 +791,19 @@ function moveThumb(){
           if(newView==='rank')renderRank();else renderList();
           window.scrollTo(0,0);
         }else{
-          // 弹回开头
+          // 弹回开头：scrub 回 0，动画结束后把 incoming 重新 hidden
+          const incomingSnap=curView==='list'?rank:main;
           [main,rank].forEach(v=>{if(v)v.style.transition='transform .25s ease,opacity .25s ease';});
           scrub(0);
-          setTimeout(()=>{cleanupScrub();moveThumb();},260);
+          setTimeout(()=>{
+            cleanupScrub();
+            // 关键：把拖动时露出来的 incoming 重新藏起来
+            if(incomingSnap){
+              if(curView==='list')rank.classList.add('hidden');
+              else main.classList.add('hidden');
+            }
+            moveThumb();
+          },260);
         }
       }else{cleanupScrub();moveThumb();}
       setTimeout(()=>{suppressClick=false;},150);
