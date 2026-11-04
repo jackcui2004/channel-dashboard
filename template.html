@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三频道数据看板</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans SC",sans-serif;background:#f5f5f7;color:#1d1d1f;line-height:1.6;padding:20px;max-width:1200px;margin:0 auto}
+header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:8px}
+h1{font-size:26px}
+.updated{color:#86868b;font-size:13px;margin-bottom:20px}
+.lang-btn{padding:8px 18px;border-radius:20px;border:1px solid #d2d2d7;background:#fff;cursor:pointer;font-size:14px}
+.lang-btn:hover{border-color:#0071e3;color:#0071e3}
+.tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.tab{padding:10px 20px;border-radius:20px;border:1px solid #d2d2d7;background:#fff;cursor:pointer;font-size:15px}
+.tab.active{background:#0071e3;color:#fff;border-color:#0071e3}
+.tab .count{opacity:.7;font-size:13px}
+.controls{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.search{flex:1;min-width:200px;padding:12px 16px;border:1px solid #d2d2d7;border-radius:12px;font-size:15px}
+.sortsel{padding:12px;border:1px solid #d2d2d7;border-radius:12px;font-size:14px;background:#fff}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px}
+.stat{background:#fff;border-radius:12px;padding:16px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.stat .num{font-size:24px;font-weight:700;color:#0071e3}
+.stat .label{font-size:12px;color:#86868b;margin-top:4px}
+.video{background:#fff;border-radius:12px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.08);overflow:hidden}
+.video-header{padding:16px 20px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.video-header:hover{background:#f9f9fb}
+.video-title{font-size:15px;font-weight:600;flex:1}
+.video-meta{font-size:12px;color:#86868b;white-space:nowrap}
+.video-body{display:none;padding:0 20px 20px;border-top:1px solid #f0f0f0}
+.video.open .video-body{display:block}
+.video.open .video-header{background:#f0f7ff}
+.detail{margin-top:12px;font-size:14px}
+.detail-label{font-weight:600;color:#555;margin-bottom:4px;font-size:13px}
+.detail-value{background:#f9f9fb;border-radius:8px;padding:10px 12px;white-space:pre-wrap;word-break:break-word;font-size:13px}
+.detail-value .translating{color:#86868b;font-style:italic;font-size:12px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.tag{background:#e8f0fe;color:#1a73e8;border-radius:12px;padding:2px 10px;font-size:12px}
+.comment{border-left:3px solid #e0e0e0;padding:8px 12px;margin:8px 0;background:#fafafa;border-radius:0 8px 8px 0;font-size:13px}
+.comment .author{font-weight:600;color:#0071e3;font-size:12px}
+.comment .likes{color:#86868b;font-size:11px;margin-left:8px}
+.comment .reply{margin-top:6px;margin-left:16px;border-left:2px solid #0071e3;padding-left:10px}
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;margin-left:8px;vertical-align:middle}
+.badge-hot{background:#ffebee;color:#c62828}
+.badge-nodata{background:#f5f5f5;color:#86868b}
+.channel-section{display:none}
+.channel-section.active{display:block}
+.empty{color:#86868b;text-align:center;padding:40px;font-size:14px}
+footer{margin-top:32px;color:#86868b;font-size:12px;text-align:center}
+a{color:#0071e3}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="page-title">三频道数据看板</h1>
+  <button class="lang-btn" id="lang-btn" onclick="toggleLang()">EN</button>
+</header>
+<div class="updated" id="updated-line">数据更新于 __UPDATED_AT__</div>
+
+<div class="tabs" id="tabs"></div>
+
+<div class="controls">
+  <input class="search" id="search" placeholder="搜索标题…" oninput="applyFilter()">
+  <select class="sortsel" id="sort" onchange="applyFilter()">
+    <option value="published_desc">按发布时间 ↓</option>
+    <option value="views_desc">按播放量 ↓</option>
+    <option value="views_asc">按播放量 ↑</option>
+  </select>
+</div>
+
+<div id="content"></div>
+
+<footer id="footer-note">数据来自 YouTube 公开页面 · 每天自动更新 · 数字缺失处标为「—」</footer>
+
+<script>
+const DATA = __DATA_JSON__;
+let lang = localStorage.getItem('dash-lang') || 'zh';
+let activeChannel = 0;
+const transCache = {};  // 翻译缓存
+
+const I18N = {
+  zh: {subs:'订阅', videos:'视频', totalViews:'总播放', avgViews:'平均播放',
+       searchPh:'搜索标题…', sortDate:'按发布时间 ↓', sortViewsD:'按播放量 ↓', sortViewsA:'按播放量 ↑',
+       views:'播放', likes:'点赞', comments:'评论', duration:'时长', published:'发布日期',
+       desc:'简介', tags:'标签', commentsTitle:'评论精选', open:'展开', hot:'爆款',
+       updated:'数据更新于', footer:'数据来自 YouTube 公开页面 · 每天自动更新 · 数字缺失处标为「—」',
+       noResult:'没有匹配的视频', translating:'（正在翻译…）', transFail:'（翻译暂不可用，显示原文）',
+       na:'—', btn:'EN'},
+  en: {subs:'Subscribers', videos:'Videos', totalViews:'Total views', avgViews:'Avg views',
+       searchPh:'Search titles…', sortDate:'Newest first', sortViewsD:'Most viewed', sortViewsA:'Least viewed',
+       views:'views', likes:'likes', comments:'comments', duration:'Duration', published:'Published',
+       desc:'Description', tags:'Tags', commentsTitle:'Top comments', open:'', hot:'HOT',
+       updated:'Updated at', footer:'Data from public YouTube pages · updated daily · missing numbers shown as "—"',
+       noResult:'No matching videos', translating:'', transFail:'',
+       na:'—', btn:'中文'}
+};
+const T = () => I18N[lang];
+
+function fmtNum(n){ return (n===null||n===undefined) ? T().na : n.toLocaleString('en-US'); }
+function esc(s){ return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+async function translate(text){
+  if(!text || lang==='en') return null;
+  if(transCache[text]!==undefined) return transCache[text];
+  // 分片：太长按段切，避免接口拒绝
+  const chunks=[]; let t=text;
+  while(t.length>1800){ let i=t.lastIndexOf('\n',1800); if(i<0)i=1800; chunks.push(t.slice(0,i)); t=t.slice(i); }
+  chunks.push(t);
+  try{
+    let out='';
+    for(const c of chunks){
+      const url='https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t&q='+encodeURIComponent(c);
+      const r=await fetch(url); if(!r.ok) throw 0;
+      const j=await r.json();
+      out+=j[0].map(x=>x[0]).join('');
+    }
+    transCache[text]=out; return out;
+  }catch(e){
+    // 兜底：MyMemory
+    try{
+      const url='https://api.mymemory.translated.net/get?q='+encodeURIComponent(text.slice(0,450))+'&langpair=en|zh-CN';
+      const r=await fetch(url); if(!r.ok) throw 0;
+      const j=await r.json();
+      if(j.responseData&&j.responseData.translatedText){ transCache[text]=j.responseData.translatedText; return j.responseData.translatedText; }
+    }catch(e2){}
+    transCache[text]=null; return null;
+  }
+}
+
+function renderTabs(){
+  const tabs=document.getElementById('tabs');
+  tabs.innerHTML=DATA.channels.map((c,i)=>
+    `<button class="tab${i===activeChannel?' active':''}" onclick="switchChannel(${i})">${esc(c.name)} <span class="count">${c.videos.length}</span></button>`
+  ).join('');
+}
+
+function channelStats(c){
+  const vs=c.videos.filter(v=>typeof v.views==='number');
+  const total=vs.reduce((a,v)=>a+v.views,0);
+  const avg=vs.length?Math.round(total/vs.length):null;
+  return {total, avg};
+}
+
+function applyI18n(){
+  const t=T();
+  document.getElementById('page-title').textContent = lang==='zh'?'三频道数据看板':'3-Channel Dashboard';
+  document.getElementById('lang-btn').textContent=t.btn;
+  document.getElementById('search').placeholder=t.searchPh;
+  const s=document.getElementById('sort');
+  s.options[0].text=t.sortDate; s.options[1].text=t.sortViewsD; s.options[2].text=t.sortViewsA;
+  document.getElementById('updated-line').textContent=t.updated+' '+DATA.updated_at;
+  document.getElementById('footer-note').textContent=t.footer;
+  renderTabs(); renderList();
+}
+
+function toggleLang(){
+  lang = lang==='zh' ? 'en' : 'zh';
+  localStorage.setItem('dash-lang',lang);
+  applyI18n();
+}
+
+function switchChannel(i){ activeChannel=i; renderTabs(); applyFilter(); }
+
+function getFiltered(){
+  const q=document.getElementById('search').value.toLowerCase();
+  const sort=document.getElementById('sort').value;
+  let vs=DATA.channels[activeChannel].videos.filter(v=>(v.title||'').toLowerCase().includes(q));
+  const key = sort==='views_desc'||sort==='views_asc' ? 'views' : 'published';
+  vs=vs.slice().sort((a,b)=>{
+    const av=a[key], bv=b[key];
+    if(av==null) return 1; if(bv==null) return -1;
+    if(sort==='views_asc') return av-bv;
+    return av<bv?1:av>bv?-1:0;
+  });
+  return vs;
+}
+
+function applyFilter(){ renderList(); }
+
+function toggleVideo(el){ el.closest('.video').classList.toggle('open'); maybeTranslate(el.closest('.video')); }
+
+async function maybeTranslate(card){
+  if(lang==='en'||!card.classList.contains('open')) return;
+  const t=T();
+  for(const el of card.querySelectorAll('[data-translate]')){
+    if(el.dataset.done) continue;
+    el.dataset.done='1';
+    const orig=el.dataset.orig;
+    const note=document.createElement('div');
+    note.className='translating'; note.textContent=t.translating;
+    el.appendChild(note);
+    const tr=await translate(orig);
+    note.remove();
+    if(tr){ el.innerHTML=esc(tr); }
+    else if(t.transFail){ const f=document.createElement('div'); f.className='translating'; f.textContent=t.transFail; el.appendChild(f); }
+  }
+}
+
+function commentHtml(c){
+  const t=T();
+  let h=`<div class="comment"><span class="author">${esc(c.author||'?')}</span><span class="likes">👍 ${fmtNum(c.likes)}${c.time?' · '+esc(c.time):''}</span><div data-translate data-orig="${esc(c.text||'')}">${esc(c.text||'')}</div>`;
+  for(const r of (c.replies||[])){
+    h+=`<div class="reply"><span class="author">${esc(r.author||'?')}</span><span class="likes">👍 ${fmtNum(r.likes)}</span><div data-translate data-orig="${esc(r.text||'')}">${esc(r.text||'')}</div></div>`;
+  }
+  return h+'</div>';
+}
+
+function renderList(){
+  const t=T();
+  const vs=getFiltered();
+  const box=document.getElementById('content');
+  if(!vs.length){ box.innerHTML=`<div class="empty">${t.noResult}</div>`; return; }
+  box.innerHTML=vs.map(v=>{
+    const hot=v.hot?`<span class="badge badge-hot">🔥 ${t.hot}</span>`:'';
+    const meta=`${fmtNum(v.views)} ${t.views} · 👍 ${fmtNum(v.likes)} · 💬 ${fmtNum(v.comments)}${v.duration?' · '+esc(v.duration):''}`;
+    let body=`<div class="detail"><div class="detail-label">${t.published}</div><div class="detail-value">${esc(v.published||t.na)}</div></div>`;
+    body+=`<div class="detail"><div class="detail-label">${t.desc}</div><div class="detail-value" data-translate data-orig="${esc(v.description||'')}">${v.description?esc(v.description):t.na}</div></div>`;
+    if(v.tags&&v.tags.length) body+=`<div class="detail"><div class="detail-label">${t.tags}</div><div class="tags">${v.tags.map(x=>`<span class="tag">${esc(x)}</span>`).join('')}</div></div>`;
+    if(v.comments_text&&v.comments_text.length)
+      body+=`<div class="detail"><div class="detail-label">${t.commentsTitle} (${v.comments_text.length})</div>${v.comments_text.map(commentHtml).join('')}</div>`;
+    return `<div class="video" data-vid="${esc(v.id)}">
+      <div class="video-header" onclick="toggleVideo(this)">
+        <div class="video-title">${esc(v.title||'(no title)')}${hot}</div>
+        <div class="video-meta">${meta}</div>
+      </div>
+      <div class="video-body">
+        <div class="detail"><div class="detail-value"><a href="https://www.youtube.com/watch?v=${esc(v.id)}" target="_blank" rel="noopener">▶ YouTube</a></div></div>
+        ${body}
+      </div>
+    </div>`;
+  }).join('');
+  // 频道统计条
+  const c=DATA.channels[activeChannel];
+  const st=channelStats(c);
+  box.innerHTML=`<div class="stats">
+      <div class="stat"><div class="num">${fmtNum(c.subs)}</div><div class="label">${t.subs}</div></div>
+      <div class="stat"><div class="num">${c.videos.length}</div><div class="label">${t.videos}</div></div>
+      <div class="stat"><div class="num">${fmtNum(st.total)}</div><div class="label">${t.totalViews}</div></div>
+      <div class="stat"><div class="num">${fmtNum(st.avg)}</div><div class="label">${t.avgViews}</div></div>
+    </div>`+box.innerHTML;
+}
+
+applyI18n();
+</script>
+</body>
+</html>
