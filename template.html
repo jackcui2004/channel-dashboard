@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title data-i18n-title>三频道数据看板</title>
+<title data-i18n-title>YouTube 数据看板</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -110,7 +110,7 @@ h1{font-size:24px;font-weight:800;text-align:center;letter-spacing:1px;margin:6p
 </head>
 <body>
 <div class="langicon" id="langicon" title="切换语言">🌐</div>
-<h1 id="page-title">三频道数据看板</h1>
+<h1 id="page-title">YouTube 数据看板</h1>
 <div class="updated" id="updated-line">数据更新于 __UPDATED_AT__</div>
 <input class="search" id="search" placeholder="🔍 搜索标题关键词...">
 <div id="mainview" class="pageview">
@@ -138,7 +138,7 @@ const DATA = __DATA_JSON__;
 let lang = 'zh';
 try{ lang = localStorage.getItem('dash-lang') || 'zh'; }catch(e){}
 const T = {
-zh:{updated:'数据更新于',refresh:'刷新数据',search:'🔍 搜索标题关键词...',subs:'订阅者',videos:'视频数',totalViews:'总播放量',avgViews:'平均播放/视频',openChan:'在 YouTube 打开频道',sort:'排序',latest:'最新发布',byViews:'播放量',plays:'播放',likes:'点赞',comments:'评论',duration:'时长',detail:'详情',collapse:'收起',desc:'简介',tags:'标签',note:'备注',commentsTitle:'评论',captured:(a,b)=>`（已抓取 ${a} 条 / 共 ${b} 条）`,watch:'在 YouTube 观看 →',likeWord:'赞',noResult:'没有匹配的视频',footer:'数据来自 YouTube 公开页面 · 每小时自动更新 · 缺失数字标为「—」',hot:'🔥 爆款',translating:'正在翻译…',transFail:'（翻译暂不可用，显示英文原文）',translated:'已翻译',refreshNote:'数据每小时自动更新',pageTitle:'三频道数据看板',listView:'视频列表',rankView:'📈 涨幅榜',rankTitle:'小时播放量涨幅榜',rankSub:'对比上一轮抓取',noDelta:'暂无上一轮数据',transTitle:'🌐 标题翻译',transTitleOn:'🌐 已翻译',translatingTitle:'翻译中…',back:'← 返回',rankBtn:'📈 涨幅榜',expandAll:'展开查看全部 {n} 条 ▼',collapseAll:'收起 ▲'},
+zh:{updated:'数据更新于',refresh:'刷新数据',search:'🔍 搜索标题关键词...',subs:'订阅者',videos:'视频数',totalViews:'总播放量',avgViews:'平均播放/视频',openChan:'在 YouTube 打开频道',sort:'排序',latest:'最新发布',byViews:'播放量',plays:'播放',likes:'点赞',comments:'评论',duration:'时长',detail:'详情',collapse:'收起',desc:'简介',tags:'标签',note:'备注',commentsTitle:'评论',captured:(a,b)=>`（已抓取 ${a} 条 / 共 ${b} 条）`,watch:'在 YouTube 观看 →',likeWord:'赞',noResult:'没有匹配的视频',footer:'数据来自 YouTube 公开页面 · 每小时自动更新 · 缺失数字标为「—」',hot:'🔥 爆款',translating:'正在翻译…',transFail:'（翻译暂不可用，显示英文原文）',translated:'已翻译',refreshNote:'数据每小时自动更新',pageTitle:'YouTube 数据看板',listView:'视频列表',rankView:'📈 涨幅榜',rankTitle:'小时播放量涨幅榜',rankSub:'对比上一轮抓取',noDelta:'暂无上一轮数据',transTitle:'🌐 标题翻译',transTitleOn:'🌐 已翻译',translatingTitle:'翻译中…',back:'← 返回',rankBtn:'📈 涨幅榜',expandAll:'展开查看全部 {n} 条 ▼',collapseAll:'收起 ▲'},
 en:{updated:'Updated',refresh:'Refresh',search:'🔍 Search titles...',subs:'Subscribers',videos:'Videos',totalViews:'Total views',avgViews:'Avg views/video',openChan:'Open channel on YouTube',sort:'Sort',latest:'Newest',byViews:'Views',plays:'Views',likes:'Likes',comments:'Comments',duration:'Duration',detail:'Details',collapse:'Collapse',desc:'Description',tags:'Tags',note:'Note',commentsTitle:'Comments',captured:(a,b)=>`(${a} of ${b} captured)`,watch:'Watch on YouTube →',likeWord:'likes',noResult:'No matching videos',footer:'Data from public YouTube pages · auto-updated hourly · missing values shown as "—"',hot:'🔥 HOT',translating:'',transFail:'',translated:'',refreshNote:'Data auto-updates every hour',pageTitle:'3-Channel Data Dashboard',listView:'Video List',rankView:'📈 Growth',rankTitle:'Hourly Growth Top 5',rankSub:'',noDelta:'No previous data yet',transTitle:'🌐 Translate Titles',transTitleOn:'🌐 Translated',translatingTitle:'Translating…',back:'← Back',rankBtn:'📈 Growth',expandAll:'Show all {n} ▼',collapseAll:'Collapse ▲'}};
 const t = ()=>T[lang];
 /* ---------- 翻译：内存 + localStorage 缓存，Google gtx 主通道，MyMemory 兜底 ---------- */
