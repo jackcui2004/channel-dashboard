@@ -680,122 +680,122 @@ function moveThumb(){
   thumb.style.left=btn.offsetLeft+'px';
   thumb.style.width=btn.offsetWidth+'px';
 }
-// 底部栏按住拖动切换（像苹果液态玻璃）
+// 底部栏按住拖动切换：scrub 点击切换动画的时间线
+// 点击动画 = flip-out(0.35s) → 切换 → flip-in(0.35s)，拖动进度 0→1 对应整个时间线
 (function(){
   const seg=document.getElementById('g-seg');
   const thumb=document.getElementById('g-thumb');
   if(!seg||!thumb)return;
-  let startX=null, dragging=false, suppressClick=false;
+  let startX=null, dragging=false, suppressClick=false, scrubDir=1;
   const DRAG_THRESHOLD=12;
+  // scrub 时间线：progress 0→0.5 是 outgoing 的 flip-out，0.5→1 是 incoming 的 flip-in
+  function scrub(progress){
+    const main=document.getElementById('mainview'), rank=document.getElementById('rankview');
+    const outgoing=curView==='list'?main:rank;
+    const incoming=curView==='list'?rank:main;
+    if(!outgoing||!incoming)return;
+    const dir=curView==='list'?-1:1;
+    if(progress<0.5){
+      // 前半：outgoing 做 flip-out (normal → rotateY(-18deg), opacity 0)
+      const p=progress/0.5;
+      const angle=-18*p*dir;
+      outgoing.style.transform=`perspective(1200px) rotateY(${angle}deg)`;
+      outgoing.style.transformOrigin='top center';
+      outgoing.style.opacity=String(1-p);
+      outgoing.style.position='relative';outgoing.style.zIndex='2';
+      incoming.classList.remove('hidden');
+      incoming.style.position='absolute';incoming.style.top='0';
+      incoming.style.left='0';incoming.style.right='0';incoming.style.zIndex='1';
+      incoming.style.opacity='0';incoming.style.pointerEvents='none';
+      incoming.style.transform=`perspective(1200px) rotateY(${18*dir}deg)`;
+      incoming.style.transformOrigin='top center';
+    }else{
+      // 后半：incoming 做 flip-in (rotateY(18deg), opacity 0 → normal)
+      const p=(progress-0.5)/0.5;
+      const angle=18*(1-p)*dir;
+      incoming.classList.remove('hidden');
+      incoming.style.position='relative';incoming.style.zIndex='2';
+      incoming.style.opacity=String(p);
+      incoming.style.transform=`perspective(1200px) rotateY(${angle}deg)`;
+      incoming.style.transformOrigin='top center';
+      incoming.style.pointerEvents='';
+      outgoing.style.position='absolute';outgoing.style.top='0';
+      outgoing.style.left='0';outgoing.style.right='0';outgoing.style.zIndex='1';
+      outgoing.style.opacity='0';outgoing.style.pointerEvents='none';
+      outgoing.style.transform=`perspective(1200px) rotateY(${-18*dir}deg)`;
+      outgoing.style.transformOrigin='top center';
+    }
+  }
+  function cleanupScrub(){
+    const main=document.getElementById('mainview'), rank=document.getElementById('rankview');
+    [main,rank].forEach(v=>{
+      if(!v)return;
+      v.style.position='';v.style.top='';v.style.left='';v.style.right='';
+      v.style.zIndex='';v.style.opacity='';v.style.pointerEvents='';
+      v.style.transform='';v.style.transformOrigin='';v.style.transition='';
+    });
+  }
   seg.addEventListener('touchstart',e=>{
-    const t=e.touches[0];
-    startX=t.clientX;
-    dragging=false;
-    suppressClick=false;
+    startX=e.touches[0].clientX;
+    dragging=false;suppressClick=false;
+    scrubDir=curView==='list'?1:-1;
   },{passive:true});
   seg.addEventListener('touchmove',e=>{
     if(startX===null)return;
-    const t=e.touches[0];
-    const dx=t.clientX-startX;
-    if(!dragging && Math.abs(dx)>DRAG_THRESHOLD){
+    const dx=e.touches[0].clientX-startX;
+    if(!dragging&&Math.abs(dx)>DRAG_THRESHOLD){
       dragging=true;
       thumb.style.transition='none';
-      // 准备翻书：把目标视图放到下面
       const main=document.getElementById('mainview'), rank=document.getElementById('rankview');
-      const incoming=curView==='list'?rank:main;
-      const outgoing=curView==='list'?main:rank;
-      if(incoming&&outgoing){
-        incoming.classList.remove('hidden');
-        incoming.style.position='absolute';
-        incoming.style.top='0';incoming.style.left='0';incoming.style.right='0';
-        incoming.style.zIndex='1';
-        incoming.style.opacity='0';
-        incoming.style.pointerEvents='none';
-        outgoing.style.position='relative';
-        outgoing.style.zIndex='2';
-        if(curView==='rank')renderList();
-        else renderRank();
-      }
+      [main,rank].forEach(v=>{if(v)v.style.transition='none';});
+      if(curView==='rank')renderList();else renderRank();
     }
     if(dragging){
       const btn=curView==='rank'?document.getElementById('g-rank'):document.getElementById('g-list');
       const other=curView==='rank'?document.getElementById('g-list'):document.getElementById('g-rank');
       if(!btn||!other)return;
-      const minL=Math.min(btn.offsetLeft, other.offsetLeft);
-      const maxL=Math.max(btn.offsetLeft, other.offsetLeft);
-      let newLeft=btn.offsetLeft+dx;
-      newLeft=Math.max(minL, Math.min(maxL, newLeft));
+      const minL=Math.min(btn.offsetLeft,other.offsetLeft);
+      const maxL=Math.max(btn.offsetLeft,other.offsetLeft);
+      let newLeft=Math.max(minL,Math.min(maxL,btn.offsetLeft+dx));
       thumb.style.left=newLeft+'px';
-      // 翻书联动：根据拖动进度旋转当前页面
       const totalDist=Math.abs(other.offsetLeft-btn.offsetLeft)||1;
-      const progress=Math.max(0,Math.min(1,Math.abs(newLeft-btn.offsetLeft)/totalDist));
-      const main=document.getElementById('mainview'), rank=document.getElementById('rankview');
-      const outgoing=curView==='list'?main:rank;
-      const incoming=curView==='list'?rank:main;
-      if(outgoing&&incoming){
-        const dir=curView==='list'?-1:1; // list->rank 向左翻，rank->list 向右翻
-        const angle=progress*55*dir;
-        outgoing.style.transform=`perspective(1200px) rotateY(${angle}deg)`;
-        outgoing.style.transformOrigin=dir<0?'left center':'right center';
-        outgoing.style.opacity=1-progress*0.4;
-        incoming.style.opacity=String(progress*0.9);
-      }
+      let progress=Math.abs(newLeft-btn.offsetLeft)/totalDist;
+      // 方向：向目标方向拖 progress 0→1，反向拖则 progress 减小
+      const movingToward=(curView==='list'&&dx>0)||(curView==='rank'&&dx<0);
+      progress=movingToward?Math.max(0,Math.min(1,progress)):0;
+      scrub(progress);
       e.preventDefault();
     }
   },{passive:false});
   seg.addEventListener('touchend',e=>{
     if(startX===null)return;
     const wasDragging=dragging;
-    const main=document.getElementById('mainview'), rank=document.getElementById('rankview');
-    const cleanup=()=>{
-      [main,rank].forEach(v=>{
-        if(!v)return;
-        v.style.position='';v.style.top='';v.style.left='';v.style.right='';
-        v.style.zIndex='';v.style.opacity='';v.style.pointerEvents='';
-        v.style.transform='';v.style.transformOrigin='';
-      });
-    };
     if(wasDragging){
       suppressClick=true;
       const btn=curView==='rank'?document.getElementById('g-rank'):document.getElementById('g-list');
       const other=curView==='rank'?document.getElementById('g-list'):document.getElementById('g-rank');
+      const main=document.getElementById('mainview'), rank=document.getElementById('rankview');
       if(btn&&other){
         const curL=parseFloat(thumb.style.left)||btn.offsetLeft;
         const mid=(btn.offsetLeft+other.offsetLeft)/2;
-        if((curView==='list'&&curL>mid)||(curView==='rank'&&curL<mid)){
-          // 翻过去：先清理再走正常切换动画
-          cleanup();
+        const goThrough=(curView==='list'&&curL>mid)||(curView==='rank'&&curL<mid);
+        if(goThrough){
+          // 松手 = 点击动画的结束：直接完成切换
+          cleanupScrub();
           curView==='list'?showRank():showMain();
         }else{
-          // 弹回
-          const outgoing=curView==='list'?main:rank;
-          const incoming=curView==='list'?rank:main;
-          if(outgoing){
-            outgoing.style.transition='transform .25s ease,opacity .25s ease';
-            outgoing.style.transform='perspective(1200px) rotateY(0deg)';
-            outgoing.style.opacity='1';
-          }
-          if(incoming)incoming.style.opacity='0';
-          setTimeout(()=>{
-            cleanup();
-            if(outgoing)outgoing.style.transition='';
-            moveThumb();
-          },260);
+          // 弹回开头
+          [main,rank].forEach(v=>{if(v)v.style.transition='transform .25s ease,opacity .25s ease';});
+          scrub(0);
+          setTimeout(()=>{cleanupScrub();moveThumb();},260);
         }
-      }else{
-        cleanup();moveThumb();
-      }
+      }else{cleanupScrub();moveThumb();}
       setTimeout(()=>{suppressClick=false;},150);
     }
-    startX=null;
-    dragging=false;
+    startX=null;dragging=false;
   },{passive:true});
-  // 拖动后屏蔽一次点击，避免误触发
   seg.addEventListener('click',e=>{
-    if(suppressClick){
-      e.stopPropagation();
-      e.preventDefault();
-    }
+    if(suppressClick){e.stopPropagation();e.preventDefault();}
   },true);
 })();
 function showRank(){
