@@ -65,8 +65,8 @@ h1{font-size:24px;font-weight:800;text-align:center;letter-spacing:1px;margin:6p
 .tab .n{font-size:15px}
 .tab.on{color:var(--text);font-weight:800;border-bottom-color:var(--red)}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0 10px}
-.stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 6px;text-align:center}
-.stat .num{font-size:24px;font-weight:800;letter-spacing:.3px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 6px;text-align:center;position:relative}
+.stat .num{font-size:24px;font-weight:800;letter-spacing:.3px;position:relative;display:inline-block}
 .stat .label{font-size:12px;color:var(--muted);margin-top:4px}
 .chanlink{color:var(--muted);font-size:13px;margin:2px 0 14px}
 .chanlink a{color:var(--muted);text-decoration:underline}
@@ -127,7 +127,8 @@ h1{font-size:24px;font-weight:800;text-align:center;letter-spacing:1px;margin:6p
 .pageview.flip-out{transform:perspective(1200px) rotateY(-18deg);opacity:0}
 .pageview.flip-in{transform:perspective(1200px) rotateY(18deg);opacity:0}
 .delta{display:inline-block;font-size:11px;font-weight:700;color:var(--red);background:#fdeceb;border-radius:6px;padding:1px 6px;margin-left:4px;vertical-align:2px;white-space:nowrap}
-.stat .delta{margin-left:0;margin-top:4px}
+.stat .delta{position:absolute;top:-10px;right:-6px;margin:0;font-size:10px;padding:2px 6px;background:var(--card);border:1.5px solid var(--red);border-radius:8px}
+[data-theme="dark"] .stat .delta{background:#1e1e1e}
 .viewseg{margin:6px 0 4px}
 .rankcard{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
 .ranknum{font-size:22px;font-weight:800;color:var(--red);min-width:28px;text-align:center}
@@ -226,7 +227,12 @@ async function translateText(text){
 }
 /* ---------- 工具 ---------- */
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
-function fmtNum(v){return (v===null||v===undefined||isNaN(v))?'—':Number(v).toLocaleString('en-US')}
+function fmtNum(v){
+  if(v===null||v===undefined||isNaN(v))return '—';
+  v=Number(v);
+  if(v>=10000)return (v/10000).toFixed(1).replace(/\.0$/,'')+'w';
+  return v.toLocaleString('en-US');
+}
 function fmtUpdated(s){
   if(!s||s==='—')return '—';
   const d=new Date(s);if(isNaN(d))return esc(s);
@@ -255,7 +261,7 @@ function allVideosWithDelta(){
   (DATA.channels||[]).forEach(c=>{
     (c.videos||[]).forEach(v=>{
       const d=delta(v,'views');
-      if(d!=null&&d>0)out.push({v,chan:c.name,d,
+      if(d!=null&&d>0)out.push({v,chan:c.name,chanId:c.id,d,
         dl:delta(v,'likes'),dc:delta(v,'comments')});
     });
   });
@@ -281,6 +287,11 @@ function hotWords(){
     .filter(([w,d])=>d.count>=2)
     .sort((a,b)=>b[1].views-a[1].views)
     .slice(0,20);
+}
+// 频道 ID 到颜色 class 的映射
+function chanColorClass(chanId){
+  const map={'moonveilstories':'c0','kimiaudiobooks':'c1','midnightvowstales':'c2','myprettyrevenge':'c3'};
+  return map[chanId]||'c2';
 }
 function renderRank(){
   const el=document.getElementById('ranklist');
@@ -312,7 +323,7 @@ function renderRank(){
         <div class="ranknum r${i+1}">${i+1}</div>
         <div class="rankinfo">
           <div class="ranktitle" data-orig-title="${esc(v.title||'')}">${titleHtml}</div>
-          <div class="rankchan">${esc(r.chan||'')} · ${t().plays} ${fmtNum(v.views)} · ${t().likes} ${fmtNum(v.likes)}${r.dl>0?` <span class="delta">+${fmtNum(r.dl)}</span>`:''} · ${t().comments} ${fmtNum(v.comments)}${r.dc>0?` <span class="delta">+${fmtNum(r.dc)}</span>`:''} · ${esc(v.published||'—')}</div>
+          <div class="rankchan"><span class="chan-tag ${chanColorClass(r.chanId)}" style="font-size:11px;padding:1px 8px;margin-bottom:0">${esc(r.chan||'')}</span> · ${t().plays} ${fmtNum(v.views)} · ${t().likes} ${fmtNum(v.likes)}${r.dl>0?` <span class="delta">+${fmtNum(r.dl)}</span>`:''} · ${t().comments} ${fmtNum(v.comments)}${r.dc>0?` <span class="delta">+${fmtNum(r.dc)}</span>`:''} · ${esc(v.published||'—')}</div>
         </div>
         <div class="rankdelta"><div class="d">+${fmtNum(r.d)}</div><div class="l">${t().plays}</div></div>`;
       if(open){
@@ -547,26 +558,23 @@ function applyLang(){
 }
 function renderAll(){renderTabs();renderStats();renderSort();renderList()}
 document.getElementById('langicon').onclick=()=>{lang=lang==='zh'?'en':'zh';applyLang()};
-// 深色模式切换（含日出日落自动）
-// theme: 'light' | 'dark' | 'auto'
-let theme='auto';
-try{theme=localStorage.getItem('dash-theme')||'auto'}catch(e){}
+// 深色模式：默认自动（按日出日落），手动切换后到下个日出/日落自动恢复
+let manualTheme=null;  // null=自动, 'light'/'dark'=手动
+let manualSunState=null;  // 手动时的昼夜状态
+try{
+  const saved=localStorage.getItem('dash-theme-manual');
+  if(saved)manualTheme=saved;
+}catch(e){}
 
-// 日出日落计算（简化版，按北京经纬度，足够判断昼夜）
+// 日出日落计算（简化版，按北京经纬度）
 function getSunTimes(date){
-  // 北京：39.9°N, 116.4°E
   const lat=39.9, lng=116.4;
   const rad=Math.PI/180;
   const dayOfYear=Math.floor((date-new Date(date.getFullYear(),0,0))/864e5);
-  // 太阳赤纬
   const decl=-23.44*Math.cos(rad*(360/365*(dayOfYear+10)));
-  // 时角
   const ha=Math.acos((Math.sin(rad*-0.83)-Math.sin(rad*lat)*Math.sin(rad*decl))/(Math.cos(rad*lat)*Math.cos(rad*decl)))/rad;
-  // 北京时区的正午（考虑经度修正）
   const noon=12-(lng-120)/15;
-  const sunrise=noon-ha/15;
-  const sunset=noon+ha/15;
-  return {sunrise, sunset};
+  return {sunrise:noon-ha/15, sunset:noon+ha/15};
 }
 function isNightTime(){
   const now=new Date();
@@ -575,24 +583,29 @@ function isNightTime(){
   return h<sunrise||h>=sunset;
 }
 function applyTheme(){
-  let effective=theme;
-  if(theme==='auto'){
-    effective=isNightTime()?'dark':'light';
+  const night=isNightTime();
+  let effective;
+  if(manualTheme){
+    // 手动模式：如果昼夜状态变了，恢复自动
+    if((night?'night':'day')!==manualSunState){
+      manualTheme=null;
+      try{localStorage.removeItem('dash-theme-manual')}catch(e){}
+      effective=night?'dark':'light';
+    }else{
+      effective=manualTheme;
+    }
+  }else{
+    effective=night?'dark':'light';
   }
   document.documentElement.setAttribute('data-theme',effective);
-  const icon=document.getElementById('themeicon');
-  if(theme==='auto'){
-    icon.textContent=isNightTime()?'🌙⏰':'☀️⏰';
-  }else{
-    icon.textContent=theme==='dark'?'☀️':'🌙';
-  }
-  try{localStorage.setItem('dash-theme',theme)}catch(e){}
+  document.getElementById('themeicon').textContent=effective==='dark'?'☀️':'🌙';
 }
-// 每分钟检查一次（自动模式下跟随日出日落）
-setInterval(()=>{if(theme==='auto')applyTheme()},60000);
+setInterval(applyTheme,60000);
 document.getElementById('themeicon').onclick=()=>{
-  // 循环：auto -> light -> dark -> auto
-  theme=theme==='auto'?'light':theme==='light'?'dark':'auto';
+  const current=document.documentElement.getAttribute('data-theme');
+  manualTheme=current==='dark'?'light':'dark';
+  manualSunState=isNightTime()?'night':'day';
+  try{localStorage.setItem('dash-theme-manual',manualTheme)}catch(e){}
   applyTheme();
 };
 applyTheme();
