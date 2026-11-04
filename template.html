@@ -62,6 +62,12 @@ h1{font-size:24px;font-weight:800;text-align:center;letter-spacing:1px;margin:6p
 .vhead{cursor:pointer}
 .vtitle{font-family:Georgia,"Songti SC","Noto Serif SC",serif;font-size:21px;font-weight:800;line-height:1.5;margin-bottom:8px}
 .badge-hot{display:inline-block;font-size:13px;background:var(--red);color:#fff;border-radius:8px;padding:3px 10px;margin-right:8px;font-weight:700;vertical-align:2px;font-family:-apple-system,"PingFang SC",sans-serif}
+.badge-new{display:inline-block;font-size:13px;border-radius:8px;padding:3px 10px;margin-right:8px;font-weight:700;vertical-align:2px;font-family:-apple-system,"PingFang SC",sans-serif}
+.badge-new.c-purple{background:#C724FF;color:#fff;box-shadow:0 0 8px #C724FF}
+.badge-new.c-green{background:#39FF14;color:#000;box-shadow:0 0 8px #39FF14}
+.badge-new.c-gray{background:#E8E8E8;color:#333;box-shadow:0 0 8px #bbb;border:1px solid #ccc}
+.badge-new.c-red{background:#FF3131;color:#fff;box-shadow:0 0 8px #FF3131}
+#color-cycler{position:fixed;bottom:90px;right:16px;z-index:999;background:#000;color:#fff;border-radius:20px;padding:10px 16px;font-size:14px;box-shadow:0 2px 10px rgba(0,0,0,.3)}
 .vmeta{font-size:14px;color:var(--muted);line-height:1.8}
 .vmeta b{color:var(--text);font-weight:700}
 .toggle{color:var(--red);font-weight:700;cursor:pointer;white-space:nowrap}
@@ -139,14 +145,30 @@ h1{font-size:24px;font-weight:800;text-align:center;letter-spacing:1px;margin:6p
     <button id="g-rank">📈 涨幅榜</button>
   </div>
 </div>
+<button id="color-cycler">🎨 紫</button>
 <script>
+// 新标签颜色切换器（临时，选定后删除）
+(function(){
+  const colors=[['c-purple','紫'],['c-green','绿'],['c-gray','灰'],['c-red','红']];
+  let idx=0;
+  window.__newColor='c-purple';
+  const btn=document.getElementById('color-cycler');
+  if(btn)btn.onclick=()=>{
+    idx=(idx+1)%colors.length;
+    window.__newColor=colors[idx][0];
+    btn.textContent='🎨 '+colors[idx][1];
+    // 刷新让新颜色生效
+    renderList();
+    if(curView==='rank')renderRank();
+  };
+})();
 const DATA = __DATA_JSON__;
 /* ---------- 语言 ---------- */
 let lang = 'zh';
 try{ lang = localStorage.getItem('dash-lang') || 'zh'; }catch(e){}
 const T = {
-zh:{updated:'数据更新于',refresh:'刷新数据',search:'🔍 搜索标题关键词...',subs:'订阅者',videos:'视频数',totalViews:'总播放量',avgViews:'平均播放/视频',openChan:'在 YouTube 打开频道',sort:'排序',latest:'最新发布',byViews:'播放量',plays:'播放',likes:'点赞',comments:'评论',duration:'时长',detail:'详情',collapse:'收起',desc:'简介',tags:'标签',note:'备注',commentsTitle:'评论',captured:(a,b)=>`（已抓取 ${a} 条 / 共 ${b} 条）`,watch:'在 YouTube 观看 →',likeWord:'赞',noResult:'没有匹配的视频',footer:'数据来自 YouTube 公开页面 · 每小时自动更新 · 缺失数字标为「—」',hot:'🔥 爆款',translating:'正在翻译…',transFail:'（翻译暂不可用，显示英文原文）',translated:'已翻译',refreshNote:'数据每小时自动更新',pageTitle:'YouTube 数据看板',listView:'视频列表',rankView:'📈 涨幅榜',rankTitle:'小时播放量涨幅榜',rankSub:'对比上一轮抓取',noDelta:'暂无上一轮数据',transTitle:'🌐 标题翻译',transTitleOn:'🌐 已翻译',translatingTitle:'翻译中…',back:'← 返回',rankBtn:'📈 涨幅榜',expandAll:'展开查看全部 {n} 条 ▼',collapseAll:'收起 ▲'},
-en:{updated:'Updated',refresh:'Refresh',search:'🔍 Search titles...',subs:'Subscribers',videos:'Videos',totalViews:'Total views',avgViews:'Avg views/video',openChan:'Open channel on YouTube',sort:'Sort',latest:'Newest',byViews:'Views',plays:'Views',likes:'Likes',comments:'Comments',duration:'Duration',detail:'Details',collapse:'Collapse',desc:'Description',tags:'Tags',note:'Note',commentsTitle:'Comments',captured:(a,b)=>`(${a} of ${b} captured)`,watch:'Watch on YouTube →',likeWord:'likes',noResult:'No matching videos',footer:'Data from public YouTube pages · auto-updated hourly · missing values shown as "—"',hot:'🔥 HOT',translating:'',transFail:'',translated:'',refreshNote:'Data auto-updates every hour',pageTitle:'3-Channel Data Dashboard',listView:'Video List',rankView:'📈 Growth',rankTitle:'Hourly Growth Top 5',rankSub:'',noDelta:'No previous data yet',transTitle:'🌐 Translate Titles',transTitleOn:'🌐 Translated',translatingTitle:'Translating…',back:'← Back',rankBtn:'📈 Growth',expandAll:'Show all {n} ▼',collapseAll:'Collapse ▲'}};
+zh:{updated:'数据更新于',refresh:'刷新数据',search:'🔍 搜索标题关键词...',subs:'订阅者',videos:'视频数',totalViews:'总播放量',avgViews:'平均播放/视频',openChan:'在 YouTube 打开频道',sort:'排序',latest:'最新发布',byViews:'播放量',plays:'播放',likes:'点赞',comments:'评论',duration:'时长',detail:'详情',collapse:'收起',desc:'简介',tags:'标签',note:'备注',commentsTitle:'评论',captured:(a,b)=>`（已抓取 ${a} 条 / 共 ${b} 条）`,watch:'在 YouTube 观看 →',likeWord:'赞',noResult:'没有匹配的视频',footer:'数据来自 YouTube 公开页面 · 每小时自动更新 · 缺失数字标为「—」',hot:'🔥 爆款',translating:'正在翻译…',transFail:'（翻译暂不可用，显示英文原文）',translated:'已翻译',refreshNote:'数据每小时自动更新',pageTitle:'YouTube 数据看板',listView:'视频列表',rankView:'📈 涨幅榜',rankTitle:'小时播放量涨幅榜',rankSub:'对比上一轮抓取',noDelta:'暂无上一轮数据',transTitle:'🌐 标题翻译',transTitleOn:'🌐 已翻译',isNew:'🆕 新发布',translatingTitle:'翻译中…',back:'← 返回',rankBtn:'📈 涨幅榜',expandAll:'展开查看全部 {n} 条 ▼',collapseAll:'收起 ▲'},
+en:{updated:'Updated',refresh:'Refresh',search:'🔍 Search titles...',subs:'Subscribers',videos:'Videos',totalViews:'Total views',avgViews:'Avg views/video',openChan:'Open channel on YouTube',sort:'Sort',latest:'Newest',byViews:'Views',plays:'Views',likes:'Likes',comments:'Comments',duration:'Duration',detail:'Details',collapse:'Collapse',desc:'Description',tags:'Tags',note:'Note',commentsTitle:'Comments',captured:(a,b)=>`(${a} of ${b} captured)`,watch:'Watch on YouTube →',likeWord:'likes',noResult:'No matching videos',footer:'Data from public YouTube pages · auto-updated hourly · missing values shown as "—"',hot:'🔥 HOT',translating:'',transFail:'',translated:'',refreshNote:'Data auto-updates every hour',pageTitle:'3-Channel Data Dashboard',listView:'Video List',rankView:'📈 Growth',rankTitle:'Hourly Growth Top 5',rankSub:'',noDelta:'No previous data yet',transTitle:'🌐 Translate Titles',transTitleOn:'🌐 Translated',isNew:'🆕 NEW',translatingTitle:'Translating…',back:'← Back',rankBtn:'📈 Growth',expandAll:'Show all {n} ▼',collapseAll:'Collapse ▲'}};
 const t = ()=>T[lang];
 /* ---------- 翻译：内存 + localStorage 缓存，Google gtx 主通道，MyMemory 兜底 ---------- */
 const memCache = {}, inflight = {};
@@ -380,6 +402,12 @@ function commentHtml(c){
 function videoHtml(v){
   const open=openSet.has(v.id);
   const hot=v.hot?`<span class="badge-hot">${t().hot}</span>`:'';
+  // 新发布标签：当天发布的视频（数据只有日期精度）
+  let isNew='';
+  try{
+    const today=new Date().toISOString().slice(0,10);
+    if(v.published===today)isNew=`<span class="badge-new ${window.__newColor||'c-purple'}">${t().isNew}</span>`;
+  }catch(e){}
   const chanTag=(curChan===-1&&v._chan)?`<div style="font-size:12.5px;color:var(--muted);margin-bottom:4px">${esc(v._chan)}</div>`:'';
   const titleShow=esc(v.title||'');
   const meta=`${t().plays} <b>${fmtNum(v.views)}</b>${deltaHtml(v,'views')} · ${t().likes} ${fmtNum(v.likes)}${deltaHtml(v,'likes')} · ${t().comments} ${fmtNum(v.comments)}${deltaHtml(v,'comments')} · ${t().duration} ${esc(v.duration||'—')} · ${esc(v.published||'—')} <span class="toggle" data-id="${esc(v.id)}">${open?t().collapse+' ▲':t().detail+' ▼'}</span>`;
@@ -397,7 +425,7 @@ function videoHtml(v){
   }
   body+=`<a class="ytwatch" href="https://www.youtube.com/watch?v=${esc(v.id)}" target="_blank" rel="noopener">${t().watch}</a>`;
   body+='</div>';
-  return `<div class="video${open?' open':''}" data-vid="${esc(v.id)}"><div class="vhead">${chanTag}<div class="vtitle" data-orig-title="${esc(v.title||'')}">${hot}${titleShow}</div><div class="vmeta">${meta}</div></div>${body}</div>`;
+  return `<div class="video${open?' open':''}" data-vid="${esc(v.id)}"><div class="vhead">${chanTag}<div class="vtitle" data-orig-title="${esc(v.title||'')}">${hot}${isNew}${titleShow}</div><div class="vmeta">${meta}</div></div>${body}</div>`;
 }
 function renderList(){
   const vs=filteredVideos();
