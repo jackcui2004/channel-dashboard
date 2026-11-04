@@ -181,11 +181,11 @@ def parse_comments(raw_comments):
         else:
             tops[cid] = item
             order.append(cid)
-            if len(order) >= 10:
-                # 顶层评论够 10 条后仍需继续扫一遍以便挂载回复
+            if len(order) >= 50:
+                # 顶层评论够 50 条后仍需继续扫一遍以便挂载回复
                 pass
-    # 只保留前 10 条顶层
-    result = [tops[cid] for cid in order[:10]]
+    # 只保留前 50 条顶层
+    result = [tops[cid] for cid in order[:50]]
     # timestamp -> 可读时间
     for item in result:
         item["time"] = fmt_ts(item["time"])
