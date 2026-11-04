@@ -233,7 +233,7 @@ function renderRank(){
     h+=ranked.map((r,i)=>{
       const v=r.v;
       const open=openSet.has('rank_'+v.id);
-      const titleHtml = titleTransOn && v.title_zh ? esc(v.title_zh) : esc(v.title||'');
+      const titleHtml = titleTransOn && (v.title_zh||v._titleZh) ? esc(v.title_zh||v._titleZh) : esc(v.title||'');
       let card=`<div class="rankcard${open?' open':''}" style="flex-wrap:wrap;cursor:pointer" data-rankid="${esc(v.id)}">
         <div class="ranknum r${i+1}">${i+1}</div>
         <div class="rankinfo">
@@ -346,6 +346,27 @@ function renderSort(){
 }
 function toggleTitleTrans(){
   titleTransOn=!titleTransOn;
+  if(titleTransOn){
+    // 服务端没有中文标题时，客户端兜底翻译（用用户 IP，不会被限）
+    const vs=filteredVideos();
+    const todo=vs.filter(v=>!v.title_zh&&!v._titleZh&&v.title);
+    if(todo.length){
+      const btn=document.getElementById('btn-trans-title');
+      if(btn){btn.textContent=t().translatingTitle;btn.disabled=true}
+      (async()=>{
+        const chunk=6;
+        for(let i=0;i<todo.length;i+=chunk){
+          await Promise.all(todo.slice(i,i+chunk).map(async v=>{
+            const tr=await translateText(v.title);
+            if(tr)v._titleZh=tr;
+          }));
+        }
+        renderSort();renderList();
+        if(curView==='rank')renderRank();
+      })();
+      return;
+    }
+  }
   renderSort();renderList();
   if(curView==='rank')renderRank();
 }
@@ -362,7 +383,7 @@ function videoHtml(v){
   const open=openSet.has(v.id);
   const hot=v.hot?`<span class="badge-hot">${t().hot}</span>`:'';
   const chanTag=(curChan===-1&&v._chan)?`<div style="font-size:12.5px;color:var(--muted);margin-bottom:4px">${esc(v._chan)}</div>`:'';
-  const titleShow=(titleTransOn&&v.title_zh)?esc(v.title_zh):esc(v.title||'');
+  const titleShow=(titleTransOn&&(v.title_zh||v._titleZh))?esc(v.title_zh||v._titleZh):esc(v.title||'');
   const meta=`${t().plays} <b>${fmtNum(v.views)}</b>${deltaHtml(v,'views')} · ${t().likes} ${fmtNum(v.likes)}${deltaHtml(v,'likes')} · ${t().comments} ${fmtNum(v.comments)}${deltaHtml(v,'comments')} · ${t().duration} ${esc(v.duration||'—')} · ${esc(v.published||'—')} <span class="toggle" data-id="${esc(v.id)}">${open?t().collapse+' ▲':t().detail+' ▼'}</span>`;
   let body=`<div class="vbody">`;
   body+=`<div class="dlabel">${t().desc}</div><div class="dtext" data-translate data-orig="${esc(v.description||'')}">${v.description?esc(v.description):'—'}</div>`;
