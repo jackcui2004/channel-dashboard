@@ -488,21 +488,29 @@ document.getElementById('g-rank').onclick=showRank;
   window.addEventListener('scroll',()=>{
     if(!ticking){ticking=true;requestAnimationFrame(onScroll)}
   },{passive:true});
-  // 左右滑动翻页（touch 事件，iOS 兼容）
-  let tx=0, swiped=false;
+  // 左右滑动翻页（touch 事件，iOS 兼容；按钮上也能滑）
+  let tx=0, ty=0, swiped=false;
   bar.addEventListener('touchstart',e=>{
-    if(e.target.tagName==='BUTTON')return;
-    tx=e.touches[0].clientX; swiped=false;
+    const t=e.touches[0];
+    tx=t.clientX; ty=t.clientY; swiped=false;
   },{passive:true});
   bar.addEventListener('touchmove',e=>{
-    if(e.target.tagName==='BUTTON')return;
-    const dx=e.touches[0].clientX-tx;
-    if(Math.abs(dx)>50 && !swiped){
+    const t=e.touches[0];
+    const dx=t.clientX-tx, dy=t.clientY-ty;
+    // 水平滑动超过 40px 且水平分量主导 → 翻页
+    if(!swiped && Math.abs(dx)>40 && Math.abs(dx)>Math.abs(dy)*1.5){
       swiped=true;
       if(dx<0 && curView==='list')showRank();
       else if(dx>0 && curView==='rank')showMain();
     }
   },{passive:true});
+  // 滑动后阻止按钮的点击误触
+  bar.addEventListener('touchend',e=>{
+    if(swiped){e.preventDefault();e.stopPropagation()}
+  },{passive:false});
+  bar.addEventListener('click',e=>{
+    if(swiped){e.preventDefault();e.stopPropagation();swiped=false}
+  },true);
 })();
 document.getElementById('search').oninput=(e)=>{query=e.target.value.trim();renderList()};
 applyLang();
