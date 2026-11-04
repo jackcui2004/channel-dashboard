@@ -340,6 +340,7 @@ function renderRank(){
           card+=`<div style="text-align:center;margin:10px 0"><button class="sortpill" data-rcexpand="${esc(v.id)}">${cOpen?t().collapseAll:t().expandAll.replace('{n}',ct.length)}</button></div>`;
         }
         card+=`<a class="ytwatch" href="https://www.youtube.com/watch?v=${esc(v.id)}" target="_blank" rel="noopener">${t().watch}</a>`;
+        card+=`<div style="text-align:center;margin-top:12px"><span class="toggle" data-rcollapse="${esc(v.id)}">${t().collapse} ▲</span></div>`;
         card+=`</div>`;
       }
       card+=`</div>`;
@@ -351,12 +352,32 @@ function renderRank(){
     card.onclick=(e)=>{
       if(e.target.closest('a'))return;
       if(e.target.closest('[data-rcexpand]'))return;
+      if(e.target.closest('[data-rcollapse]'))return;
       const id=card.dataset.rankid;
       const key='rank_'+id;
       openSet.has(key)?openSet.delete(key):openSet.add(key);
       renderRank();
       if(openSet.has(key)&&lang==='zh')translateOpen(card);
     };
+  });
+  el.querySelectorAll('[data-rcollapse]').forEach(b=>b.onclick=(e)=>{
+    e.stopPropagation();
+    const id=b.dataset.rcollapse;
+    const key='rank_'+id;
+    const card=b.closest('.rankcard');
+    const rect=card?card.getBoundingClientRect():null;
+    const scrollY=rect?window.scrollY+rect.top:null;
+    openSet.delete(key);
+    renderRank();
+    if(scrollY!==null){
+      requestAnimationFrame(()=>{
+        const newCard=document.querySelector(`[data-rankid="${id}"]`);
+        if(newCard){
+          const nr=newCard.getBoundingClientRect();
+          window.scrollTo(0, window.scrollY+nr.top-20);
+        }
+      });
+    }
   });
   el.querySelectorAll('[data-rcexpand]').forEach(b=>b.onclick=(e)=>{
     e.stopPropagation();
@@ -518,6 +539,13 @@ function renderList(){
     const id=b.dataset.collapse;
     openSet.delete(id);
     renderList();
+    requestAnimationFrame(()=>{
+      const card=document.querySelector(`[data-vid="${id}"]`);
+      if(card){
+        const r=card.getBoundingClientRect();
+        window.scrollTo(0, window.scrollY+r.top-20);
+      }
+    });
   });
   el.querySelectorAll('[data-cexpand]').forEach(b=>b.onclick=(e)=>{
     e.stopPropagation();
@@ -615,9 +643,73 @@ function moveThumb(){
   const thumb=document.getElementById('g-thumb');
   const btn=curView==='rank'?document.getElementById('g-rank'):document.getElementById('g-list');
   if(!seg||!thumb||!btn)return;
+  thumb.style.transition='left .25s ease,width .25s ease';
   thumb.style.left=btn.offsetLeft+'px';
   thumb.style.width=btn.offsetWidth+'px';
 }
+// 底部栏按住拖动切换（像苹果液态玻璃）
+(function(){
+  const seg=document.getElementById('g-seg');
+  const thumb=document.getElementById('g-thumb');
+  if(!seg||!thumb)return;
+  let startX=null, dragging=false, suppressClick=false;
+  const DRAG_THRESHOLD=12;
+  seg.addEventListener('touchstart',e=>{
+    const t=e.touches[0];
+    startX=t.clientX;
+    dragging=false;
+    suppressClick=false;
+  },{passive:true});
+  seg.addEventListener('touchmove',e=>{
+    if(startX===null)return;
+    const t=e.touches[0];
+    const dx=t.clientX-startX;
+    if(!dragging && Math.abs(dx)>DRAG_THRESHOLD){
+      dragging=true;
+      thumb.style.transition='none';
+    }
+    if(dragging){
+      const btn=curView==='rank'?document.getElementById('g-rank'):document.getElementById('g-list');
+      const other=curView==='rank'?document.getElementById('g-list'):document.getElementById('g-rank');
+      if(!btn||!other)return;
+      // 限制拖动范围在两个按钮之间
+      const minL=Math.min(btn.offsetLeft, other.offsetLeft);
+      const maxL=Math.max(btn.offsetLeft, other.offsetLeft);
+      let newLeft=btn.offsetLeft+dx;
+      newLeft=Math.max(minL, Math.min(maxL, newLeft));
+      thumb.style.left=newLeft+'px';
+      e.preventDefault();
+    }
+  },{passive:false});
+  seg.addEventListener('touchend',e=>{
+    if(startX===null)return;
+    if(dragging){
+      suppressClick=true;
+      const btn=curView==='rank'?document.getElementById('g-rank'):document.getElementById('g-list');
+      const other=curView==='rank'?document.getElementById('g-list'):document.getElementById('g-rank');
+      if(btn&&other){
+        const curL=parseFloat(thumb.style.left)||btn.offsetLeft;
+        const mid=(btn.offsetLeft+other.offsetLeft)/2;
+        // 松手时如果滑过中线就切换，否则弹回
+        if((curView==='list'&&curL>mid)||(curView==='rank'&&curL<mid)){
+          curView==='list'?showRank():showMain();
+        }else{
+          moveThumb();
+        }
+      }
+      setTimeout(()=>{suppressClick=false;},100);
+    }
+    startX=null;
+    dragging=false;
+  },{passive:true});
+  // 拖动后屏蔽一次点击，避免误触发
+  seg.addEventListener('click',e=>{
+    if(suppressClick){
+      e.stopPropagation();
+      e.preventDefault();
+    }
+  },true);
+})();
 function showRank(){
   if(curView==='rank')return;
   curView='rank';
