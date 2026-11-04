@@ -13,6 +13,13 @@
   --tag-bg:#f0efed; --tag:#6b6b6b;
   --pill:#f0efed;
 }
+[data-theme="dark"]{
+  --bg:#121212; --card:#1e1e1e; --border:#2e2e2e;
+  --text:#e8e8e8; --muted:#9a9a9a; --faint:#6a6a6a;
+  --red:#e05545; --red-dark:#c04436;
+  --tag-bg:#2a2a2a; --tag:#b0b0b0;
+  --pill:#2a2a2a;
+}
 body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding:16px 14px 110px;max-width:680px;margin:0 auto;-webkit-font-smoothing:antialiased}
 .langicon{display:inline-block;min-width:44px;height:38px;border-radius:19px;padding:0 14px;
   background:rgba(255,255,255,.72);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);
@@ -21,6 +28,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans G
 .langicon:active{transform:scale(.95)}
 .topbar{display:flex;align-items:center;justify-content:space-between;margin:6px 0 10px}
 .topbar h1{margin:0}
+[data-theme="dark"] .glassbar{background:rgba(30,30,30,.72);border-color:rgba(255,255,255,.12)}
+[data-theme="dark"] .glassbar .seg{background:rgba(255,255,255,.08)}
+[data-theme="dark"] .glassbar .seg .thumb{background:#2e2e2e}
+[data-theme="dark"] .langicon{background:rgba(30,30,30,.72);border-color:var(--border)}
 .glassbar{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:50;
   display:flex;align-items:center;gap:4px;padding:8px;
   background:rgba(255,255,255,.65);backdrop-filter:blur(24px) saturate(200%);-webkit-backdrop-filter:blur(24px) saturate(200%);
@@ -136,7 +147,10 @@ h1{font-size:24px;font-weight:800;text-align:center;letter-spacing:1px;margin:6p
 <div class="wrap">
 <div class="topbar">
 <h1 id="page-title">YouTube 数据看板</h1>
+<div style="display:flex;gap:8px;align-items:center">
+<div class="langicon" id="themeicon" title="深色模式切换">🌙</div>
 <div class="langicon" id="langicon" title="切换语言">中 / EN</div>
+</div>
 </div>
 <div class="updated" id="updated-line">数据更新于 2026-11-04T22:48:29+08:00</div>
 <input class="search" id="search" placeholder="🔍 搜索标题关键词...">
@@ -528,6 +542,16 @@ function applyLang(){
 }
 function renderAll(){renderTabs();renderStats();renderSort();renderList()}
 document.getElementById('langicon').onclick=()=>{lang=lang==='zh'?'en':'zh';applyLang()};
+// 深色模式切换
+let theme='light';
+try{theme=localStorage.getItem('dash-theme')||'light'}catch(e){}
+function applyTheme(){
+  document.documentElement.setAttribute('data-theme',theme);
+  document.getElementById('themeicon').textContent=theme==='dark'?'☀️':'🌙';
+  try{localStorage.setItem('dash-theme',theme)}catch(e){}
+}
+document.getElementById('themeicon').onclick=()=>{theme=theme==='dark'?'light':'dark';applyTheme()};
+applyTheme();
 function moveThumb(){
   const seg=document.getElementById('g-seg');
   const thumb=document.getElementById('g-thumb');
