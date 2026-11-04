@@ -168,7 +168,7 @@ function fmtUpdated(s){
   return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${p(d.getHours())}:${p(d.getMinutes())}${tz}`;
 }
 /* ---------- 状态 ---------- */
-let curChan=0, sortMode='latest', query='', curView='list', titleTransOn=false;
+let curChan=-1, sortMode='latest', query='', curView='list', titleTransOn=false;
 const openSet=new Set();
 function chan(){return (DATA.channels||[])[curChan]||{videos:[]}}
 /* ---------- 环比差值 ---------- */
@@ -242,7 +242,7 @@ function renderRank(){
   if(lang==='zh')el.querySelectorAll('.rankcard.open').forEach(translateOpen);
 }
 function filteredVideos(){
-  let vs=(chan().videos||[]).slice();
+  let vs=chanVideos();
   if(query){const q=query.toLowerCase();vs=vs.filter(v=>(v.title||'').toLowerCase().includes(q))}
   if(sortMode==='views')vs.sort((a,b)=>(b.views||0)-(a.views||0));
   else vs.sort((a,b)=>String(b.published||'').localeCompare(String(a.published||'')));
@@ -251,25 +251,44 @@ function filteredVideos(){
 /* ---------- 渲染 ---------- */
 function renderTabs(){
   const el=document.getElementById('tabs');
-  el.innerHTML=(DATA.channels||[]).map((c,i)=>{
+  const chans=DATA.channels||[];
+  let html=`<div class="tab${curChan===-1?' on':''}" data-i="-1">${lang==='zh'?'全部':'All'}</div>`;
+  html+=chans.map((c,i)=>{
     const nm=esc(c.name||'');
     const parts=nm.split(' ');
     const shown=parts.length>1?parts[0]+'<br>'+parts.slice(1).join(' '):nm;
-    return `<div class="tab${i===curChan?' on':''}" data-i="${i}">${shown} <span class="n">(${(c.videos||[]).length})</span></div>`;
+    return `<div class="tab${i===curChan?' on':''}" data-i="${i}">${shown}</div>`;
   }).join('');
+  el.innerHTML=html;
   el.querySelectorAll('.tab').forEach(td=>td.onclick=()=>{curChan=+td.dataset.i;openSet.clear();renderAll()});
 }
+function chanVideos(){
+  if(curChan===-1){
+    const out=[];
+    (DATA.channels||[]).forEach(c=>{(c.videos||[]).forEach(v=>{const cp=Object.assign({},v);cp._chan=c.name;out.push(cp)})});
+    return out;
+  }
+  return (chan().videos||[]).slice();
+}
 function renderStats(){
-  const c=chan(),vs=c.videos||[];
+  let subs=null, vs, chanUrl='', handle='';
+  if(curChan===-1){
+    vs=chanVideos();
+    subs=(DATA.channels||[]).reduce((a,c)=>a+(c.subs||0),0);
+    handle='all';
+  }else{
+    const c=chan();vs=c.videos||[];
+    subs=c.subs;chanUrl=c.url||'';
+    handle='@'+String(chanUrl).split('/').pop();
+  }
   const tot=vs.reduce((a,v)=>a+(v.views||0),0);
   const avg=vs.length?Math.round(tot/vs.length):0;
   document.getElementById('stats').innerHTML=`
-    <div class="stat"><div class="num">${fmtNum(c.subs)}</div><div class="label">${t().subs}</div></div>
+    <div class="stat"><div class="num">${fmtNum(subs)}</div><div class="label">${t().subs}</div></div>
     <div class="stat"><div class="num">${vs.length}</div><div class="label">${t().videos}</div></div>
     <div class="stat"><div class="num">${fmtNum(tot)}</div><div class="label">${t().totalViews}</div></div>
     <div class="stat"><div class="num">${fmtNum(avg)}</div><div class="label">${t().avgViews}</div></div>`;
-  const handle='@'+String(c.url||'').split('/').pop();
-  document.getElementById('chanlink').innerHTML=`${esc(handle)} · <a href="${esc(c.url||'#')}" target="_blank" rel="noopener">${t().openChan}</a>`;
+  document.getElementById('chanlink').innerHTML = curChan===-1 ? '' : `${esc(handle)} · <a href="${esc(chanUrl||'#')}" target="_blank" rel="noopener">${t().openChan}</a>`;
 }
 function renderSort(){
   document.getElementById('sortrow').innerHTML=`<span class="cap">${t().sort}</span>
@@ -289,6 +308,7 @@ function commentHtml(c){
 function videoHtml(v){
   const open=openSet.has(v.id);
   const hot=v.hot?`<span class="badge-hot">${t().hot}</span>`:'';
+  const chanTag=(curChan===-1&&v._chan)?`<div style="font-size:12.5px;color:var(--muted);margin-bottom:4px">${esc(v._chan)}</div>`:'';
   const meta=`${t().plays} <b>${fmtNum(v.views)}</b>${deltaHtml(v,'views')} · ${t().likes} ${fmtNum(v.likes)}${deltaHtml(v,'likes')} · ${t().comments} ${fmtNum(v.comments)}${deltaHtml(v,'comments')} · ${t().duration} ${esc(v.duration||'—')} · ${esc(v.published||'—')} <span class="toggle" data-id="${esc(v.id)}">${open?t().collapse+' ▲':t().detail+' ▼'}</span>`;
   let body=`<div class="vbody">`;
   body+=`<div class="dlabel">${t().desc}</div><div class="dtext" data-translate data-orig="${esc(v.description||'')}">${v.description?esc(v.description):'—'}</div>`;
@@ -299,7 +319,7 @@ function videoHtml(v){
   body+=ct.length?ct.map(commentHtml).join(''):`<div class="note">—</div>`;
   body+=`<a class="ytwatch" href="https://www.youtube.com/watch?v=${esc(v.id)}" target="_blank" rel="noopener">${t().watch}</a>`;
   body+='</div>';
-  return `<div class="video${open?' open':''}" data-vid="${esc(v.id)}"><div class="vhead"><div class="vtitle">${hot}${esc(v.title||'')}</div><div class="vmeta">${meta}</div></div>${body}</div>`;
+  return `<div class="video${open?' open':''}" data-vid="${esc(v.id)}"><div class="vhead">${chanTag}<div class="vtitle">${hot}${esc(v.title||'')}</div><div class="vmeta">${meta}</div></div>${body}</div>`;
 }
 function renderList(){
   if(curView==='rank'){
