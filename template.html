@@ -237,7 +237,7 @@ function renderRank(){
       let card=`<div class="rankcard${open?' open':''}" style="flex-wrap:wrap;cursor:pointer" data-rankid="${esc(v.id)}">
         <div class="ranknum r${i+1}">${i+1}</div>
         <div class="rankinfo">
-          <div class="ranktitle">${titleHtml}</div>
+          <div class="ranktitle" data-orig-title="${esc(v.title||'')}">${titleHtml}</div>
           <div class="rankchan">${esc(r.chan||'')} · ${t().plays} ${fmtNum(v.views)} · ${t().likes} ${fmtNum(v.likes)}${r.dl>0?` <span class="delta">+${fmtNum(r.dl)}</span>`:''} · ${t().comments} ${fmtNum(v.comments)}${r.dc>0?` <span class="delta">+${fmtNum(r.dc)}</span>`:''} · ${esc(v.published||'—')}</div>
         </div>
         <div class="rankdelta"><div class="d">+${fmtNum(r.d)}</div><div class="l">${t().plays}</div></div>`;
@@ -279,6 +279,7 @@ function renderRank(){
     renderRank();
   });
   if(lang==='zh')el.querySelectorAll('.rankcard.open').forEach(translateOpen);
+  if(titleTransOn)translateTitlesDom(el);
 }
 function filteredVideos(){
   let vs=chanVideos();
@@ -344,42 +345,27 @@ function renderSort(){
   document.querySelectorAll('.sortpill[data-s]').forEach(b=>b.onclick=()=>{sortMode=b.dataset.s;renderSort();renderList()});
   document.getElementById('btn-trans-title').onclick=toggleTitleTrans;
 }
+async function translateTitlesDom(scope){
+  const els=(scope||document).querySelectorAll('.vtitle[data-orig-title]:not([data-translated="1"]),.ranktitle[data-orig-title]:not([data-translated="1"])');
+  for(const el of els){
+    const orig=el.getAttribute('data-orig-title');
+    if(!orig)continue;
+    const tr=await translateText(orig);
+    if(tr){
+      const hotEl=el.querySelector('.badge-hot');
+      const hotHtml=hotEl?hotEl.outerHTML:'';
+      el.innerHTML=hotHtml+esc(tr);
+      el.setAttribute('data-translated','1');
+    }
+  }
+}
 async function toggleTitleTrans(){
   titleTransOn=!titleTransOn;
   renderSort();renderList();
   if(curView==='rank')renderRank();
   if(titleTransOn){
-    // 跟简介翻译完全一样的逻辑：直接翻译页面上的标题元素
-    const els=document.querySelectorAll('.vtitle[data-orig-title]');
-    for(const el of els){
-      const orig=el.getAttribute('data-orig-title');
-      if(!orig)continue;
-      // 跳过已经翻译过的（有 data-translated 标记）
-      if(el.getAttribute('data-translated')==='1')continue;
-      const tr=await translateText(orig);
-      if(tr){
-        // 保留 hot badge，只替换标题文字
-        const hotEl=el.querySelector('.badge-hot');
-        const hotHtml=hotEl?hotEl.outerHTML:'';
-        el.innerHTML=hotHtml+esc(tr);
-        el.setAttribute('data-translated','1');
-      }
-    }
-    // 涨幅榜的标题也翻译
-    if(curView==='rank'){
-      const rankEls=document.querySelectorAll('#rankview .vtitle[data-orig-title]');
-      for(const el of rankEls){
-        const orig=el.getAttribute('data-orig-title');
-        if(!orig||el.getAttribute('data-translated')==='1')continue;
-        const tr=await translateText(orig);
-        if(tr){
-          const hotEl=el.querySelector('.badge-hot');
-          const hotHtml=hotEl?hotEl.outerHTML:'';
-          el.innerHTML=hotHtml+esc(tr);
-          el.setAttribute('data-translated','1');
-        }
-      }
-    }
+    await translateTitlesDom(document);
+    if(curView==='rank')await translateTitlesDom(document.getElementById('rankview'));
   }
 }
 function commentHtml(c){
@@ -439,6 +425,7 @@ function renderList(){
     renderList();
   });
   if(lang==='zh')translateVisible();
+  if(titleTransOn)translateTitlesDom(el);
 }
 async function translateOpen(card){
   const els=card.querySelectorAll('[data-translate]');
