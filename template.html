@@ -139,8 +139,8 @@ const DATA = __DATA_JSON__;
 let lang = 'zh';
 try{ lang = localStorage.getItem('dash-lang') || 'zh'; }catch(e){}
 const T = {
-zh:{updated:'数据更新于',refresh:'刷新数据',search:'🔍 搜索标题关键词...',subs:'订阅者',videos:'视频数',totalViews:'总播放量',avgViews:'平均播放/视频',openChan:'在 YouTube 打开频道',sort:'排序',latest:'最新发布',byViews:'播放量',plays:'播放',likes:'点赞',comments:'评论',duration:'时长',detail:'详情',collapse:'收起',desc:'简介',tags:'标签',note:'备注',commentsTitle:'评论',captured:(a,b)=>`（已抓取 ${a} 条 / 共 ${b} 条）`,watch:'在 YouTube 观看 →',likeWord:'赞',noResult:'没有匹配的视频',footer:'数据来自 YouTube 公开页面 · 每小时自动更新 · 缺失数字标为「—」',hot:'🔥 爆款',translating:'正在翻译…',transFail:'（翻译暂不可用，显示英文原文）',translated:'已翻译',refreshNote:'数据每小时自动更新',pageTitle:'三频道数据看板',listView:'视频列表',rankView:'📈 涨幅榜',rankTitle:'小时播放量涨幅榜',rankSub:'对比上一轮抓取',noDelta:'暂无上一轮数据',transTitle:'🌐 标题翻译',transTitleOn:'🌐 已翻译',translatingTitle:'翻译中…',back:'← 返回',rankBtn:'📈 涨幅榜'},
-en:{updated:'Updated',refresh:'Refresh',search:'🔍 Search titles...',subs:'Subscribers',videos:'Videos',totalViews:'Total views',avgViews:'Avg views/video',openChan:'Open channel on YouTube',sort:'Sort',latest:'Newest',byViews:'Views',plays:'Views',likes:'Likes',comments:'Comments',duration:'Duration',detail:'Details',collapse:'Collapse',desc:'Description',tags:'Tags',note:'Note',commentsTitle:'Comments',captured:(a,b)=>`(${a} of ${b} captured)`,watch:'Watch on YouTube →',likeWord:'likes',noResult:'No matching videos',footer:'Data from public YouTube pages · auto-updated hourly · missing values shown as "—"',hot:'🔥 HOT',translating:'',transFail:'',translated:'',refreshNote:'Data auto-updates every hour',pageTitle:'3-Channel Data Dashboard',listView:'Video List',rankView:'📈 Growth',rankTitle:'Hourly Growth Top 5',rankSub:'',noDelta:'No previous data yet',transTitle:'🌐 Translate Titles',transTitleOn:'🌐 Translated',translatingTitle:'Translating…',back:'← Back',rankBtn:'📈 Growth'}};
+zh:{updated:'数据更新于',refresh:'刷新数据',search:'🔍 搜索标题关键词...',subs:'订阅者',videos:'视频数',totalViews:'总播放量',avgViews:'平均播放/视频',openChan:'在 YouTube 打开频道',sort:'排序',latest:'最新发布',byViews:'播放量',plays:'播放',likes:'点赞',comments:'评论',duration:'时长',detail:'详情',collapse:'收起',desc:'简介',tags:'标签',note:'备注',commentsTitle:'评论',captured:(a,b)=>`（已抓取 ${a} 条 / 共 ${b} 条）`,watch:'在 YouTube 观看 →',likeWord:'赞',noResult:'没有匹配的视频',footer:'数据来自 YouTube 公开页面 · 每小时自动更新 · 缺失数字标为「—」',hot:'🔥 爆款',translating:'正在翻译…',transFail:'（翻译暂不可用，显示英文原文）',translated:'已翻译',refreshNote:'数据每小时自动更新',pageTitle:'三频道数据看板',listView:'视频列表',rankView:'📈 涨幅榜',rankTitle:'小时播放量涨幅榜',rankSub:'对比上一轮抓取',noDelta:'暂无上一轮数据',transTitle:'🌐 标题翻译',transTitleOn:'🌐 已翻译',translatingTitle:'翻译中…',back:'← 返回',rankBtn:'📈 涨幅榜',expandAll:'展开查看全部 {n} 条 ▼',collapseAll:'收起 ▲'},
+en:{updated:'Updated',refresh:'Refresh',search:'🔍 Search titles...',subs:'Subscribers',videos:'Videos',totalViews:'Total views',avgViews:'Avg views/video',openChan:'Open channel on YouTube',sort:'Sort',latest:'Newest',byViews:'Views',plays:'Views',likes:'Likes',comments:'Comments',duration:'Duration',detail:'Details',collapse:'Collapse',desc:'Description',tags:'Tags',note:'Note',commentsTitle:'Comments',captured:(a,b)=>`(${a} of ${b} captured)`,watch:'Watch on YouTube →',likeWord:'likes',noResult:'No matching videos',footer:'Data from public YouTube pages · auto-updated hourly · missing values shown as "—"',hot:'🔥 HOT',translating:'',transFail:'',translated:'',refreshNote:'Data auto-updates every hour',pageTitle:'3-Channel Data Dashboard',listView:'Video List',rankView:'📈 Growth',rankTitle:'Hourly Growth Top 5',rankSub:'',noDelta:'No previous data yet',transTitle:'🌐 Translate Titles',transTitleOn:'🌐 Translated',translatingTitle:'Translating…',back:'← Back',rankBtn:'📈 Growth',expandAll:'Show all {n} ▼',collapseAll:'Collapse ▲'}};
 const t = ()=>T[lang];
 /* ---------- 翻译：内存 + localStorage 缓存，Google gtx 主通道，MyMemory 兜底 ---------- */
 const memCache = {}, inflight = {};
@@ -190,7 +190,7 @@ function fmtUpdated(s){
 }
 /* ---------- 状态 ---------- */
 let curChan=-1, sortMode='latest', query='', curView='list', titleTransOn=false;
-const openSet=new Set();
+const openSet=new Set(), commentsOpen=new Set();
 function chan(){return (DATA.channels||[])[curChan]||{videos:[]}}
 /* ---------- 环比差值 ---------- */
 function delta(v, key){
@@ -240,8 +240,13 @@ function renderRank(){
         card+=`<div class="dlabel">${t().desc}</div><div class="dtext" data-translate data-orig="${esc(v.description||'')}">${v.description?esc(v.description):'—'}</div>`;
         if(v.tags&&v.tags.length)card+=`<div class="tags">${v.tags.map(x=>`<span class="tag">#${esc(x)}</span>`).join('')}</div>`;
         const ct=v.comments_text||[];
+        const cOpen=commentsOpen.has('rank_'+v.id);
+        const showCt=cOpen?ct:ct.slice(0,5);
         card+=`<div class="ctitle">${t().commentsTitle} ${t().captured(ct.length, v.comments==null?'—':fmtNum(v.comments))}</div>`;
-        card+=ct.length?ct.map(commentHtml).join(''):`<div class="note">—</div>`;
+        card+=showCt.length?showCt.map(commentHtml).join(''):`<div class="note">—</div>`;
+        if(ct.length>5){
+          card+=`<div style="text-align:center;margin:10px 0"><button class="sortpill" data-rcexpand="${esc(v.id)}">${cOpen?t().collapseAll:t().expandAll.replace('{n}',ct.length)}</button></div>`;
+        }
         card+=`<a class="ytwatch" href="https://www.youtube.com/watch?v=${esc(v.id)}" target="_blank" rel="noopener">${t().watch}</a>`;
         card+=`</div>`;
       }
@@ -253,12 +258,19 @@ function renderRank(){
   el.querySelectorAll('.rankcard').forEach(card=>{
     card.onclick=(e)=>{
       if(e.target.closest('a'))return;
+      if(e.target.closest('[data-rcexpand]'))return;
       const id=card.dataset.rankid;
       const key='rank_'+id;
       openSet.has(key)?openSet.delete(key):openSet.add(key);
       renderRank();
       if(openSet.has(key)&&lang==='zh')translateOpen(card);
     };
+  });
+  el.querySelectorAll('[data-rcexpand]').forEach(b=>b.onclick=(e)=>{
+    e.stopPropagation();
+    const id='rank_'+b.dataset.rcexpand;
+    commentsOpen.has(id)?commentsOpen.delete(id):commentsOpen.add(id);
+    renderRank();
   });
   if(lang==='zh')el.querySelectorAll('.rankcard.open').forEach(translateOpen);
 }
@@ -351,8 +363,13 @@ function videoHtml(v){
   if(v.tags&&v.tags.length)body+=`<div class="tags">${v.tags.map(x=>`<span class="tag">#${esc(x)}</span>`).join('')}</div>`;
   if(v.note)body+=`<div class="note">${t().note}：${esc(v.note)}</div>`;
   const ct=v.comments_text||[];
+  const cOpen=commentsOpen.has(v.id);
+  const showCt=cOpen?ct:ct.slice(0,5);
   body+=`<div class="ctitle">${t().commentsTitle} ${t().captured(ct.length, v.comments==null?'—':fmtNum(v.comments))}</div>`;
-  body+=ct.length?ct.map(commentHtml).join(''):`<div class="note">—</div>`;
+  body+=showCt.length?showCt.map(commentHtml).join(''):`<div class="note">—</div>`;
+  if(ct.length>5){
+    body+=`<div style="text-align:center;margin:10px 0"><button class="sortpill" data-cexpand="${esc(v.id)}">${cOpen?t().collapseAll:t().expandAll.replace('{n}',ct.length)}</button></div>`;
+  }
   body+=`<a class="ytwatch" href="https://www.youtube.com/watch?v=${esc(v.id)}" target="_blank" rel="noopener">${t().watch}</a>`;
   body+='</div>';
   return `<div class="video${open?' open':''}" data-vid="${esc(v.id)}"><div class="vhead">${chanTag}<div class="vtitle">${hot}${titleShow}</div><div class="vmeta">${meta}</div></div>${body}</div>`;
@@ -375,6 +392,12 @@ function renderList(){
     openSet.has(id)?openSet.delete(id):openSet.add(id);
     renderList();
     if(openSet.has(id)&&lang==='zh'){const card=el.querySelector(`[data-vid="${CSS.escape(id)}"]`);if(card)translateOpen(card)}
+  });
+  el.querySelectorAll('[data-cexpand]').forEach(b=>b.onclick=(e)=>{
+    e.stopPropagation();
+    const id=b.dataset.cexpand;
+    commentsOpen.has(id)?commentsOpen.delete(id):commentsOpen.add(id);
+    renderList();
   });
   if(lang==='zh')translateVisible();
 }
