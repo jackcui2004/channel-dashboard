@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>三频道数据看板</title>
+<title data-i18n-title>三频道数据看板</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -96,8 +96,8 @@ const DATA = __DATA_JSON__;
 let lang = 'zh';
 try{ lang = localStorage.getItem('dash-lang') || 'zh'; }catch(e){}
 const T = {
-zh:{updated:'数据更新于',refresh:'刷新数据',search:'🔍 搜索标题关键词...',subs:'订阅者',videos:'视频数',totalViews:'总播放量',avgViews:'平均播放/视频',openChan:'在 YouTube 打开频道',sort:'排序',latest:'最新发布',byViews:'播放量',plays:'播放',likes:'点赞',comments:'评论',duration:'时长',detail:'详情',collapse:'收起',desc:'简介',tags:'标签',note:'备注',commentsTitle:'评论',captured:(a,b)=>`（已抓取 ${a} 条 / 共 ${b} 条）`,watch:'在 YouTube 观看 →',likeWord:'赞',noResult:'没有匹配的视频',footer:'数据来自 YouTube 公开页面 · 每天自动更新 · 缺失数字标为「—」',hot:'🔥 爆款',translating:'正在翻译…',transFail:'（翻译暂不可用，显示英文原文）',translated:'已翻译',refreshNote:'数据每天北京时间 8 点自动更新'},
-en:{updated:'Updated',refresh:'Refresh',search:'🔍 Search titles...',subs:'Subscribers',videos:'Videos',totalViews:'Total views',avgViews:'Avg views/video',openChan:'Open channel on YouTube',sort:'Sort',latest:'Newest',byViews:'Views',plays:'Views',likes:'Likes',comments:'Comments',duration:'Duration',detail:'Details',collapse:'Collapse',desc:'Description',tags:'Tags',note:'Note',commentsTitle:'Comments',captured:(a,b)=>`(${a} of ${b} captured)`,watch:'Watch on YouTube →',likeWord:'likes',noResult:'No matching videos',footer:'Data from public YouTube pages · auto-updated daily · missing values shown as 「—」',hot:'🔥 HOT',translating:'',transFail:'',translated:'',refreshNote:'Data auto-updates daily at 08:00 Beijing time'}};
+zh:{updated:'数据更新于',refresh:'刷新数据',search:'🔍 搜索标题关键词...',subs:'订阅者',videos:'视频数',totalViews:'总播放量',avgViews:'平均播放/视频',openChan:'在 YouTube 打开频道',sort:'排序',latest:'最新发布',byViews:'播放量',plays:'播放',likes:'点赞',comments:'评论',duration:'时长',detail:'详情',collapse:'收起',desc:'简介',tags:'标签',note:'备注',commentsTitle:'评论',captured:(a,b)=>`（已抓取 ${a} 条 / 共 ${b} 条）`,watch:'在 YouTube 观看 →',likeWord:'赞',noResult:'没有匹配的视频',footer:'数据来自 YouTube 公开页面 · 每天自动更新 · 缺失数字标为「—」',hot:'🔥 爆款',translating:'正在翻译…',transFail:'（翻译暂不可用，显示英文原文）',translated:'已翻译',refreshNote:'数据每天北京时间 8 点自动更新',pageTitle:'三频道数据看板'},
+en:{updated:'Updated',refresh:'Refresh',search:'🔍 Search titles...',subs:'Subscribers',videos:'Videos',totalViews:'Total views',avgViews:'Avg views/video',openChan:'Open channel on YouTube',sort:'Sort',latest:'Newest',byViews:'Views',plays:'Views',likes:'Likes',comments:'Comments',duration:'Duration',detail:'Details',collapse:'Collapse',desc:'Description',tags:'Tags',note:'Note',commentsTitle:'Comments',captured:(a,b)=>`(${a} of ${b} captured)`,watch:'Watch on YouTube →',likeWord:'likes',noResult:'No matching videos',footer:'Data from public YouTube pages · auto-updated daily · missing values shown as "—"',hot:'🔥 HOT',translating:'',transFail:'',translated:'',refreshNote:'Data auto-updates daily at 08:00 Beijing time',pageTitle:'3-Channel Data Dashboard'}};
 const t = ()=>T[lang];
 /* ---------- 翻译：内存 + localStorage 缓存，Google gtx 主通道，MyMemory 兜底 ---------- */
 const memCache = {}, inflight = {};
@@ -142,7 +142,8 @@ function fmtUpdated(s){
   if(!s||s==='—')return '—';
   const d=new Date(s);if(isNaN(d))return esc(s);
   const p=n=>n.toString().padStart(2,'0');
-  return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${p(d.getHours())}:${p(d.getMinutes())}（北京时间）`;
+  const tz = lang==='zh' ? '（北京时间）' : ' (Beijing Time)';
+  return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${p(d.getHours())}:${p(d.getMinutes())}${tz}`;
 }
 /* ---------- 状态 ---------- */
 let curChan=0, sortMode='latest', query='';
@@ -182,7 +183,7 @@ function renderSort(){
   document.getElementById('sortrow').innerHTML=`<span class="cap">${t().sort}</span>
     <button class="sortpill${sortMode==='latest'?' on':''}" data-s="latest">${t().latest}</button>
     <button class="sortpill${sortMode==='views'?' on':''}" data-s="views">${t().byViews}</button>`;
-  document.querySelectorAll('.sortpill').forEach(b=>b.onclick=()=>{sortMode=b.dataset.s;renderList()});
+  document.querySelectorAll('.sortpill').forEach(b=>b.onclick=()=>{sortMode=b.dataset.s;renderSort();renderList()});
 }
 function commentHtml(c){
   const likeTxt=c.likes==null?'':` <span class="clike">${t().likeWord} ${c.likes}</span>`;
@@ -247,7 +248,8 @@ async function translateVisible(){
 function applyLang(){
   document.getElementById('btn-zh').classList.toggle('on',lang==='zh');
   document.getElementById('btn-en').classList.toggle('on',lang==='en');
-  document.getElementById('page-title').textContent=lang==='zh'?'三频道数据看板':'Channel Dashboard';
+  document.getElementById('page-title').textContent=t().pageTitle;
+  document.title=t().pageTitle;
   document.getElementById('updated-line').textContent=`${t().updated} ${fmtUpdated('__UPDATED_AT__')}`;
   document.getElementById('search').placeholder=t().search;
   document.getElementById('btn-refresh').textContent=t().refresh;
