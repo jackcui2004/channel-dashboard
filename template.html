@@ -113,7 +113,6 @@ h1{font-size:24px;font-weight:800;text-align:center;letter-spacing:1px;margin:6p
 <div id="list"></div>
 </div>
 <div id="rankview" class="pageview hidden">
-  <div style="margin:6px 0 4px"><button class="sortpill" id="btn-trans-title">🌐 标题翻译</button></div>
   <div id="ranklist"></div>
 </div>
 <div class="footer" id="footer"></div>
@@ -305,8 +304,26 @@ function renderStats(){
 function renderSort(){
   document.getElementById('sortrow').innerHTML=`<span class="cap">${t().sort}</span>
     <button class="sortpill${sortMode==='latest'?' on':''}" data-s="latest">${t().latest}</button>
-    <button class="sortpill${sortMode==='views'?' on':''}" data-s="views">${t().byViews}</button>`;
-  document.querySelectorAll('.sortpill').forEach(b=>b.onclick=()=>{sortMode=b.dataset.s;renderSort();renderList()});
+    <button class="sortpill${sortMode==='views'?' on':''}" data-s="views">${t().byViews}</button>
+    <button class="sortpill${titleTransOn?' on':''}" id="btn-trans-title">${titleTransOn?t().transTitleOn:t().transTitle}</button>`;
+  document.querySelectorAll('.sortpill[data-s]').forEach(b=>b.onclick=()=>{sortMode=b.dataset.s;renderSort();renderList()});
+  document.getElementById('btn-trans-title').onclick=toggleTitleTrans;
+}
+async function toggleTitleTrans(){
+  const btn=document.getElementById('btn-trans-title');
+  if(titleTransOn){titleTransOn=false;renderSort();renderList();return}
+  btn.textContent=t().translatingTitle;btn.disabled=true;
+  const vs=filteredVideos();
+  const todo=vs.filter(v=>!v._titleZh&&v.title);
+  // 并行翻译，限并发避免刷爆
+  const chunk=6;
+  for(let i=0;i<todo.length;i+=chunk){
+    await Promise.all(todo.slice(i,i+chunk).map(async v=>{
+      const tr=await translateText(v.title);
+      if(tr)v._titleZh=tr;
+    }));
+  }
+  titleTransOn=true;renderSort();renderList();
 }
 function commentHtml(c){
   const likeTxt=c.likes==null?'':` <span class="clike">${t().likeWord} ${c.likes}</span>`;
@@ -321,6 +338,7 @@ function videoHtml(v){
   const open=openSet.has(v.id);
   const hot=v.hot?`<span class="badge-hot">${t().hot}</span>`:'';
   const chanTag=(curChan===-1&&v._chan)?`<div style="font-size:12.5px;color:var(--muted);margin-bottom:4px">${esc(v._chan)}</div>`:'';
+  const titleShow=(titleTransOn&&v._titleZh)?esc(v._titleZh):esc(v.title||'');
   const meta=`${t().plays} <b>${fmtNum(v.views)}</b>${deltaHtml(v,'views')} · ${t().likes} ${fmtNum(v.likes)}${deltaHtml(v,'likes')} · ${t().comments} ${fmtNum(v.comments)}${deltaHtml(v,'comments')} · ${t().duration} ${esc(v.duration||'—')} · ${esc(v.published||'—')} <span class="toggle" data-id="${esc(v.id)}">${open?t().collapse+' ▲':t().detail+' ▼'}</span>`;
   let body=`<div class="vbody">`;
   body+=`<div class="dlabel">${t().desc}</div><div class="dtext" data-translate data-orig="${esc(v.description||'')}">${v.description?esc(v.description):'—'}</div>`;
@@ -331,7 +349,7 @@ function videoHtml(v){
   body+=ct.length?ct.map(commentHtml).join(''):`<div class="note">—</div>`;
   body+=`<a class="ytwatch" href="https://www.youtube.com/watch?v=${esc(v.id)}" target="_blank" rel="noopener">${t().watch}</a>`;
   body+='</div>';
-  return `<div class="video${open?' open':''}" data-vid="${esc(v.id)}"><div class="vhead">${chanTag}<div class="vtitle">${hot}${esc(v.title||'')}</div><div class="vmeta">${meta}</div></div>${body}</div>`;
+  return `<div class="video${open?' open':''}" data-vid="${esc(v.id)}"><div class="vhead">${chanTag}<div class="vtitle">${hot}${titleShow}</div><div class="vmeta">${meta}</div></div>${body}</div>`;
 }
 function renderList(){
   const vs=filteredVideos();
@@ -378,7 +396,8 @@ function applyLang(){
   document.getElementById('search').placeholder=t().search;
   document.getElementById('btn-refresh').textContent=t().refresh;
   document.getElementById('btn-rank-top').textContent=t().rankBtn;
-  document.getElementById('btn-trans-title').textContent=titleTransOn?t().transTitleOn:t().transTitle;
+  const btt=document.getElementById('btn-trans-title');
+  if(btt)btt.textContent=titleTransOn?t().transTitleOn:t().transTitle;
   document.getElementById('footer').textContent=t().footer;
   try{localStorage.setItem('dash-lang',lang)}catch(e){}
   renderAll();
@@ -416,19 +435,6 @@ function showMain(){
   },320);
 }
 document.getElementById('btn-rank-top').onclick=()=>{curView==='rank'?showMain():showRank()};
-document.getElementById('btn-trans-title').onclick=async (e)=>{
-  const btn=e.target;
-  if(titleTransOn){titleTransOn=false;btn.classList.remove('on');btn.textContent=t().transTitle;renderRank();return}
-  btn.textContent=t().translatingTitle;btn.disabled=true;
-  const ranked=allVideosWithDelta().slice(0,5);
-  for(const r of ranked){
-    if(!r.titleZh&&r.v.title){
-      const tr=await translateText(r.v.title);
-      if(tr)r.titleZh=tr;
-    }
-  }
-  titleTransOn=true;btn.disabled=false;btn.classList.add('on');btn.textContent=t().transTitleOn;renderRank();
-};
 document.getElementById('search').oninput=(e)=>{query=e.target.value.trim();renderList()};
 applyLang();
 </script>
