@@ -90,7 +90,7 @@ def safe_int(v):
 
 
 def list_channel_videos(ydl, channel_url, limit=None):
-    """扁平抓取频道视频列表，返回 [(video_id, title)]"""
+    """扁平抓取频道视频列表，返回 [(video_id, title, flat_data)]，flat_data 含播放量等兜底字段"""
     opts = dict(BASE_OPTS)
     opts["extract_flat"] = True
     # flat 模式下也分页取全
@@ -104,12 +104,19 @@ def list_channel_videos(ydl, channel_url, limit=None):
             continue
         vid = e.get("id")
         if vid:
-            videos.append({"id": vid, "title": e.get("title")})
+            # flat 条目里可能自带 view_count（"1.2K views" 已被 yt-dlp 解析为数字）
+            # 留作详情页抓不到时的兜底
+            flat = {
+                "views": safe_int(e.get("view_count")),
+                "duration": fmt_duration(e.get("duration")),
+                "published": fmt_date(e.get("upload_date")),
+            }
+            videos.append({"id": vid, "title": e.get("title"), "flat": flat})
     subs = safe_int(info.get("channel_follower_count"))
     return videos, subs
 
 
-def fetch_video_detail(ydl, video_id, fetch_comments=False):
+def fetch_video_detail(ydl, video_id, fetch_comments=False, flat_fallback=None):
     """抓取单个视频详情；fetch_comments=True 时抓前 10 条顶层评论"""
     url = f"https://www.youtube.com/watch?v={video_id}"
     opts = dict(BASE_OPTS)
@@ -234,14 +241,20 @@ def main():
         print(f"[info] {ch['name']}: {len(video_list)} 个视频，订阅 {subs}")
         videos = []
         for i, v in enumerate(video_list):
-            # 先抓详情（不带评论），用于判定爆款
-            detail = fetch_video_detail(ydl, v["id"], fetch_comments=False)
+            # 先抓详情（不带评论），用于判定爆款；flat 数据作兜底
+            detail = fetch_video_detail(ydl, v["id"], fetch_comments=False,
+                                        flat_fallback=v.get("flat"))
             if detail is None:
                 detail = {"id": v["id"], "title": v.get("title"), "views": None,
                           "likes": None, "comments": None, "comments_text": [],
                           "duration": None, "published": None,
                           "description": None, "tags": [], "hot": False,
                           "error": "detail_fetch_failed"}
+            # flat 兜底：详情页没抓到的字段用列表页数据补
+            flat = v.get("flat") or {}
+            for k in ("views", "duration", "published"):
+                if detail.get(k) is None and flat.get(k) is not None:
+                    detail[k] = flat[k]
             videos.append(detail)
             print(f"  [{i+1}/{len(video_list)}] {detail['id']} views={detail['views']}")
 
