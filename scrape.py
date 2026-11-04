@@ -305,6 +305,27 @@ def main():
 
     elapsed = time.time() - total_start
     print(f"[info] 完成，用时 {elapsed/60:.1f} 分钟")
+    # ---- 环比：把上一轮 data.json 的 views/likes/comments 记为 prev_* ----
+    prev_map = {}
+    prev_updated = None
+    try:
+        with open(args.out, encoding="utf-8") as f:
+            old = json.load(f)
+        prev_updated = old.get("updated_at")
+        for ch in old.get("channels", []):
+            for v in ch.get("videos", []):
+                prev_map[v["id"]] = v
+    except (FileNotFoundError, json.JSONDecodeError):
+        pass
+    if prev_updated:
+        result["prev_updated_at"] = prev_updated
+    for ch in result["channels"]:
+        for v in ch.get("videos", []):
+            pv = prev_map.get(v["id"])
+            if pv:
+                v["prev_views"] = pv.get("views")
+                v["prev_likes"] = pv.get("likes")
+                v["prev_comments"] = pv.get("comments")
     with open(args.out, "w", encoding="utf-8") as f:
         json.dump(result, f, ensure_ascii=False, indent=1)
     print(f"[info] 已写入 {args.out}")
