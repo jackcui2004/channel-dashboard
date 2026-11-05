@@ -217,6 +217,7 @@ function fmtUpdated(s){
 }
 /* ---------- 状态 ---------- */
 let curChan=-1, sortMode='latest', query='', curView='list', titleTransOn=false;
+const savedScroll={list:0,rank:0};
 const openSet=new Set(), commentsOpen=new Set();
 function chan(){return (DATA.channels||[])[curChan]||{videos:[]}}
 /* ---------- 环比差值 ---------- */
@@ -538,6 +539,7 @@ function moveThumb(){
 }
 function showRank(){
   if(curView==='rank')return;
+  savedScroll.list=window.scrollY;
   curView='rank';
   document.getElementById('g-rank').classList.add('on');
   document.getElementById('g-list').classList.remove('on');
@@ -549,11 +551,12 @@ function showRank(){
     rank.classList.remove('hidden');rank.classList.add('flip-in');
     renderRank();
     requestAnimationFrame(()=>requestAnimationFrame(()=>rank.classList.remove('flip-in')));
-    window.scrollTo(0,0);
+    window.scrollTo(0,savedScroll.rank||0);
   },320);
 }
 function showMain(){
   if(curView==='list')return;
+  savedScroll.rank=window.scrollY;
   curView='list';
   document.getElementById('g-list').classList.add('on');
   document.getElementById('g-rank').classList.remove('on');
@@ -565,7 +568,7 @@ function showMain(){
     main.classList.remove('hidden');main.classList.add('flip-in');
     renderList();
     requestAnimationFrame(()=>requestAnimationFrame(()=>main.classList.remove('flip-in')));
-    window.scrollTo(0,0);
+    window.scrollTo(0,savedScroll.list||0);
   },320);
 }
 document.getElementById('g-list').onclick=showMain;
