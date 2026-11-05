@@ -13,13 +13,6 @@
   --tag-bg:#f0efed; --tag:#6b6b6b;
   --pill:#f0efed;
 }
-[data-theme="dark"]{
-  --bg:#121212; --card:#1e1e1e; --border:#2e2e2e;
-  --text:#e8e8e8; --muted:#9a9a9a; --faint:#6a6a6a;
-  --red:#e05545; --red-dark:#c04436;
-  --tag-bg:#2a2a2a; --tag:#b0b0b0;
-  --pill:#2a2a2a;
-}
 body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding:16px 14px 110px;max-width:680px;margin:0 auto;-webkit-font-smoothing:antialiased}
 .langicon{display:inline-block;min-width:44px;height:38px;border-radius:19px;padding:0 14px;
   background:rgba(255,255,255,.72);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);
@@ -28,15 +21,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans G
 .langicon:active{transform:scale(.95)}
 .topbar{display:flex;align-items:center;justify-content:space-between;margin:6px 0 10px}
 .topbar h1{margin:0}
-[data-theme="dark"] .badge-new{background:transparent!important;box-shadow:none!important}
-[data-theme="dark"] .badge-new.c-purple{color:#C724FF;border:1.5px solid #C724FF}
-[data-theme="dark"] .badge-new.c-green{color:#39FF14;border:1.5px solid #39FF14}
-[data-theme="dark"] .badge-new.c-gray{color:#E8E8E8;border:1.5px solid #E8E8E8}
-[data-theme="dark"] .badge-new.c-red{color:#FF3131;border:1.5px solid #FF3131}
-[data-theme="dark"] .glassbar{background:rgba(30,30,30,.72);border-color:rgba(255,255,255,.12)}
-[data-theme="dark"] .glassbar .seg{background:rgba(255,255,255,.08)}
-[data-theme="dark"] .glassbar .seg .thumb{background:#4a4a4a}
-[data-theme="dark"] .langicon{background:rgba(30,30,30,.72);border-color:var(--border)}
 .glassbar{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:50;
   display:flex;align-items:center;gap:4px;padding:8px;
   background:rgba(255,255,255,.65);backdrop-filter:blur(24px) saturate(200%);-webkit-backdrop-filter:blur(24px) saturate(200%);
@@ -65,8 +49,8 @@ h1{font-size:24px;font-weight:800;text-align:center;letter-spacing:1px;margin:6p
 .tab .n{font-size:15px}
 .tab.on{color:var(--text);font-weight:800;border-bottom-color:var(--red)}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0 10px}
-.stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 6px;text-align:center;position:relative}
-.stat .num{font-size:24px;font-weight:800;letter-spacing:.3px;position:relative;display:inline-block}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 6px;text-align:center}
+.stat .num{font-size:24px;font-weight:800;letter-spacing:.3px}
 .stat .label{font-size:12px;color:var(--muted);margin-top:4px}
 .chanlink{color:var(--muted);font-size:13px;margin:2px 0 14px}
 .chanlink a{color:var(--muted);text-decoration:underline}
@@ -80,7 +64,6 @@ h1{font-size:24px;font-weight:800;text-align:center;letter-spacing:1px;margin:6p
 .ranksubtabs{display:flex;gap:8px;margin-bottom:14px}
 .ranksubtab{border:1px solid var(--border);background:var(--card);border-radius:16px;padding:6px 16px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer}
 .ranksubtab.on{background:var(--text);color:var(--card);border-color:var(--text)}
-[data-theme="dark"] .ranksubtab.on{background:var(--red);color:#fff;border-color:var(--red)}
 .wordrow{display:flex;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:8px}
 .wordrank{font-size:16px;font-weight:800;width:28px;color:var(--red)}
 .wordrank.w1{color:#d4a017}.wordrank.w2{color:#888}.wordrank.w3{color:#b87333}
@@ -94,18 +77,17 @@ h1{font-size:24px;font-weight:800;text-align:center;letter-spacing:1px;margin:6p
 .badge-new.c-green{background:#39FF14;color:#000;box-shadow:0 0 4px rgba(57,255,20,.6)}
 .badge-new.c-gray{background:#E8E8E8;color:#333;box-shadow:0 0 4px rgba(0,0,0,.15);border:1px solid #ccc}
 .badge-new.c-red{background:#FF3131;color:#fff;box-shadow:0 0 4px rgba(255,49,49,.6)}
-/* 频道 ID：彩色字体 + 描边，无底色，深浅模式一致无色差 */
-.chan-tag{display:inline-block;font-size:12.5px;border-radius:6px;padding:2px 10px;margin-bottom:6px;font-weight:700;border:1.5px solid;background:transparent}
-.chan-tag.c0{color:#8B5CF6;border-color:#8B5CF6}
-.chan-tag.c1{color:#22C55E;border-color:#22C55E}
-.chan-tag.c2{color:#6B7280;border-color:#6B7280}
-.chan-tag.c3{color:#EF4444;border-color:#EF4444}
+/* 频道 ID 底色（调灰版，低调区分） */
+.chan-tag{display:inline-block;font-size:12.5px;border-radius:6px;padding:2px 10px;margin-bottom:6px;font-weight:600}
+.chan-tag.c0{background:#E6D9F0;color:#5A3D7A}
+.chan-tag.c1{background:#D9E8D9;color:#3D6B3D}
+.chan-tag.c2{background:#E2E2E2;color:#555}
+.chan-tag.c3{background:#F0D9D9;color:#7A3D3D}
 .vmeta{font-size:14px;color:var(--muted);line-height:1.8}
 .vmeta b{color:var(--text);font-weight:700}
 .toggle{color:var(--red);font-weight:700;cursor:pointer;white-space:nowrap}
-.vbody{display:none;margin-top:6px;overflow:hidden}
+.vbody{display:none;margin-top:6px}
 .video.open .vbody{display:block}
-.vbody.collapsing{display:block !important}
 .dlabel{color:var(--muted);font-size:14px;margin:14px 0 6px}
 .dtext{font-size:15.5px;line-height:1.9;white-space:pre-wrap;word-break:break-word}
 .dtext .translating{color:var(--faint);font-size:13px}
@@ -126,11 +108,10 @@ h1{font-size:24px;font-weight:800;text-align:center;letter-spacing:1px;margin:6p
 .noresult{text-align:center;color:var(--muted);padding:40px 0;font-size:15px}
 .pageview{transition:transform .35s ease,opacity .35s ease;transform-origin:top center}
 .pageview.hidden{display:none}
-.pageview.flip-out{transform:perspective(2500px) rotateY(-12deg);opacity:0}
-.pageview.flip-in{transform:perspective(2500px) rotateY(12deg);opacity:0}
-.delta{display:inline-block;font-size:11px;font-weight:700;color:var(--red);background:transparent;border:1.5px solid var(--red);border-radius:6px;padding:0 5px;margin-left:4px;vertical-align:0;white-space:nowrap}
-.stat .delta{position:absolute;top:-10px;right:-6px;margin:0;font-size:10px;padding:2px 6px;background:var(--card);border:1.5px solid var(--red);border-radius:8px}
-[data-theme="dark"] .stat .delta{background:#1e1e1e}
+.pageview.flip-out{transform:perspective(1200px) rotateY(-18deg);opacity:0}
+.pageview.flip-in{transform:perspective(1200px) rotateY(18deg);opacity:0}
+.delta{display:inline-block;font-size:11px;font-weight:700;color:var(--red);background:#fdeceb;border-radius:6px;padding:1px 6px;margin-left:4px;vertical-align:2px;white-space:nowrap}
+.stat .delta{margin-left:0;margin-top:4px}
 .viewseg{margin:6px 0 4px}
 .rankcard{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
 .ranknum{font-size:22px;font-weight:800;color:var(--red);min-width:28px;text-align:center}
@@ -155,10 +136,7 @@ h1{font-size:24px;font-weight:800;text-align:center;letter-spacing:1px;margin:6p
 <div class="wrap">
 <div class="topbar">
 <h1 id="page-title">YouTube 数据看板</h1>
-<div style="display:flex;gap:8px;align-items:center">
-<div class="langicon" id="themeicon" title="深色模式切换">🌙</div>
 <div class="langicon" id="langicon" title="切换语言">中 / EN</div>
-</div>
 </div>
 <div class="updated" id="updated-line">数据更新于 2026-11-05T07:55:12+08:00</div>
 <input class="search" id="search" placeholder="🔍 搜索标题关键词...">
@@ -229,12 +207,7 @@ async function translateText(text){
 }
 /* ---------- 工具 ---------- */
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
-function fmtNum(v){
-  if(v===null||v===undefined||isNaN(v))return '—';
-  v=Number(v);
-  if(v>=10000)return (v/10000).toFixed(1).replace(/\.0$/,'')+'w';
-  return v.toLocaleString('en-US');
-}
+function fmtNum(v){return (v===null||v===undefined||isNaN(v))?'—':Number(v).toLocaleString('en-US')}
 function fmtUpdated(s){
   if(!s||s==='—')return '—';
   const d=new Date(s);if(isNaN(d))return esc(s);
@@ -244,7 +217,7 @@ function fmtUpdated(s){
 }
 /* ---------- 状态 ---------- */
 let curChan=-1, sortMode='latest', query='', curView='list', titleTransOn=false;
-const openSet=new Set(), commentsOpen=new Set(), drawerOpen=new Set(), cmtOpen=new Set();
+const openSet=new Set(), commentsOpen=new Set();
 function chan(){return (DATA.channels||[])[curChan]||{videos:[]}}
 /* ---------- 环比差值 ---------- */
 function delta(v, key){
@@ -263,7 +236,7 @@ function allVideosWithDelta(){
   (DATA.channels||[]).forEach(c=>{
     (c.videos||[]).forEach(v=>{
       const d=delta(v,'views');
-      if(d!=null&&d>0)out.push({v,chan:c.name,chanId:c.id,d,
+      if(d!=null&&d>0)out.push({v,chan:c.name,d,
         dl:delta(v,'likes'),dc:delta(v,'comments')});
     });
   });
@@ -290,11 +263,6 @@ function hotWords(){
     .sort((a,b)=>b[1].views-a[1].views)
     .slice(0,20);
 }
-// 频道 ID 到颜色 class 的映射
-function chanColorClass(chanId){
-  const map={'moonveilstories':'c0','kimiaudiobooks':'c1','midnightvowstales':'c2','myprettyrevenge':'c3'};
-  return map[chanId]||'c2';
-}
 function renderRank(){
   const el=document.getElementById('ranklist');
   const hasPrev=!!DATA.prev_updated_at;
@@ -310,8 +278,6 @@ function renderRank(){
       }).join('');
     }
     el.innerHTML=h;
-  // 初始化已打开抽屉的高度
-  el.querySelectorAll('.drawer.open .drawer-body').forEach(b=>{b.style.height='auto';});
     el.querySelectorAll('[data-rt]').forEach(b=>b.onclick=()=>{rankTab=b.dataset.rt;renderRank()});
     return;
   }
@@ -327,7 +293,7 @@ function renderRank(){
         <div class="ranknum r${i+1}">${i+1}</div>
         <div class="rankinfo">
           <div class="ranktitle" data-orig-title="${esc(v.title||'')}">${titleHtml}</div>
-          <div class="rankchan"><span class="chan-tag ${chanColorClass(r.chanId)}" style="font-size:11px;padding:1px 8px;margin-bottom:0">${esc(r.chan||'')}</span> · ${t().plays} ${fmtNum(v.views)} · ${t().likes} ${fmtNum(v.likes)}${r.dl>0?` <span class="delta">+${fmtNum(r.dl)}</span>`:''} · ${t().comments} ${fmtNum(v.comments)}${r.dc>0?` <span class="delta">+${fmtNum(r.dc)}</span>`:''} · ${esc(v.published||'—')}</div>
+          <div class="rankchan">${esc(r.chan||'')} · ${t().plays} ${fmtNum(v.views)} · ${t().likes} ${fmtNum(v.likes)}${r.dl>0?` <span class="delta">+${fmtNum(r.dl)}</span>`:''} · ${t().comments} ${fmtNum(v.comments)}${r.dc>0?` <span class="delta">+${fmtNum(r.dc)}</span>`:''} · ${esc(v.published||'—')}</div>
         </div>
         <div class="rankdelta"><div class="d">+${fmtNum(r.d)}</div><div class="l">${t().plays}</div></div>`;
       if(open){
@@ -343,7 +309,6 @@ function renderRank(){
           card+=`<div style="text-align:center;margin:10px 0"><button class="sortpill" data-rcexpand="${esc(v.id)}">${cOpen?t().collapseAll:t().expandAll.replace('{n}',ct.length)}</button></div>`;
         }
         card+=`<a class="ytwatch" href="https://www.youtube.com/watch?v=${esc(v.id)}" target="_blank" rel="noopener">${t().watch}</a>`;
-        card+=`<div style="text-align:center;margin-top:12px"><span class="toggle" data-rcollapse="${esc(v.id)}">${t().collapse} ▲</span></div>`;
         card+=`</div>`;
       }
       card+=`</div>`;
@@ -355,42 +320,12 @@ function renderRank(){
     card.onclick=(e)=>{
       if(e.target.closest('a'))return;
       if(e.target.closest('[data-rcexpand]'))return;
-      if(e.target.closest('[data-rcollapse]'))return;
       const id=card.dataset.rankid;
       const key='rank_'+id;
       openSet.has(key)?openSet.delete(key):openSet.add(key);
       renderRank();
       if(openSet.has(key)&&lang==='zh')translateOpen(card);
     };
-  });
-  el.querySelectorAll('[data-rcollapse]').forEach(b=>b.onclick=(e)=>{
-    e.stopPropagation();
-    const id=b.dataset.rcollapse;
-    const key='rank_'+id;
-    const card=b.closest('.rankcard');
-    const body=card?card.querySelector('.vbody'):null;
-    const doCollapse=()=>{
-      openSet.delete(key);
-      renderRank();
-      requestAnimationFrame(()=>{
-        const newCard=document.querySelector(`[data-rankid="${id}"]`);
-        if(newCard){
-          const nr=newCard.getBoundingClientRect();
-          window.scrollTo(0, window.scrollY+nr.top-20);
-        }
-      });
-    };
-    if(body){
-      const h=body.offsetHeight;
-      body.style.height=h+'px';
-      body.style.overflow='hidden';
-      void body.offsetHeight;
-      body.style.transition='height .35s ease';
-      body.style.height='0px';
-      setTimeout(doCollapse, 360);
-    }else{
-      doCollapse();
-    }
   });
   el.querySelectorAll('[data-rcexpand]').forEach(b=>b.onclick=(e)=>{
     e.stopPropagation();
@@ -491,71 +426,42 @@ async function toggleTitleTrans(){
 }
 function commentHtml(c){
   const likeTxt=c.likes==null?'':` <span class="clike">${t().likeWord} ${c.likes}</span>`;
-  const aiBadge=c.ai_reply?`<span class="ai-badge">AI 推荐</span>`:'';
-  let h=`<div class="comment"><div class="chead"><span class="author">${esc(c.author||'?')}</span>${likeTxt}${aiBadge}</div><div class="ctext" data-translate data-orig="${esc(c.text||'')}">${esc(c.text||'')}</div>`;
+  let h=`<div class="comment"><div class="chead"><span class="author">${esc(c.author||'?')}</span>${likeTxt}</div><div class="ctext" data-translate data-orig="${esc(c.text||'')}">${esc(c.text||'')}</div>`;
   (c.replies||[]).forEach(r=>{
     const rl=r.likes==null?'':` <span class="clike">${t().likeWord} ${r.likes}</span>`;
     h+=`<div class="reply"><div class="chead"><span class="author">${esc(r.author||'?')}</span>${rl}</div><div class="ctext" data-translate data-orig="${esc(r.text||'')}">${esc(r.text||'')}</div></div>`;
   });
-  if(c.ai_reply){
-    h+=`<div class="ai-box" data-ai-orig="${esc(c.ai_reply)}"><span class="ai-box-tag">AI 推荐回复</span><div class="ai-box-text" data-translate data-orig="${esc(c.ai_reply)}">${esc(c.ai_reply)}</div><span class="ai-box-copy">点击复制</span></div>`;
-  }
   return h+'</div>';
 }
 function videoHtml(v){
-  const vid=esc(v.id);
   const open=openSet.has(v.id);
   const hot=v.hot?`<span class="badge-hot">${t().hot}</span>`:'';
+  // 新发布标签：当天发布的视频（数据只有日期精度）
   let isNew='';
   try{
     const today=new Date().toISOString().slice(0,10);
     if(v.published===today)isNew=`<span class="badge-new c-purple">${t().isNew}</span>`;
   }catch(e){}
   const chanTag=(curChan===-1&&v._chan)?`<div class="chan-tag c${(v._chanIdx||0)%4}">${esc(v._chan)}</div>`:'';
-  const meta=`${t().plays} <b>${fmtNum(v.views)}</b>${deltaHtml(v,'views')} · ${t().likes} ${fmtNum(v.likes)}${deltaHtml(v,'likes')} · ${t().comments} ${fmtNum(v.comments)}${deltaHtml(v,'comments')} · ${t().duration} ${esc(v.duration||'—')} <span class="toggle" data-vtoggle="${vid}">${open?t().collapse+' ▲':t().detail+' ▼'}</span>`;
-  let html=`<div class="video" data-vid="${vid}">${chanTag}<div class="vhead">${hot}${isNew}<div class="vtitle" data-translate data-orig="${esc(v.title||'')}">${esc(v.title||'')}</div><div class="vmeta">${meta}</div><div class="vtime">${esc(v.published||'—')}</div></div>`;
-  if(open){
-    html+=`<div class="vbody"><div class="dlabel">${t().desc}</div><div class="dtext" data-translate data-orig="${esc(v.description||'')}">${v.description?esc(v.description):'—'}</div>`;
-    if(v.tags&&v.tags.length)html+=`<div class="tags">${v.tags.map(x=>`<span class="tag">#${esc(x)}</span>`).join('')}</div>`;
-    if(v.note)html+=`<div class="note">${t().note}：${esc(v.note)}</div>`;
-    html+=`<a class="ytwatch" href="https://www.youtube.com/watch?v=${vid}" target="_blank" rel="noopener">${t().watch}</a></div>`;
-  }
-  html+=`</div>`;
-  // 评论卡：完全独立的卡片
+  const titleShow=esc(v.title||'');
+  const meta=`${t().plays} <b>${fmtNum(v.views)}</b>${deltaHtml(v,'views')} · ${t().likes} ${fmtNum(v.likes)}${deltaHtml(v,'likes')} · ${t().comments} ${fmtNum(v.comments)}${deltaHtml(v,'comments')} · ${t().duration} ${esc(v.duration||'—')} <span class="toggle" data-id="${esc(v.id)}">${open?t().collapse+' ▲':t().detail+' ▼'}</span>`;
+  const timeHtml=`<div class="vtime">${esc(v.published||'—')}</div>`;
+  let body=`<div class="vbody">`;
+  body+=`<div class="dlabel">${t().desc}</div><div class="dtext" data-translate data-orig="${esc(v.description||'')}">${v.description?esc(v.description):'—'}</div>`;
+  if(v.tags&&v.tags.length)body+=`<div class="tags">${v.tags.map(x=>`<span class="tag">#${esc(x)}</span>`).join('')}</div>`;
+  if(v.note)body+=`<div class="note">${t().note}：${esc(v.note)}</div>`;
   const ct=v.comments_text||[];
-  if(ct.length){
-    const cOpen=cmtOpen.has(v.id);
-    const showAll=commentsOpen.has(v.id);
-    const showCt=showAll?ct:ct.slice(0,5);
-    html+=`<div class="video" data-cmt="${vid}"><div class="vhead"><div class="vtitle">💬 ${t().commentsTitle} (${ct.length})</div><div class="vmeta"><span class="toggle" data-ctoggle="${vid}">${cOpen?t().collapse+' ▲':t().detail+' ▼'}</span></div></div>`;
-    if(cOpen){
-      html+=`<div class="vbody">`+showCt.map(commentHtml).join('');
-      if(ct.length>5)html+=`<div style="text-align:center;margin:10px 0"><button class="sortpill" data-cexpand="${vid}">${showAll?t().collapseAll:t().expandAll.replace('{n}',ct.length)}</button></div>`;
-      html+=`</div>`;
-    }
-    html+=`</div>`;
+  const cOpen=commentsOpen.has(v.id);
+  const showCt=cOpen?ct:ct.slice(0,5);
+  body+=`<div class="ctitle">${t().commentsTitle} ${t().captured(ct.length, v.comments==null?'—':fmtNum(v.comments))}</div>`;
+  body+=showCt.length?showCt.map(commentHtml).join(''):`<div class="note">—</div>`;
+  if(ct.length>5){
+    body+=`<div style="text-align:center;margin:10px 0"><button class="sortpill" data-cexpand="${esc(v.id)}">${cOpen?t().collapseAll:t().expandAll.replace('{n}',ct.length)}</button></div>`;
   }
-  return html;
-}
-
-function toggleDrawer(key, headEl){
-  const body=document.getElementById('drawer-'+key.replace('_','-'));
-  if(!body)return;
-  const isOpen=drawerOpen.has(key);
-  const inner=body.querySelector('.drawer-body-inner');
-  if(isOpen){
-    drawerOpen.delete(key);
-    body.style.height=body.offsetHeight+'px';
-    void body.offsetHeight;
-    body.style.height='0px';
-    headEl.closest('.drawer').classList.remove('open');
-  }else{
-    drawerOpen.add(key);
-    const h=inner?inner.offsetHeight:200;
-    body.style.height=h+'px';
-    headEl.closest('.drawer').classList.add('open');
-    setTimeout(()=>{body.style.height='auto';},360);
-  }
+  body+=`<a class="ytwatch" href="https://www.youtube.com/watch?v=${esc(v.id)}" target="_blank" rel="noopener">${t().watch}</a>`;
+  body+=`<div style="text-align:center;margin-top:12px"><span class="toggle" data-collapse="${esc(v.id)}">${t().collapse} ▲</span></div>`;
+  body+='</div>';
+  return `<div class="video${open?' open':''}" data-vid="${esc(v.id)}"><div class="vhead">${chanTag}<div class="vtitle" data-orig-title="${esc(v.title||'')}">${hot}${isNew}${titleShow}</div><div class="vmeta">${meta}</div></div>${body}${timeHtml}</div>`;
 }
 function renderList(){
   const vs=filteredVideos();
@@ -576,49 +482,11 @@ function renderList(){
     renderList();
     if(openSet.has(id)&&lang==='zh'){const card=el.querySelector(`[data-vid="${CSS.escape(id)}"]`);if(card)translateOpen(card)}
   });
-
-  el.querySelectorAll('[data-vtoggle]').forEach(b=>b.onclick=(e)=>{
-    e.stopPropagation();
-    const id=b.dataset.vtoggle;
-    openSet.has(id)?openSet.delete(id):openSet.add(id);
-    renderList();
-  });
-  el.querySelectorAll('[data-ctoggle]').forEach(b=>b.onclick=(e)=>{
-    e.stopPropagation();
-    const id=b.dataset.ctoggle;
-    cmtOpen.has(id)?cmtOpen.delete(id):cmtOpen.add(id);
-    renderList();
-  });
   el.querySelectorAll('[data-collapse]').forEach(b=>b.onclick=(e)=>{
     e.stopPropagation();
     const id=b.dataset.collapse;
-    const card=b.closest('.video');
-    const body=card?card.querySelector('.vbody'):null;
-    if(body){
-      // 纯容器收缩：只动 height，不闪透明度，下面内容跟着一体上移
-      const h=body.offsetHeight;
-      body.style.height=h+'px';
-      body.style.overflow='hidden';
-      body.classList.add('collapsing');
-      // 强制 reflow 让浏览器记住起始高度
-      void body.offsetHeight;
-      body.style.transition='height .35s ease';
-      body.style.height='0px';
-      setTimeout(()=>{
-        openSet.delete(id);
-        renderList();
-        requestAnimationFrame(()=>{
-          const nc=document.querySelector(`[data-vid="${id}"]`);
-          if(nc){
-            const r=nc.getBoundingClientRect();
-            window.scrollTo(0, window.scrollY+r.top-20);
-          }
-        });
-      },360);
-    }else{
-      openSet.delete(id);
-      renderList();
-    }
+    openSet.delete(id);
+    renderList();
   });
   el.querySelectorAll('[data-cexpand]').forEach(b=>b.onclick=(e)=>{
     e.stopPropagation();
@@ -660,197 +528,14 @@ function applyLang(){
 }
 function renderAll(){renderTabs();renderStats();renderSort();renderList()}
 document.getElementById('langicon').onclick=()=>{lang=lang==='zh'?'en':'zh';applyLang()};
-// 深色模式：默认自动（按日出日落），手动切换后到下个日出/日落自动恢复
-let manualTheme=null;  // null=自动, 'light'/'dark'=手动
-let manualSunState=null;  // 手动时的昼夜状态
-try{
-  const saved=localStorage.getItem('dash-theme-manual');
-  if(saved)manualTheme=saved;
-}catch(e){}
-
-// 日出日落计算（简化版，按北京经纬度）
-function getSunTimes(date){
-  const lat=39.9, lng=116.4;
-  const rad=Math.PI/180;
-  const dayOfYear=Math.floor((date-new Date(date.getFullYear(),0,0))/864e5);
-  const decl=-23.44*Math.cos(rad*(360/365*(dayOfYear+10)));
-  const ha=Math.acos((Math.sin(rad*-0.83)-Math.sin(rad*lat)*Math.sin(rad*decl))/(Math.cos(rad*lat)*Math.cos(rad*decl)))/rad;
-  const noon=12-(lng-120)/15;
-  return {sunrise:noon-ha/15, sunset:noon+ha/15};
-}
-function isNightTime(){
-  const now=new Date();
-  const {sunrise, sunset}=getSunTimes(now);
-  const h=now.getHours()+now.getMinutes()/60;
-  return h<sunrise||h>=sunset;
-}
-function applyTheme(){
-  const night=isNightTime();
-  let effective;
-  if(manualTheme){
-    // 手动模式：如果昼夜状态变了，恢复自动
-    if((night?'night':'day')!==manualSunState){
-      manualTheme=null;
-      try{localStorage.removeItem('dash-theme-manual')}catch(e){}
-      effective=night?'dark':'light';
-    }else{
-      effective=manualTheme;
-    }
-  }else{
-    effective=night?'dark':'light';
-  }
-  document.documentElement.setAttribute('data-theme',effective);
-  document.getElementById('themeicon').textContent=effective==='dark'?'☀️':'🌙';
-}
-setInterval(applyTheme,60000);
-document.getElementById('themeicon').onclick=()=>{
-  const current=document.documentElement.getAttribute('data-theme');
-  manualTheme=current==='dark'?'light':'dark';
-  manualSunState=isNightTime()?'night':'day';
-  try{localStorage.setItem('dash-theme-manual',manualTheme)}catch(e){}
-  applyTheme();
-};
-applyTheme();
 function moveThumb(){
   const seg=document.getElementById('g-seg');
   const thumb=document.getElementById('g-thumb');
   const btn=curView==='rank'?document.getElementById('g-rank'):document.getElementById('g-list');
   if(!seg||!thumb||!btn)return;
-  thumb.style.transition='left .25s ease,width .25s ease';
   thumb.style.left=btn.offsetLeft+'px';
   thumb.style.width=btn.offsetWidth+'px';
 }
-// 底部栏按住拖动切换：scrub 点击切换动画的时间线
-// 点击动画 = flip-out(0.35s) → 切换 → flip-in(0.35s)，拖动进度 0→1 对应整个时间线
-(function(){
-  const seg=document.getElementById('g-seg');
-  const thumb=document.getElementById('g-thumb');
-  if(!seg||!thumb)return;
-  let startX=null, dragging=false, suppressClick=false, scrubDir=1;
-  const DRAG_THRESHOLD=12;
-  // scrub 时间线：跟点击动画完全一致，只作用在 mainview/rankview（搜索框以下），不碰 position
-  // progress 0→0.5: outgoing 做 flip-out；0.5: 切换 hidden；0.5→1: incoming 做 flip-in
-  function scrub(progress){
-    const main=document.getElementById('mainview'), rank=document.getElementById('rankview');
-    const outgoing=curView==='list'?main:rank;
-    const incoming=curView==='list'?rank:main;
-    if(!outgoing||!incoming)return;
-    // 不碰 position，只做 transform+opacity，跟点击动画的作用范围完全一致
-    [main,rank].forEach(v=>{if(v){v.style.position='';v.style.top='';v.style.left='';v.style.right='';v.style.zIndex='';}});
-    if(progress<0.5){
-      // 前半：outgoing flip-out，incoming 保持 hidden
-      const p=progress/0.5;
-      outgoing.classList.remove('hidden');
-      outgoing.style.transform=`perspective(1200px) rotateY(${-12*p}deg)`;
-      outgoing.style.transformOrigin='top center';
-      outgoing.style.opacity=String(1-p);
-      incoming.classList.add('hidden');
-      incoming.style.transform='';incoming.style.opacity='';
-    }else{
-      // 后半：outgoing hidden，incoming flip-in
-      const p=(progress-0.5)/0.5;
-      outgoing.classList.add('hidden');
-      outgoing.style.transform='';outgoing.style.opacity='';
-      incoming.classList.remove('hidden');
-      incoming.style.transform=`perspective(1200px) rotateY(${12*(1-p)}deg)`;
-      incoming.style.transformOrigin='top center';
-      incoming.style.opacity=String(p);
-    }
-  }
-  function cleanupScrub(){
-    const main=document.getElementById('mainview'), rank=document.getElementById('rankview');
-    [main,rank].forEach(v=>{
-      if(!v)return;
-      v.style.opacity='';v.style.pointerEvents='';
-      v.style.transform='';v.style.transformOrigin='';v.style.transition='';
-    });
-  }
-  seg.addEventListener('touchstart',e=>{
-    startX=e.touches[0].clientX;
-    dragging=false;suppressClick=false;
-    scrubDir=curView==='list'?1:-1;
-  },{passive:true});
-  seg.addEventListener('touchmove',e=>{
-    if(startX===null)return;
-    const dx=e.touches[0].clientX-startX;
-    if(!dragging&&Math.abs(dx)>DRAG_THRESHOLD){
-      dragging=true;
-      thumb.style.transition='none';
-      const main=document.getElementById('mainview'), rank=document.getElementById('rankview');
-      [main,rank].forEach(v=>{if(v)v.style.transition='none';});
-      if(curView==='rank')renderList();else renderRank();
-    }
-    if(dragging){
-      const btn=curView==='rank'?document.getElementById('g-rank'):document.getElementById('g-list');
-      const other=curView==='rank'?document.getElementById('g-list'):document.getElementById('g-rank');
-      if(!btn||!other)return;
-      const minL=Math.min(btn.offsetLeft,other.offsetLeft);
-      const maxL=Math.max(btn.offsetLeft,other.offsetLeft);
-      let newLeft=Math.max(minL,Math.min(maxL,btn.offsetLeft+dx));
-      thumb.style.left=newLeft+'px';
-      const totalDist=Math.abs(other.offsetLeft-btn.offsetLeft)||1;
-      let progress=Math.abs(newLeft-btn.offsetLeft)/totalDist;
-      // 方向：向目标方向拖 progress 0→1，反向拖则 progress 减小
-      const movingToward=(curView==='list'&&dx>0)||(curView==='rank'&&dx<0);
-      progress=movingToward?Math.max(0,Math.min(1,progress)):0;
-      scrub(progress);
-      e.preventDefault();
-    }
-  },{passive:false});
-  seg.addEventListener('touchend',e=>{
-    if(startX===null)return;
-    const wasDragging=dragging;
-    if(wasDragging){
-      suppressClick=true;
-      const btn=curView==='rank'?document.getElementById('g-rank'):document.getElementById('g-list');
-      const other=curView==='rank'?document.getElementById('g-list'):document.getElementById('g-rank');
-      const main=document.getElementById('mainview'), rank=document.getElementById('rankview');
-      if(btn&&other){
-        const curL=parseFloat(thumb.style.left)||btn.offsetLeft;
-        const mid=(btn.offsetLeft+other.offsetLeft)/2;
-        const goThrough=(curView==='list'&&curL>mid)||(curView==='rank'&&curL<mid);
-        if(goThrough){
-          // 拖动已 scrub 到位，直接定格为结束态，不重播点击动画
-          const incoming=curView==='list'?rank:main;
-          const outgoing=curView==='list'?main:rank;
-          const newView=curView==='list'?'rank':'list';
-          curView=newView;
-          document.getElementById('g-rank').classList.toggle('on',newView==='rank');
-          document.getElementById('g-list').classList.toggle('on',newView==='list');
-          cleanupScrub();
-          if(outgoing)outgoing.classList.add('hidden');
-          if(incoming){
-            incoming.classList.remove('hidden');
-            // 确保结束态干净：无 transform、无透明度残留
-            incoming.style.transform='';incoming.style.opacity='';
-          }
-          moveThumb();
-          if(newView==='rank')renderRank();else renderList();
-          window.scrollTo(0,0);
-        }else{
-          // 弹回开头：scrub 回 0，动画结束后把 incoming 重新 hidden
-          const incomingSnap=curView==='list'?rank:main;
-          [main,rank].forEach(v=>{if(v)v.style.transition='transform .25s ease,opacity .25s ease';});
-          scrub(0);
-          setTimeout(()=>{
-            cleanupScrub();
-            // 关键：把拖动时露出来的 incoming 重新藏起来
-            if(incomingSnap){
-              if(curView==='list')rank.classList.add('hidden');
-              else main.classList.add('hidden');
-            }
-            moveThumb();
-          },260);
-        }
-      }else{cleanupScrub();moveThumb();}
-      setTimeout(()=>{suppressClick=false;},150);
-    }
-    startX=null;dragging=false;
-  },{passive:true});
-  seg.addEventListener('click',e=>{
-    if(suppressClick){e.stopPropagation();e.preventDefault();}
-  },true);
-})();
 function showRank(){
   if(curView==='rank')return;
   curView='rank';
@@ -890,22 +575,7 @@ document.getElementById('g-rank').onclick=showRank;
   const seg=document.getElementById('g-seg');
   let startX=0, dragging=false;
   // 初始化 thumb 位置
-  function init(){
-    moveThumb();
-    // AI 回复点击复制英文原文
-    document.addEventListener('click',e=>{
-      const ar=e.target.closest('.ai-box');
-      if(ar){
-        const orig=ar.dataset.aiOrig||'';
-        if(orig){
-          navigator.clipboard.writeText(orig).then(()=>{
-            const cp=ar.querySelector('.ai-box-copy');
-            if(cp){const t=cp.textContent;cp.textContent='已复制 ✓';setTimeout(()=>{cp.textContent=t;},1500);}
-          }).catch(()=>{});
-        }
-      }
-    });
-  }
+  function init(){ moveThumb(); }
   if(document.readyState==='complete')init();
   else window.addEventListener('load',init);
   setTimeout(init,100);
