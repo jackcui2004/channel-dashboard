@@ -12,6 +12,7 @@
   .now { background: #241b33; border: 1px solid #4b3670; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
   .now .t { font-size: 16px; margin-bottom: 10px; }
   audio { width: 100%; }
+  h2 { font-size: 15px; color: #b9aed6; margin: 24px 0 10px; font-weight: 600; }
   .list { display: flex; flex-direction: column; gap: 10px; }
   .item { display: flex; align-items: center; gap: 12px; background: #1d1626; border: 1px solid #352a4a; border-radius: 10px; padding: 13px 14px; color: #f2ecff; font-size: 15px; text-align: left; width: 100%; cursor: pointer; }
   .item.active { border-color: #9b7ff0; background: #2c2140; }
@@ -26,13 +27,14 @@
 <body>
 <div class="wrap">
   <h1>My Mafia Husband Told Me To Find A Lover — Then The Don Took His Wife</h1>
-  <p class="sub">Moonveil 配音全片 · Aria 主讲 + Helio 男声 · 共 83 分 33 秒，分 9 段流式播放，点一段就能听，不用整段下载。</p>
+  <p class="sub">Moonveil 配音全片 · Aria 主讲 + Helio 男声 · 共 83 分 33 秒，整片不用拆，点开直接听。</p>
   <div class="now">
-    <div class="t" id="nowTitle">第 1 段 · 0:00–10:00</div>
-    <audio id="player" controls preload="metadata" playsinline></audio>
+    <div class="t">全片 · 83:33</div>
+    <audio id="fullplayer" controls preload="metadata" playsinline src="full.mp3"></audio>
   </div>
+  <h2>分段版（网慢时从这里单段听）</h2>
   <div class="list" id="list"></div>
-  <p class="tip">播完一段会自动接下一段。想离线听，点每段右边的“下载”。完整 83 分钟文件在 Drive「BoringHusband_v2_分镜包」里。</p>
+  <p class="tip">整片播完就停，分段版播完一段会自动接下一段。想离线听，点每段右边的“下载”。完整文件也在 Drive「BoringHusband_v2_分镜包」里。</p>
 </div>
 <script>
 var parts = [
@@ -46,15 +48,25 @@ var parts = [
   ["part08.mp3", "第 8 段", "70:00–80:00"],
   ["part09.mp3", "第 9 段", "80:00–83:33"]
 ];
-var player = document.getElementById("player");
-var nowTitle = document.getElementById("nowTitle");
 var list = document.getElementById("list");
-var current = 0;
+var current = -1;
 function play(i) {
   current = i;
-  player.src = parts[i][0];
-  nowTitle.textContent = parts[i][1] + " · " + parts[i][2];
-  player.play();
+  var p = document.getElementById("partplayer");
+  if (!p) {
+    var box = document.createElement("div");
+    box.className = "now";
+    box.innerHTML = '<div class="t" id="partTitle"></div><audio id="partplayer" controls preload="metadata" playsinline></audio>';
+    list.parentNode.insertBefore(box, list);
+    p = document.getElementById("partplayer");
+    p.addEventListener("ended", function() {
+      if (current + 1 < parts.length) play(current + 1);
+    });
+  }
+  p.src = parts[i][0];
+  document.getElementById("partTitle").textContent = parts[i][1] + " · " + parts[i][2];
+  p.play();
+  p.scrollIntoView({ behavior: "smooth", block: "center" });
   var items = list.children;
   for (var k = 0; k < items.length; k++) {
     items[k].classList.toggle("active", k === i);
@@ -62,7 +74,7 @@ function play(i) {
 }
 parts.forEach(function(p, i) {
   var b = document.createElement("button");
-  b.className = "item" + (i === 0 ? " active" : "");
+  b.className = "item";
   b.innerHTML = '<span class="num">' + (i + 1) + '</span><span class="meta">' + p[1] + '<small>' + p[2] + '</small></span>';
   var a = document.createElement("a");
   a.className = "dl";
@@ -74,10 +86,6 @@ parts.forEach(function(p, i) {
   b.onclick = function() { play(i); };
   list.appendChild(b);
 });
-player.addEventListener("ended", function() {
-  if (current + 1 < parts.length) play(current + 1);
-});
-player.src = parts[0][0];
 </script>
 </body>
 </html>
