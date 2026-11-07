@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Moonveil 配音 · BoringHusband 全片</title>
+<style>
+  body { margin: 0; background: #14101c; color: #f2ecff; font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 28px 18px 60px; }
+  h1 { font-size: 20px; line-height: 1.5; margin: 0 0 4px; }
+  .sub { color: #b9aed6; font-size: 14px; line-height: 1.6; margin: 0 0 20px; }
+  .now { background: #241b33; border: 1px solid #4b3670; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+  .now .t { font-size: 16px; margin-bottom: 10px; }
+  audio { width: 100%; }
+  .list { display: flex; flex-direction: column; gap: 10px; }
+  .item { display: flex; align-items: center; gap: 12px; background: #1d1626; border: 1px solid #352a4a; border-radius: 10px; padding: 13px 14px; color: #f2ecff; font-size: 15px; text-align: left; width: 100%; cursor: pointer; }
+  .item.active { border-color: #9b7ff0; background: #2c2140; }
+  .item .num { width: 26px; height: 26px; border-radius: 50%; background: #4b3670; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+  .item.active .num { background: #9b7ff0; }
+  .item .meta { flex: 1; }
+  .item .meta small { display: block; color: #b9aed6; font-size: 12px; margin-top: 2px; }
+  .item .dl { color: #9b7ff0; font-size: 13px; text-decoration: none; flex-shrink: 0; }
+  .tip { color: #8d81a8; font-size: 13px; line-height: 1.7; margin-top: 22px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>My Mafia Husband Told Me To Find A Lover — Then The Don Took His Wife</h1>
+  <p class="sub">Moonveil 配音全片 · Aria 主讲 + Helio 男声 · 共 83 分 33 秒，分 9 段流式播放，点一段就能听，不用整段下载。</p>
+  <div class="now">
+    <div class="t" id="nowTitle">第 1 段 · 0:00–10:00</div>
+    <audio id="player" controls preload="metadata" playsinline></audio>
+  </div>
+  <div class="list" id="list"></div>
+  <p class="tip">播完一段会自动接下一段。想离线听，点每段右边的“下载”。完整 83 分钟文件在 Drive「BoringHusband_v2_分镜包」里。</p>
+</div>
+<script>
+var parts = [
+  ["part01.mp3", "第 1 段", "0:00–10:00"],
+  ["part02.mp3", "第 2 段", "10:00–20:00"],
+  ["part03.mp3", "第 3 段", "20:00–30:00"],
+  ["part04.mp3", "第 4 段", "30:00–40:00"],
+  ["part05.mp3", "第 5 段", "40:00–50:00"],
+  ["part06.mp3", "第 6 段", "50:00–60:00"],
+  ["part07.mp3", "第 7 段", "60:00–70:00"],
+  ["part08.mp3", "第 8 段", "70:00–80:00"],
+  ["part09.mp3", "第 9 段", "80:00–83:33"]
+];
+var player = document.getElementById("player");
+var nowTitle = document.getElementById("nowTitle");
+var list = document.getElementById("list");
+var current = 0;
+function play(i) {
+  current = i;
+  player.src = parts[i][0];
+  nowTitle.textContent = parts[i][1] + " · " + parts[i][2];
+  player.play();
+  var items = list.children;
+  for (var k = 0; k < items.length; k++) {
+    items[k].classList.toggle("active", k === i);
+  }
+}
+parts.forEach(function(p, i) {
+  var b = document.createElement("button");
+  b.className = "item" + (i === 0 ? " active" : "");
+  b.innerHTML = '<span class="num">' + (i + 1) + '</span><span class="meta">' + p[1] + '<small>' + p[2] + '</small></span>';
+  var a = document.createElement("a");
+  a.className = "dl";
+  a.href = p[0];
+  a.download = p[0];
+  a.textContent = "下载";
+  a.onclick = function(e) { e.stopPropagation(); };
+  b.appendChild(a);
+  b.onclick = function() { play(i); };
+  list.appendChild(b);
+});
+player.addEventListener("ended", function() {
+  if (current + 1 < parts.length) play(current + 1);
+});
+player.src = parts[0][0];
+</script>
+</body>
+</html>
