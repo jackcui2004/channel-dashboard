@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>《逆天邪神》写法打分器 · 12 维 × 100 分</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#171512; color:#d8d0bf; font-family:"Songti SC","Noto Serif SC",serif; font-size:19px; line-height:1.9; }
+  .topbar { position:sticky; top:0; z-index:10; background:rgba(23,21,18,.96); border-bottom:1px solid #3a3226; padding:10px 18px; display:flex; justify-content:space-between; align-items:center; }
+  .topbar .t { color:#c9a86a; font-size:15px; letter-spacing:2px; }
+  .topbar .fs button { background:none; border:1px solid #c9a86a; color:#c9a86a; border-radius:4px; padding:2px 10px; margin-left:6px; font-size:15px; cursor:pointer; }
+  .progress { position:fixed; top:0; left:0; height:3px; background:#c9a86a; width:0; z-index:20; }
+  .wrap { max-width:760px; margin:0 auto; padding:28px 20px 80px; }
+  h1 { font-size:28px; color:#e8dfc8; text-align:center; line-height:1.5; margin:10px 0 6px; }
+  .sub { text-align:center; color:#9a8f78; font-size:15px; margin-bottom:20px; }
+  .scorebox { background:#201c17; border:1px solid #c9a86a; border-radius:12px; padding:20px; text-align:center; margin:20px 0; position:sticky; top:56px; z-index:5; }
+  .scorebox .num { font-size:52px; color:#c9a86a; line-height:1.1; }
+  .scorebox .grade { font-size:20px; color:#e8dfc8; margin-top:4px; }
+  .scorebox .verdict { font-size:15px; color:#9a8f78; margin-top:6px; line-height:1.7; }
+  .scorebar { height:10px; background:#2e2820; border-radius:5px; overflow:hidden; margin-top:12px; }
+  .scorebar i { display:block; height:100%; background:#c9a86a; width:0%; transition:width .3s; }
+  .btns { display:flex; gap:10px; justify-content:center; margin:16px 0 26px; flex-wrap:wrap; }
+  .btns button { background:#2a241b; border:1px solid #c9a86a; color:#c9a86a; border-radius:20px; padding:6px 18px; font-size:16px; cursor:pointer; font-family:inherit; }
+  .btns button:hover { background:#3a3226; }
+  .dim { background:#201c17; border:1px solid #3a3226; border-radius:10px; padding:16px 18px; margin:14px 0; }
+  .dim.weak { border-color:#a86a5a; }
+  .dim h3 { font-size:18px; color:#e0d5b8; margin:0 0 2px; }
+  .dim h3 .w { color:#c9a86a; font-size:14px; font-weight:normal; }
+  .dim .desc { font-size:15px; color:#9a8f78; line-height:1.7; margin-bottom:10px; }
+  .dim .row { display:flex; align-items:center; gap:12px; }
+  .dim input[type=range] { flex:1; accent-color:#c9a86a; height:28px; }
+  .dim .val { width:52px; text-align:right; color:#c9a86a; font-size:20px; }
+  .dim .pts { font-size:14px; color:#9a8f78; width:64px; text-align:right; }
+  .dim .tip { font-size:14px; color:#a86a5a; margin-top:6px; display:none; line-height:1.7; }
+  .dim.weak .tip { display:block; }
+  .dim .lvl { font-size:14px; color:#8a7f68; }
+  h2 { font-size:22px; color:#c9a86a; margin:40px 0 12px; padding-bottom:8px; border-bottom:1px solid #3a3226; }
+  table { width:100%; border-collapse:collapse; margin:14px 0; font-size:16px; line-height:1.8; }
+  th { color:#c9a86a; text-align:left; border-bottom:1px solid #4a4030; padding:6px 8px; font-weight:normal; }
+  td { border-bottom:1px solid #2e2820; padding:8px; vertical-align:top; }
+  p { margin-bottom:12px; text-indent:2em; }
+  p.noind { text-indent:0; }
+  .foot { text-align:center; color:#8a7f68; font-size:14px; margin-top:50px; }
+  .diag { background:#201c17; border:1px solid #3a3226; border-radius:10px; padding:16px 18px; margin:14px 0; font-size:16px; }
+  .diag b { color:#c9a86a; font-weight:normal; }
+  .backtop { position:fixed; right:16px; bottom:20px; background:#2a241b; border:1px solid #c9a86a; color:#c9a86a; border-radius:50%; width:44px; height:44px; font-size:20px; cursor:pointer; }
+</style>
+</head>
+<body>
+<div class="progress" id="prog"></div>
+<div class="topbar">
+  <span class="t">逆天邪神 · 写法打分器</span>
+  <span class="fs"><button onclick="adj(-1)">A-</button><button onclick="adj(1)">A+</button></span>
+</div>
+<div class="wrap">
+
+<h1>《逆天邪神》写法打分器</h1>
+<p class="sub">12 个维度 × 权重 ＝ 100 分 · 拿任意一篇小说、一章、一个故事来打<br>评分标准来自<a href="../ntxs-board/" style="color:#c9a86a;">《逆天邪神》写法拆解看板</a>的 26 个板块</p>
+
+<div class="scorebox">
+  <div class="num"><span id="total">0</span><span style="font-size:22px;"> / 100</span></div>
+  <div class="scorebar"><i id="bar"></i></div>
+  <div class="grade" id="grade">还没打分</div>
+  <div class="verdict" id="verdict">拖动下面 12 个滑杆，0–10 分，实时出总分。</div>
+</div>
+
+<div class="btns">
+  <button onclick="fillBench()">填入《逆天邪神》基准分（95 分）</button>
+  <button onclick="resetAll()">全部清零</button>
+</div>
+
+<div id="dims"></div>
+
+<h2>短板诊断</h2>
+<div class="diag" id="diag">打完分后，这里会列出最弱的三个维度，和对应的补法（直接抄看板里的公式）。</div>
+
+<h2>档位判定</h2>
+<table>
+  <tr><th>总分</th><th>档位</th><th>意味着什么</th></tr>
+  <tr><td>90–100</td><td>封神级</td><td>可连载十年，读者十年后还记得。《逆天邪神》基准 95 分。</td></tr>
+  <tr><td>80–89</td><td>爆款级</td><td>具备爆款潜质，补一到两个短板就能往上冲。</td></tr>
+  <tr><td>70–79</td><td>合格可追</td><td>能看，但缺一个让人记住的点，先补最弱的维度。</td></tr>
+  <tr><td>60–69</td><td>平庸</td><td>钩子或虐点缺失，读者三章就走。</td></tr>
+  <tr><td>0–59</td><td>不合格</td><td>先回去修总纲三铁律：写美不写欲、虐是主菜、每人一件事。</td></tr>
+</table>
+
+<h2>打分规则</h2>
+<p>每个维度 0–10 分：0–3 分是没有这个东西，4–6 分是有但没写到位，7–8 分是写到位了，9–10 分是写出名场面了。权重是这个维度在全书成功里的分量，12 个权重加起来正好 100。不要凭感觉打——每个维度下面都写了“9 分长什么样”，对着那个标准打。</p>
+<p>基准分说明：《逆天邪神》的 95 分是我按看板里的证据打的示例分，不是官方分。微观写法只给了 8 分，因为旁白讲设定偶尔拖沓；其他维度 9–10 分。你不同意哪一项，直接改滑杆，总分会跟着变。</p>
+
+<p class="foot">— 全 文 完 —<br>《逆天邪神》写法打分器 · 评分标准见写法拆解看板</p>
+</div>
+<button class="backtop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<script>
+var DIMS = [
+ {id:'hook', name:'开头钩子', w:10, bench:10, desc:'三页之内死局见血，一句狠话勾住人。9 分标准：序章绝云崖——天下围杀、主角濒死、嘴角还在冷笑。', tip:'补法：开篇先摆死局，不要铺垫。死局 + 见血 + 一句狠话，三页之内必须齐。'},
+ {id:'foreshadow', name:'伏笔', w:10, bench:9, desc:'埋得轻、收得重、一定要回收。9 分标准：天毒珠埋了 900 章才收束成“天毒合一”；轮回镜约 270 章埋在科普里，千章后回收。', tip:'补法：埋的时候藏在科普或反常里，回收的时候越重越好。不回收的伏笔就是挖坑不填。'},
+ {id:'climax', name:'高潮名场面', w:10, bench:10, desc:'十年后读者还记得的场面。9 分标准：封神之战、死境死情、蓝极星陨、陨月八章——每场都是“虐到极致再翻盘”。', tip:'补法：一卷至少一场名场面。名场面 = 虐到极致 + 一招反转 + 全场失声。'},
+ {id:'abuse', name:'虐文 / 催泪', w:10, bench:10, desc:'付出不对等、她什么都不说、真相迟来。9 分标准：沐玄音挡死劫之前没说过一句喜欢；茉莉的留言只说“你要活下去”。', tip:'补法：她默默付出（读者看见）→ 他不知道（信息差）→ 真相迟来（数字钉死）→ 他以命相还。'},
+ {id:'face', name:'打脸 / 爽点', w:8, bench:10, desc:'当众轻视 → 主角沉默 → 一招反转 → 全场失声。9 分标准：封神之战“一战封神”“封神第一”。', tip:'补法：不要让主角赛前放狠话。期待值压到最低，反转才最高。'},
+ {id:'love', name:'感情线 / 追妻火葬场', w:8, bench:9, desc:'燃料是“她做过什么、他当时不知道”。9 分标准：夏倾月线——他以为她不在乎，其实她一直在看，真相一层层揭开。', tip:'补法：追妻的火靠“真相迟来”烧，每揭一件她为他做过的事，火旺一分。'},
+ {id:'reunion', name:'破镜重圆', w:6, bench:9, desc:'不是复合，是重铸。9 分标准：沐玄音死了（1521）→ 回来了（1741）；镜子碎到最彻底再重圆。', tip:'补法：重圆之前双方都要付出代价。单方面低头不叫破镜重圆，叫哄人。'},
+ {id:'memory', name:'角色记忆点', w:10, bench:10, desc:'视觉标签 + 一件事 + 一句话。9 分标准：“我是茉莉，是被鲜血染成红色的茉莉。”“到时，两不相欠，再不相见。”', tip:'补法：颜色定身份（黑衣云澈、白衣仙子、红衣茉莉），一件事立住，一句短狠的台词当指纹。'},
+ {id:'support', name:'配角', w:8, bench:10, desc:'自己的世界里当主角，与主角有一根紧的线。9 分标准：焚绝尘是镜像，凌云是标尺，洛长生是一卷的王，小妖后是一界的王。', tip:'补法：配角出场退场都要有仪式感，宁缺毋滥。出场少没关系，每次出场都要有事做。'},
+ {id:'women', name:'女人之间 / 群像', w:6, bench:9, desc:'不宫斗，是姐妹共同体。9 分标准：全书“争风”“情敌” 0 次，“吃醋” 18 次，“姐妹” 130 次；1307 章倾月玄音、1635 章神女魔后。', tip:'补法：姐妹相称、互相托付、并肩不争宠。吃醋可以有，但只能是调味，不能是主菜。'},
+ {id:'structure', name:'主副线 / 结构', w:8, bench:9, desc:'主线是骨架，副线是血肉，支线是呼吸，拧成麻花。9 分标准：复仇主线 + 感情副线 + 兄弟支线，卷卷留钩子，中间不掉档。', tip:'补法：打一章、虐一章、揭秘一章、埋一章，轮着来。每卷结尾必留一个钩子。'},
+ {id:'micro', name:'微观写法', w:6, bench:8, desc:'动作三招、身体温度呼吸、心理一瞬、对话短句、语气遮名可认。9 分标准：对话十个字以内，狠话句尾留钩子。', tip:'补法：外貌三笔（颜色 + 一处细节 + 一个比喻），女用玉雪脂仙，男用刃狼血寒。旁白只讲设定，不讲道理。'}
+];
+var box = document.getElementById('dims');
+DIMS.forEach(function(d, i){
+  var el = document.createElement('div');
+  el.className = 'dim';
+  el.id = 'dim-' + d.id;
+  el.innerHTML = '<h3>' + (i+1) + ' · ' + d.name + ' <span class="w">权重 ' + d.w + ' 分</span></h3>' +
+    '<div class="desc">' + d.desc + '</div>' +
+    '<div class="row"><input type="range" min="0" max="10" step="1" value="0" data-i="' + i + '">' +
+    '<span class="val">0</span><span class="pts">得 0.0 分</span></div>' +
+    '<div class="lvl">0–3 没有 · 4–6 有但没到位 · 7–8 写到位了 · 9–10 写出名场面了</div>' +
+    '<div class="tip">' + d.tip + '</div>';
+  box.appendChild(el);
+});
+function lvlText(s){ return s<=3 ? '没有' : (s<=6 ? '有但没到位' : (s<=8 ? '写到位了' : '写出名场面了')); }
+function calc(){
+  var total = 0, scored = 0;
+  DIMS.forEach(function(d, i){
+    var inp = box.querySelector('input[data-i="' + i + '"]');
+    var s = parseInt(inp.value, 10);
+    var el = document.getElementById('dim-' + d.id);
+    el.querySelector('.val').textContent = s;
+    el.querySelector('.pts').textContent = '得 ' + (s * d.w / 10).toFixed(1) + ' 分';
+    el.querySelector('.lvl').textContent = lvlText(s) + '（' + s + ' 分）';
+    el.classList.toggle('weak', s < 7);
+    total += s * d.w / 10;
+    if (s > 0) scored++;
+  });
+  total = Math.round(total * 10) / 10;
+  document.getElementById('total').textContent = total;
+  document.getElementById('bar').style.width = total + '%';
+  var g = document.getElementById('grade'), v = document.getElementById('verdict');
+  if (scored === 0) { g.textContent = '还没打分'; v.textContent = '拖动上面 12 个滑杆，0–10 分，实时出总分。'; }
+  else if (total >= 90) { g.textContent = '封神级'; v.textContent = '可连载十年，读者十年后还记得。守住短板，别在续写里把人设写崩。'; }
+  else if (total >= 80) { g.textContent = '爆款级'; v.textContent = '具备爆款潜质。看下面的短板诊断，补一到两个最弱的维度就能往上冲。'; }
+  else if (total >= 70) { g.textContent = '合格可追'; v.textContent = '能看，但缺一个让人记住的点。先补最弱的维度，不要平均用力。'; }
+  else if (total >= 60) { g.textContent = '平庸'; v.textContent = '钩子或虐点缺失，读者三章就走。先修开头钩子和虐文两个维度。'; }
+  else { g.textContent = '不合格'; v.textContent = '先回去修总纲三铁律：写美不写欲、虐是主菜、每人一件事。'; }
+  var weak = DIMS.map(function(d, i){
+    return { d: d, s: parseInt(box.querySelector('input[data-i="' + i + '"]').value, 10) };
+  }).filter(function(x){ return x.s < 7; }).sort(function(a,b){ return a.s - b.s; }).slice(0,3);
+  var dg = document.getElementById('diag');
+  if (scored === 0) { dg.textContent = '打完分后，这里会列出最弱的三个维度，和对应的补法（直接抄看板里的公式）。'; }
+  else if (!weak.length) { dg.innerHTML = '没有短板，12 个维度全在 7 分以上。这已经是封神的底子了，剩下的就是别写崩。'; }
+  else {
+    dg.innerHTML = '最弱的三个维度：<br>' + weak.map(function(x, k){
+      return (k+1) + ' · <b>' + x.d.name + '（' + x.s + ' 分，权重 ' + x.d.w + '）</b>——' + x.d.tip;
+    }).join('<br>');
+  }
+}
+box.addEventListener('input', calc);
+function fillBench(){
+  DIMS.forEach(function(d, i){
+    box.querySelector('input[data-i="' + i + '"]').value = d.bench;
+  });
+  calc();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function resetAll(){
+  DIMS.forEach(function(d, i){
+    box.querySelector('input[data-i="' + i + '"]').value = 0;
+  });
+  calc();
+}
+var fs = 19;
+function adj(d){ fs = Math.max(15, Math.min(24, fs + d)); document.body.style.fontSize = fs + 'px'; try{ localStorage.setItem('ntxss_fs', fs); }catch(e){} }
+try{ var s = localStorage.getItem('ntxss_fs'); if(s){ fs = parseInt(s); document.body.style.fontSize = fs + 'px'; } }catch(e){}
+window.addEventListener('scroll', function(){
+  var h = document.documentElement;
+  var p = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+  document.getElementById('prog').style.width = p + '%';
+});
+calc();
+</script>
+</body>
+</html>
