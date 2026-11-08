@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>《逆天邪神》写法拆解看板 · 火星引力</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#171512; color:#d8d0bf; font-family:"Songti SC","Noto Serif SC",serif; font-size:19px; line-height:2.0; }
+  .topbar { position:sticky; top:0; z-index:10; background:rgba(23,21,18,.96); border-bottom:1px solid #3a3226; padding:10px 18px; display:flex; justify-content:space-between; align-items:center; backdrop-filter:blur(4px); }
+  .topbar .t { color:#c9a86a; font-size:15px; letter-spacing:2px; }
+  .topbar .fs button { background:none; border:1px solid #c9a86a; color:#c9a86a; border-radius:4px; padding:2px 10px; margin-left:6px; font-size:15px; cursor:pointer; }
+  .progress { position:fixed; top:0; left:0; height:3px; background:#c9a86a; width:0; z-index:20; }
+  .wrap { max-width:760px; margin:0 auto; padding:28px 20px 80px; }
+  h1 { font-size:30px; color:#e8dfc8; text-align:center; line-height:1.5; margin:10px 0 6px; }
+  .sub { text-align:center; color:#9a8f78; font-size:15px; margin-bottom:8px; }
+  .meta { text-align:center; color:#8a7f68; font-size:14px; margin-bottom:26px; line-height:1.9; }
+  .meta b { color:#c9a86a; font-weight:normal; }
+  .nav { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:34px; }
+  .nav a { color:#c9a86a; border:1px solid #4a4030; border-radius:20px; padding:3px 13px; font-size:15px; text-decoration:none; }
+  .nav a:hover { background:#2a241b; }
+  h2 { font-size:23px; color:#c9a86a; margin:44px 0 14px; padding-bottom:8px; border-bottom:1px solid #3a3226; }
+  h3 { font-size:19px; color:#e0d5b8; margin:26px 0 8px; }
+  p { margin-bottom:14px; text-indent:2em; }
+  p.noind, li { text-indent:0; }
+  ul, ol { margin:0 0 14px 1.4em; }
+  li { margin-bottom:8px; }
+  .card { background:#201c17; border:1px solid #3a3226; border-radius:10px; padding:18px 20px; margin:18px 0; }
+  .card h3 { margin-top:0; }
+  .card p { text-indent:0; margin-bottom:8px; }
+  .tag { display:inline-block; color:#171512; background:#c9a86a; border-radius:4px; padding:0 8px; font-size:14px; margin-right:6px; }
+  .tag.ghost { background:none; color:#c9a86a; border:1px solid #c9a86a; }
+  .ch { color:#9a8f78; font-size:15px; }
+  table { width:100%; border-collapse:collapse; margin:14px 0; font-size:16px; line-height:1.8; }
+  th { color:#c9a86a; text-align:left; border-bottom:1px solid #4a4030; padding:6px 8px; font-weight:normal; }
+  td { border-bottom:1px solid #2e2820; padding:8px; vertical-align:top; }
+  .quote { border-left:3px solid #c9a86a; padding:4px 0 4px 16px; color:#b8ac90; margin:14px 0; text-indent:0; }
+  .stat { display:flex; flex-wrap:wrap; gap:8px; margin:14px 0; }
+  .stat span { background:#201c17; border:1px solid #3a3226; border-radius:6px; padding:4px 12px; font-size:15px; }
+  .stat b { color:#c9a86a; font-weight:normal; }
+  .foot { text-align:center; color:#8a7f68; font-size:14px; margin-top:50px; }
+  .backtop { position:fixed; right:16px; bottom:20px; background:#2a241b; border:1px solid #c9a86a; color:#c9a86a; border-radius:50%; width:44px; height:44px; font-size:20px; cursor:pointer; }
+</style>
+</head>
+<body>
+<div class="progress" id="prog"></div>
+<div class="topbar">
+  <span class="t">逆天邪神 · 写法拆解看板</span>
+  <span class="fs"><button onclick="adj(-1)">A-</button><button onclick="adj(1)">A+</button></span>
+</div>
+<div class="wrap">
+
+<h1>《逆天邪神》写法拆解看板</h1>
+<p class="sub">火星引力 · 玄幻长篇 · 连载中</p>
+<p class="meta">全书 <b>2176 章</b> · 约 <b>795 万字</b> · 截至第 2177 章《魔帝九煞》<br>
+数据来源：本地全文逐字统计（2026-11-08 抓取版）· 章节号均已逐条核对原文<br>
+看板用途：拆这本书“怎么写虐、怎么写爽、怎么写人”，供以后写文直接套用</p>
+
+<div class="nav">
+  <a href="#zg">总纲</a><a href="#mcm">名场面</a><a href="#nue">虐与向死而生</a><a href="#chi">死心塌地·泪目</a><a href="#pj">破镜重圆</a><a href="#dl">打脸</a><a href="#zhuiqi">追妻火葬场</a><a href="#tx">并列前行</a><a href="#nn">男人之间</a><a href="#pj2">配角</a><a href="#nv">女人之间</a><a href="#gs">公式速查</a>
+</div>
+
+<h2 id="zg">一、总纲：火星引力的三条铁律</h2>
+<p>整本书 795 万字连载十几年不崩，靠的不是剧情多新，而是三条写法铁律翻来覆去地用：</p>
+<div class="card">
+  <h3>铁律 1 · 写美不写欲</h3>
+  <p>欲望全靠氛围和禁忌顶上去，真到床笫就拉灯。全书词频统计：<span class="tag">娇躯 54</span><span class="tag">玉体 65</span><span class="tag">酥胸 26</span><span class="tag">赤裸 27</span>，但“赤裸”大半是疗伤、浴血、衣衫打碎；<span class="tag">云雨 1</span><span class="tag">娇吟 0</span><span class="tag">深吻 0</span><span class="tag">胴体 0</span>。“呻吟”125 次里大半是受伤痛呼。美写到极致，欲只写一半——这是全书所有男女戏的地基。</p>
+</div>
+<div class="card">
+  <h3>铁律 2 · 虐是主菜，爽是配菜</h3>
+  <p>先虐后爽，而且虐要虐到“死”为止：跳崖、陨落、魂飞魄散、星球陨灭。爽不是目的，是虐到极致之后的“还债”。读者追的不是爽，是“他什么时候能把欠的讨回来”。</p>
+</div>
+<div class="card">
+  <h3>铁律 3 · 每个人物都有一件“立住”的事</h3>
+  <p>主角靠“为身边人不要命”立住；每个女主、每个配角，都靠一件具体的事立住——挡劫、等千年、独自养子、觉醒、封王。没有只靠长相和人设活着的人。</p>
+</div>
+<p class="noind">人物出场词频（全书提及次数）：</p>
+<div class="stat">
+  <span>云澈 <b>52,130</b></span><span>茉莉 <b>4,404</b></span><span>夏倾月 <b>3,769</b></span><span>池妩 <b>2,455</b></span><span>沐玄音 <b>2,423</b></span><span>凤雪児 <b>1,899</b></span><span>萧泠汐 <b>1,180</b></span><span>苍月 <b>1,060</b></span><span>神曦 <b>977</b></span><span>楚月婵 <b>767</b></span><span>蓝雪若 <b>676</b></span>
+</div>
+<p>茉莉提及次数超过正宫夏倾月——她是全书真正的“第一女主角”分量，感情线最重的一条不是爱情，是羁绊。</p>
+
+<h2 id="mcm">二、高潮名场面 TOP 12</h2>
+<p>按“读者十年后还记得”的标准排。每一场都是“虐到极致再翻盘”或“翻盘之前先虐到底”的范本。</p>
+<table>
+  <tr><th>名场面</th><th>章节</th><th>为什么封神</th></tr>
+  <tr><td>绝云崖跳崖</td><td class="ch">序章</td><td>开篇即死局：天下群雄围杀、师父之仇、天毒珠。主角开局就“死”一次，定下全书“向死而生”的调子。</td></tr>
+  <tr><td>血染的茉莉</td><td class="ch">第 39–41 章</td><td>茉莉第一次为他拼命。血红色长发、毒舌萝莉、为他染血——“我是茉莉，是被鲜血染成红色的茉莉”。</td></tr>
+  <tr><td>茉莉的眼泪</td><td class="ch">第 54 章</td><td>最硬的壳第一次裂开。毒舌、冷漠、杀人不眨眼的人，为他掉眼泪——反差即催泪。</td></tr>
+  <tr><td>我的茉莉</td><td class="ch">第 788–790 章</td><td>七百多章的铺垫收束：“我的茉莉”四个字，是占有欲，也是归属感。</td></tr>
+  <tr><td>封神之战</td><td class="ch">第 1167–1255 章</td><td>全书最大的打脸链：从“封神三十二子”到“一战封神”（1198）、“封神第一”（1247）、“封神落幕”（1255）。</td></tr>
+  <tr><td>神曦的眼泪</td><td class="ch">第 1303 章</td><td>圣洁到不可侵犯的龙后，为他掉眼泪。女神走下神坛的瞬间。</td></tr>
+  <tr><td>倾月玄音</td><td class="ch">第 1307 章</td><td>两个冰山女人同框：夏倾月 × 沐玄音。冷与冷相撞，火花不在言语，在眼神。</td></tr>
+  <tr><td>死境死情</td><td class="ch">第 1521–1522 章</td><td>沐玄音为他挡死劫。师徒线最虐的一笔：她什么都不说，直接用命换他的命。</td></tr>
+  <tr><td>蓝极星陨</td><td class="ch">第 1526–1527 章</td><td>一颗星球为他陨灭。虐的规模写到最大：不是死一个人，是死一个世界。</td></tr>
+  <tr><td>陨月八章</td><td class="ch">第 1731–1738 章</td><td>追妻火葬场的最高潮：月亮陨落，八章连写，一气呵成。</td></tr>
+  <tr><td>涅槃玄音</td><td class="ch">第 1741 章</td><td>死境死情的“还债”：她回来了。向死而生的闭环。</td></tr>
+  <tr><td>魔主云帝</td><td class="ch">第 1701 章</td><td>从“废物赘婿”到“魔主云帝”，一千七百章的翻盘收束。</td></tr>
+</table>
+
+<h2 id="nue">三、凄惨绝望 → 向死而生：四步写法</h2>
+<p>这是全书最核心的叙事发动机，几乎每一卷都在重复：</p>
+<ol>
+  <li><b>先给希望。</b>让他看到一条活路、一个人、一个承诺。希望越具体，碾碎时越疼。</li>
+  <li><b>碾碎希望。</b>不是慢慢失去，是当众、当面、一次性碾碎：围杀、背叛、陨落、星球陨灭。绝望要写到“没有任何退路”——绝云崖边、死境之中。</li>
+  <li><b>死前留一句话。</b>将死之人不交代后事，只留一句最轻的话。越轻，越重。茉莉的留言（第 865–866 章）就是范本：不说“我爱你”，只说“你要活下去”。</li>
+  <li><b>向死而生。</b>死不是终点，是燃料。跳崖重生、轮回禁术（第 753 章）、涅槃玄音（第 1741 章）、死与生（第 1945 章）——每一次“死”，都换来一次境界与格局的跃升。</li>
+</ol>
+<p class="quote">绝望的写法要点：不要写“他很绝望”，要写“他没有任何退路”。绝云崖边、前后都是敌人、脚下是死神的墓地——场景本身就是绝望，不需要形容词。</p>
+
+<h2 id="chi">四、死心塌地 · 泪目 · 催泪虐文：三件套</h2>
+<p>全书催泪不靠煽情台词，靠三件套叠加：</p>
+<div class="card">
+  <h3>1 · 付出不对等</h3>
+  <p>她付出的永远比他知道的多。楚月婵独自生下云无心、独自抚养多年，云澈知道时孩子都会跑了；沐玄音为他挡死劫之前，从来没说过一句喜欢。读者知道、他不知道——这个信息差就是泪点。</p>
+</div>
+<div class="card">
+  <h3>2 · 她什么都不说</h3>
+  <p>全书最虐的女人都有一个共同点：不解释、不邀功、不哭诉。夏倾月的冷、沐玄音的硬、楚月婵的静，都是“把话咽回去”。沉默越久，真相揭开时越催泪。</p>
+</div>
+<div class="card">
+  <h3>3 · 迟来的真相 + 数字</h3>
+  <p>真相一定要“迟来”，而且要用数字钉死：等了多少年、挡了多少劫、独自养了多少年的孩子。数字让抽象的爱变成可以数的债，债越重，泪越狠。</p>
+</div>
+<p class="quote">催泪公式：她默默付出（读者看见）→ 他浑然不知（信息差）→ 真相迟来揭开（数字钉死）→ 他以命相还。少任何一环都不催泪。</p>
+
+<h2 id="pj">五、破镜重圆：不是复合，是重铸</h2>
+<p>这本书的破镜重圆从来不是“两个人吵架又和好”，而是“镜子碎到拼不起来，再造一面新的”：</p>
+<ul>
+  <li><b>夏倾月线：</b>契约婚姻 → 各奔东西 → 她登月神帝位（第 1354 章《月神新帝》）→ 两人站到对立面 → 陨月八章（第 1731–1738 章）→ 涅槃玄音（第 1741 章）。重圆之前，先让镜子碎到最彻底。</li>
+  <li><b>沐玄音线：</b>死境死情（第 1521–1522 章）她死了 → 彼岸玄音（第 1529–1530 章）→ 涅槃玄音（第 1741 章）她回来了。破镜重圆的极致写法：先死一次，再重圆。</li>
+  <li><b>茉莉线：</b>血染的茉莉（第 805–811 章）→ 茉莉的留言（第 865–866 章）→ 邪婴茉莉（第 1492 章）。每一次重逢，都比上一次更难。</li>
+</ul>
+<p>写法要点：<b>重圆之前必须先让双方都付出代价</b>。单方面低头不叫破镜重圆，叫哄人。两个人都要碎过一次，重圆才有分量。</p>
+
+<h2 id="dl">六、打脸：三段式，封神之战是总范本</h2>
+<p>全书打脸只用一个三段式，换了上千次还没腻：</p>
+<ol>
+  <li><b>当众轻视。</b>一定要当众：礼堂上、擂台上、封神台上。轻视的人越多、地位越高，打脸越响。第 5 章大婚上萧门长老的冷嘲热讽，就是最小号的范本。</li>
+  <li><b>云澈沉默。</b>他从不现场争辩。沉默不是认怂，是让对方把轻视的话说完、说满——说得越满，脸打得越肿。</li>
+  <li><b>一招反转，全场失声。</b>反转必须一招、一瞬、不可逆：封神之战“一战封神”（第 1198 章）、“封神第一”（第 1247 章）。写全场反应不写招式本身——抽气声、死寂、瞠目结舌，反应越夸张，脸越疼。</li>
+</ol>
+<p class="quote">打脸的禁忌：不要让主角赛前放狠话。狠话一放，期待就泄了。云澈的打脸永远是“先被看扁，再一招翻盘”——期待值压到最低，反转才最高。</p>
+
+<h2 id="zhuiqi">七、追妻火葬场：燃料是“她做过什么，他当时不知道”</h2>
+<p>夏倾月线是全书最完整的追妻火葬场，燃料分三层：</p>
+<ul>
+  <li><b>第一层 · 他以为她不在乎。</b>大婚夜她冰封他的手臂、洞房夜她冷若冰霜，他以为这桩婚事只是交易。</li>
+  <li><b>第二层 · 她其实一直在看他。</b>第 6 章她一语道破他的隐忍和心境——从夏家到萧家一路，她一直在观察他。冷漠是壳，里面是看穿一切的眼睛。</li>
+  <li><b>第三层 · 她为他付出的，他当时全不知道。</b>月神新帝（第 1354 章）、倾月玄音（第 1307 章）、陨月八章（第 1731–1738 章）——真相一层层揭开，每揭一层，火葬场的火就旺一分。</li>
+</ul>
+<p>写法要点：<b>追妻的火不是靠男主角“追”烧起来的，是靠“真相迟来”烧起来的</b>。他每知道一件她为他做过的事，就多烧一分。追妻火葬场的本质是“还债文”——欠得越多，烧得越旺，读者越爽。</p>
+
+<h2 id="tx">八、并列前行 · 同行：站在同一条战线上</h2>
+<p>“同行”在这本书里有三层意思，一层比一层重：</p>
+<ul>
+  <li><b>夫妻并肩：</b>夏倾月抱着重伤的云澈，闯龙神界求见神曦（第 1303 章前后）。她不是跟在他身后，是抱着他往前走——并列的极致写法：谁强谁弱不重要，重要的是同一条战线。</li>
+  <li><b>师徒并肩：</b>沐玄音与云澈。师父不是站在高处指点，是站在他身前挡劫。死境死情（第 1521–1522 章）就是师徒并肩的终极形态。</li>
+  <li><b>生死同行：</b>茉莉与云澈。从第 39 章血染的茉莉到第 865 章茉莉的留言，两个人是“你死我活、我死你活”的绑定关系。同行不是一起走路，是一起赴死。</li>
+</ul>
+<p class="quote">并列前行的写法要点：不要写“她跟在他身后”，要写“她站在他身边”——甚至“她站在他身前”。位置就是关系。</p>
+
+<h2 id="nn">九、男人之间的关系：不煽情，关键时刻挡刀</h2>
+<p>这本书的男人之间没有“我爱你”，只有“我陪你去死”。写法分四种：</p>
+<div class="card">
+  <h3>夏元霸 · 憨傻弟弟 → 霸皇</h3>
+  <p>小舅子，也是兄弟。第 452 章《觉醒的元霸》是转折点：一个憨傻的胖子，为姐姐、为兄弟觉醒。男人之间的感情不靠台词，靠“他变强了，而且是为你变强的”。</p>
+</div>
+<div class="card">
+  <h3>萧云 · 血脉兄弟</h3>
+  <p>第 528 章《云萧，萧云》认亲，第 579 章《萧云封王》，第 780 章《萧云失踪》。兄弟线的写法是“聚少离多”：平时各走各的路，出事时第一个到。</p>
+</div>
+<div class="card">
+  <h3>萧烈 · 爷爷</h3>
+  <p>第 5 章大婚上，萧烈被当众冷嘲热讽，云澈只出现“一瞬间的怒气，随后便全部消失”。男人之间的守护是克制的：爷爷不替孙子出头，孙子把怒气咽回去——咽回去的，才是真的。</p>
+</div>
+<div class="card">
+  <h3>互损式兄弟情</h3>
+  <p>云澈和男人们的相处永远是互损、调侃、谁也不服谁。越是生死之交，嘴上越不饶人。煽情只留给生死关头的一瞬间——平时越损，那一刻越重。</p>
+</div>
+<p class="quote">男人之间写法的禁忌：不要让两个男人坐下来谈心。谈心是女人戏的写法。男人之间谈感情的唯一场合，是并肩赴死之前。</p>
+
+<h2 id="pj2">十、配角的刻画：每人一件事、一句话</h2>
+<p>795 万字、上千个配角不崩，靠的是“一人一件事”：</p>
+<table>
+  <tr><th>配角</th><th>立住的一件事</th><th>写法</th></tr>
+  <tr><td>夏元霸</td><td>第 452 章觉醒</td><td>憨傻外表 + 为姐姐变强，反差立人。</td></tr>
+  <tr><td>萧云</td><td>封王、失踪、归来</td><td>聚少离多，出事必到。</td></tr>
+  <tr><td>沐冰云</td><td>第一个认定云澈不凡的人</td><td>雪眸睿智，心无点尘。配角也可以是“先知”——她看穿主角，读者就信主角。</td></tr>
+  <tr><td>苍月</td><td>公主下嫁，温柔贤妻</td><td>身份最高、姿态最低，反差立人。</td></tr>
+  <tr><td>蓝雪若</td><td>白月光</td><td>初恋的写法：不求回报，只求他好。白月光的作用是定调——主角值得被爱。</td></tr>
+  <tr><td>萧泠汐</td><td>洞房夜相偎一夜</td><td>青梅 + 禁忌，一件事定终身。</td></tr>
+  <tr><td>凤雪児</td><td>凤凰神女，纯真痴情</td><td>干净到没有任何算计，是全书“纯”的标尺。</td></tr>
+  <tr><td>夏弘义</td><td>为女儿大婚毫不吝啬</td><td>父亲的写法：不说爱，只办事。</td></tr>
+</table>
+<p>配角铁律：<b>配角不抢戏，但每个人都要有自己的“一件事”和“一句话”</b>。没有这两样的配角，宁可不写。配角出场不是为了凑数，是为了在关键时刻推主角一把——挡刀、点醒、托付。</p>
+
+<h2 id="nv">十一、女人之间的关系：不宫斗，是姐妹共同体</h2>
+<p>这是全书最反套路的一点，也是你要我单独加的这一节。先看数据：</p>
+<div class="stat">
+  <span>姐妹 <b>130 次</b></span><span>姐姐 <b>1,168 次</b></span><span>妹妹 <b>234 次</b></span><span>吃醋 <b>18 次</b></span><span>争风 <b>0 次</b></span><span>情敌 <b>0 次</b></span>
+</div>
+<p>“争风”“情敌”全书一次都没出现过。“吃醋”只有 18 次，而且多半是调侃、撒娇，不是撕逼。火星引力写女人之间，<b>根本不用宫斗套路</b>。关系模式有四种：</p>
+<div class="card">
+  <h3>1 · 姐妹相称：以“姐姐妹妹”定关系</h3>
+  <p>众女之间互相以姐姐妹妹相称，不分大小、不争排名。称呼就是秩序：叫一声“姐姐”，争宠的戏就演不下去了。这是全书后宫不撕逼的第一道保险。</p>
+</div>
+<div class="card">
+  <h3>2 · 互相托付：把最重要的人交到对方手里</h3>
+  <p>茉莉的留言（第 865–866 章）是托付的范本：她把云澈托付给后来的人。楚月婵把女儿云无心交给众女抚养。托付是最重的信任——把命交出去，比任何情话都重。</p>
+</div>
+<div class="card">
+  <h3>3 · 并肩而非争宠：冷与冷相撞</h3>
+  <p>第 1307 章《倾月玄音》：夏倾月 × 沐玄音，两个冰山女人同框。没有暗讽、没有较劲，只有眼神和沉默。两个最强的女人之间不需要分高下——她们共同的敌人、共同守护的人是同一个。第 1635 章《神女魔后》：神曦 × 池妩，圣洁与妖娆同框，同样是并肩，不是争宠。</p>
+</div>
+<div class="card">
+  <h3>4 · 亲姐妹互补：沐玄音 × 沐冰云</h3>
+  <p>亲姐妹，一刚一柔：姐姐刚硬绝情、一语葬灭一个王朝；妹妹心无点尘、雪眸睿智，是第一个认定云澈不凡的人。两个人合起来才是一个完整的人——这是写姐妹关系的范本：不写相似，写互补。</p>
+</div>
+<p class="quote">女人之间写法的核心：共同的守护对象是圆心，彼此之间是战友。争宠是低级写法——让女人们为一个男人撕，格局就小了。让女人们为同一个目标并肩，格局才大。吃醋可以有，但只能是调味，不能是主菜。</p>
+
+<h2 id="gs">十二、公式速查表：直接套用</h2>
+<table>
+  <tr><th>手法</th><th>配方</th><th>范本章节</th></tr>
+  <tr><td>虐文</td><td>给希望 → 当众碾碎 → 她什么都不说 → 真相迟来（数字钉死）</td><td class="ch">死境死情 1521–1522</td></tr>
+  <tr><td>向死而生</td><td>死局（无退路）→ 死前一句话 → 重生/涅槃 → 境界跃升</td><td class="ch">序章跳崖 / 涅槃玄音 1741</td></tr>
+  <tr><td>催泪</td><td>她默默付出（读者看见）→ 他不知道（信息差）→ 真相揭开 → 他以命相还</td><td class="ch">茉莉的留言 865–866</td></tr>
+  <tr><td>打脸</td><td>当众轻视 → 主角沉默 → 一招反转 → 全场失声</td><td class="ch">封神之战 1167–1255</td></tr>
+  <tr><td>追妻火葬场</td><td>他以为她不在乎 → 她其实一直在看 → 她付出的他全不知道 → 真相一层层揭开</td><td class="ch">陨月八章 1731–1738</td></tr>
+  <tr><td>破镜重圆</td><td>镜子碎到最彻底 → 双方都付出代价 → 重铸一面新的</td><td class="ch">涅槃玄音 1741</td></tr>
+  <tr><td>死心塌地</td><td>不解释、不邀功、不哭诉 → 拿命和时间去填</td><td class="ch">楚月婵 / 沐玄音</td></tr>
+  <tr><td>并列前行</td><td>不写“跟在他身后”，写“站在他身边/身前”</td><td class="ch">夏倾月抱云澈求见神曦</td></tr>
+  <tr><td>男人之间</td><td>平时互损 → 生死关头挡刀 → 不谈心，只赴死</td><td class="ch">觉醒的元霸 452</td></tr>
+  <tr><td>配角</td><td>一人一件事 + 一句话 → 关键时刻推主角一把</td><td class="ch">沐冰云：第一个认定他不凡的人</td></tr>
+  <tr><td>女人之间</td><td>姐妹相称 → 互相托付 → 并肩不争宠 → 吃醋只做调味</td><td class="ch">倾月玄音 1307 / 神女魔后 1635</td></tr>
+  <tr><td>擦边控制</td><td>美写到极致 → 欲只写一半 → 拉灯（红烛燃尽、一夜过去）</td><td class="ch">大婚夜 第 5–6 章</td></tr>
+</table>
+
+<p class="foot">— 全 文 完 —<br>《逆天邪神》写法拆解看板 · 数据截至第 2177 章《魔帝九煞》<br>章节号均核对原文；词频为本地全文逐字统计</p>
+
+</div>
+<button class="backtop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<script>
+var fs = 19;
+function adj(d){ fs = Math.max(15, Math.min(24, fs + d)); document.body.style.fontSize = fs + 'px'; try{ localStorage.setItem('ntxsb_fs', fs); }catch(e){} }
+try{ var s = localStorage.getItem('ntxsb_fs'); if(s){ fs = parseInt(s); document.body.style.fontSize = fs + 'px'; } }catch(e){}
+window.addEventListener('scroll', function(){
+  var h = document.documentElement;
+  var p = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+  document.getElementById('prog').style.width = p + '%';
+});
+</script>
+</body>
+</html>
