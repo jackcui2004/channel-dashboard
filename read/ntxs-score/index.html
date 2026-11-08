@@ -45,6 +45,11 @@
   .diag { background:#201c17; border:1px solid #3a3226; border-radius:10px; padding:16px 18px; margin:14px 0; font-size:16px; }
   .diag b { color:#c9a86a; font-weight:normal; }
   .backtop { position:fixed; right:16px; bottom:20px; background:#2a241b; border:1px solid #c9a86a; color:#c9a86a; border-radius:50%; width:44px; height:44px; font-size:20px; cursor:pointer; }
+
+ .pred { font-size:15px; color:#c9a86a; margin-top:12px; line-height:1.9; }
+ .pred b { color:#e8dfc8; }
+ .tp label { font-size:15px; color:#9a8f78; }
+ .tp input { background:#171512; color:#e8dfc8; border:1px solid #3a3226; border-radius:6px; padding:6px 10px; font-size:15px; width:150px; }
 </style>
 </head>
 <body>
@@ -62,15 +67,20 @@
   <div class="num"><span id="total">0</span><span style="font-size:22px;"> / 100</span></div>
   <div class="scorebar"><i id="bar"></i></div>
   <div class="grade" id="grade">还没打分</div>
-  <div class="verdict" id="verdict">拖动下面 12 个滑杆，0–10 分，实时出总分。</div>
+  <div class="verdict" id="verdict">拖动下面 13 个滑杆，0–10 分，实时出总分。</div>
+  <div class="pred" id="pred"></div>
 </div>
 
 <div class="btns">
   <button onclick="fillBench()">填入《逆天邪神》基准分（96.9 分）</button>
+  <button onclick="fillStory('b1')">填入《黑手党丈夫让我找情人》（81.8 分）</button>
+  <button onclick="fillStory('b2')">填入《你不过是他的女佣》（72.2 分）</button>
+  <button onclick="fillStory('b3')">填入《同桌》英文版（74.5 分）</button>
+  <div class="tp" style="margin-top:10px;"><label>标题预测分（看板公式算）：<input id="titlepred" type="number" placeholder="如 557179" oninput="calc()"></label> · 留空则只算留存倍数</div>
   <button onclick="resetAll()">全部清零</button>
 </div>
 
-<div class="diag"><b>权重为什么这样改——18 倍是怎么推出来的（2026-11-09）：</b>同一 5 小时 53 分钟窗口，“Find A Lover”3,772 播放、“Girlfriend... or Maid?”204 播放，差 <b>18.5 倍</b>。拆开算：①标题战力值 80 对 25（打分模型实测：前者 S+V 30＋身体/身份 15＋破折号 15＋钩子 10＋画面 10；后者 S+V 0 分、还扣了物作主语 15 分），只算战力值这一项，预测分就差 (80/25)^(4/3) ≈ <b>4.7 倍</b>，两个标题都有引号、引号项抵消；②平均观看 30:37 对 16:17，留存差 <b>1.88 倍</b>，两片都是整片配音（83 分钟对 80 分钟），相当于看完 36.6% 对 20.2%——不是音频长度差，是内容留不住人；③4.7 × 1.88 ≈ 8.8 倍，剩下的约 <b>2.1 倍</b>是算法放大（高点击＋长观看 → 更多推荐）＋首发红利＋评论互动（60 条对 1 条）。④内容根因，逐章数过：B1 每 2–3 章一个 genre-core 爆点（出轨揭穿 → 离婚 → 婚床夜 → Hannah 丑闻 → 机场重逢），全文 divorce 25 次、slap 7 次；B3 十二章只有牛奶、纸条、白车三个安静爆点，全文 slap 0 次、cheat 0 次、divorce 0 次、revenge 0 次。所以新加第 13 维“爽文机制浓度”（权重 12），权重按“观众决策链”重排：钩子 16 → 打脸 14 → 爽文机制 12 → 虐文 10 → 高潮 10 → 记忆点 6 → 感情线 6 → 伏笔 5 → 配角 5 → 破镜重圆 4 → 女人之间 4 → 结构 4 → 微观 4。注意：校准只用了 2 个视频，是方向性修正；标题、封面、发布时间也会影响播放量，打分器只量故事本身。</div>
+<div class="diag"><b>更正（2026-11-09，v5）：上一版说的“标题战力值 80 对 25，预测分差 4.7 倍”是错的。</b>我把两个不同的分数混在了一起：①看板验证过的<b>预测分</b>（词战力值＋新鲜度＋引号，6 窗口 470 样本，Spearman +0.580）给两个标题算的是 <b>557,179 对 527,134，只差 1.06 倍</b>——这就是我 11 月 8 日亲口报给你的数（约 1007/天对约 917/天），两个标题本来就预测得差不多；②标题结构分（0–100 的打分模型）给的是 80 对 25，但这 55 分的差距全部来自 payoff 开头两个词 <b>“This Time”</b>：模型只看 payoff 第一个名词短语，“This Time” 被当成物主语，于是 S+V 0 分、画面 0 分、再扣 15 分；去掉 “This Time”，同一标题立刻 <b>80 分</b>。所以 25 分是模型误判，不是标题真差了 3.2 倍。<b>修正后的拆解：</b>18.5 倍＝点击率 1.44 倍（8.8% 对 6.1%，标题文字＋封面）× 展示量 12.8 倍；按可归因项算，标题预测 1.06 倍 × 留存 1.88 倍（30:37 对 16:17，两片都是整片配音 83 分钟对 80 分钟，看完 36.6% 对 20.2%）＝约 2.0 倍，<b>剩下约 9.3 倍是算法放大＋先发红利＋互动积累</b>：Find A Lover 发了 25 小时、已是近期热门第 1、60 条评论、8 条频道回复，Girlfriend 才 6 小时、1 条评论、冷启动——算法对高点击＋长观看的复利推荐，故事打分器量不到。<b>所以打分器改了：</b>上面 0–100 的写作分只做写作诊断，不预测播放量；播放量预测＝标题预测分 × 留存倍数，算法放大那部分明确标“未建模”。留存倍数只用 2 个视频校准（爽度 8.87 对 7.0 → 留存 1.88 倍），等攒够 5–10 个视频再校。内容根因没变：B1 每 2–3 章一个 genre-core 爆点（出轨→离婚→婚床夜→Hannah 丑闻→机场重逢），全文 divorce 25 次、slap 7 次；B3 十二章只有牛奶、纸条、白车三个安静爆点，全文 slap 0 次、cheat 0 次、divorce 0 次、revenge 0 次。</div>
 <div id="dims"></div>
 
 <h2>短板诊断</h2>
@@ -95,9 +105,9 @@
   <tr><td>微观写法（4）</td><td>8</td><td>9</td><td>9</td></tr>
   <tr><td><b>总分 / 档位</b></td><td><b>81.8 · 爆款级</b></td><td><b>72.2 · 合格可追</b></td><td><b>74.5 · 合格可追</b></td></tr>
 </table>
-<p class="noind"><b>《黑手党丈夫让我找情人》81.8 分：</b>三篇里唯一上爆款线的，和真实数据对上了——它就是播放量第一的那个视频（1 天 9,468 播放、点击率 8.8%、平均观看 30:37、60 条评论）。新加的爽文机制浓度拿了满分 10 分：出轨、掌掴、离婚、丑闻、中风、机场，六件套全齐，每 2–3 章一个爆点。标题战力值也实测 80 分，正好压在爆款线上。最弱仍是破镜重圆（5 分），但它只占 4 分，丢分有限。</p>
+<p class="noind"><b>《黑手党丈夫让我找情人》81.8 分：</b>三篇里唯一上爆款线的，和真实数据对上了——它就是播放量第一的那个视频（1 天 9,468 播放、点击率 8.8%、平均观看 30:37、60 条评论）。新加的爽文机制浓度拿了满分 10 分：出轨、掌掴、离婚、丑闻、中风、机场，六件套全齐，每 2–3 章一个爆点。标题结构分实测 80 分、预测分 557,179（约 1007/天），标题和内容两头都占了。最弱仍是破镜重圆（5 分），但它只占 4 分，丢分有限。</p>
 <p class="noind"><b>《你不过是他的女佣》72.2 分：</b>爽文机制浓度只有 5 分——有身份羞辱、有牛奶伏笔、有毕业翻身，但没有出轨、掌掴、离婚、复仇这些硬通货。最强仍是微观写法（9 分）和伏笔（8 分），但这两项在新权重里只占 4 分和 5 分，好也加不了多少分。配角（6 分）和结构（6 分）仍是短板。</p>
-<p class="noind"><b>《同桌》英文版 74.5 分：</b>爽文机制浓度只有 4 分——全文 slap 0 次、cheat 0 次、divorce 0 次、revenge 0 次，十二章只有牛奶、纸条、白车三个安静爆点。标题战力值实测只有 25 分（后半段没主语＋具体动词、还扣了物作主语 15 分），光标题这一项预测分就差了 4.7 倍。“提前一条街下车”仍是三篇里最好的意象，伏笔、记忆点、感情线、破镜全是 9 分，但这些“作家维度”在新权重里加起来只占 28 分。观众要的是爽和虐，不是伏笔有多深。</p>
+<p class="noind"><b>《同桌》英文版 74.5 分：</b>爽文机制浓度只有 4 分——全文 slap 0 次、cheat 0 次、divorce 0 次、revenge 0 次，十二章只有牛奶、纸条、白车三个安静爆点。标题要说清楚：预测分（看板公式）是 527,134（约 917/天），和《黑手党丈夫》的 557,179（约 1007/天）只差 1.06 倍，标题本来预测得差不多；结构分 25 分是 “This Time” 的模型误判（去掉即 80 分）。真正的标题差距在实测点击率上：6.1% 对 8.8%，1.44 倍——这是封面加标题呈现的综合结果。“提前一条街下车”仍是三篇里最好的意象，伏笔、记忆点、感情线、破镜全是 9 分，但这些“作家维度”在新权重里加起来只占 28 分。观众要的是爽和虐，不是伏笔有多深。</p>
 
 <h2>档位判定</h2>
 <table>
@@ -164,12 +174,37 @@ function calc(){
   document.getElementById('total').textContent = total;
   document.getElementById('bar').style.width = total + '%';
   var g = document.getElementById('grade'), v = document.getElementById('verdict');
-  if (scored === 0) { g.textContent = '还没打分'; v.textContent = '拖动上面 12 个滑杆，0–10 分，实时出总分。'; }
+  if (scored === 0) { g.textContent = '还没打分'; v.textContent = '拖动上面 13 个滑杆，0–10 分，实时出总分。'; }
   else if (total >= 90) { g.textContent = '封神级'; v.textContent = '可连载十年，读者十年后还记得。守住短板，别在续写里把人设写崩。'; }
   else if (total >= 80) { g.textContent = '爆款级'; v.textContent = '具备爆款潜质。看下面的短板诊断，补一到两个最弱的维度就能往上冲。'; }
   else if (total >= 70) { g.textContent = '合格可追'; v.textContent = '能看，但缺一个让人记住的点。先补最弱的维度，不要平均用力。'; }
   else if (total >= 60) { g.textContent = '平庸'; v.textContent = '钩子或虐点缺失，读者三章就走。先修开头钩子和虐文两个维度。'; }
   else { g.textContent = '不合格'; v.textContent = '先回去修总纲三铁律：写美不写欲、虐是主菜、每人一件事。'; }
+  var pay = 0, payW = 0;
+  DIMS.forEach(function(d, i){
+    if (['hook','face','genre','abuse','climax'].indexOf(d.id) >= 0) {
+      pay += parseInt(box.querySelector('input[data-i="' + i + '"]').value, 10) * d.w;
+      payW += d.w;
+    }
+  });
+  var payoff = pay / payW;
+  var ret = Math.max(0.5, Math.min(3, 1 + (payoff - 7.0) * 0.47));
+  var tp = parseFloat(document.getElementById('titlepred').value) || 0;
+  var pred = document.getElementById('pred');
+  if (scored === 0) { pred.innerHTML = ''; }
+  else {
+    var html = '爽度（钩子＋打脸＋爽文机制＋虐文＋高潮）<b>' + payoff.toFixed(2) + ' / 10</b> · 留存倍数 <b>' + ret.toFixed(2) + 'x</b>（相对《同桌》英文版；只用 2 个视频校准）';
+    if (tp > 0) {
+      var vm = (tp / 557179) * (ret / 1.88);
+      html += '<br>预测播放量倍数 <b>' + vm.toFixed(2) + 'x</b>（相对《黑手党丈夫让我找情人》＝标题预测分 × 留存，未含算法放大）';
+      if (matchesStory('b3')) {
+        html += '<br>实测倍数 <b>0.054x</b>，预测只解释了其中的 ' + vm.toFixed(2) + 'x，剩余 <b>' + (vm / 0.054).toFixed(1) + 'x</b> 是算法放大＋先发红利，打分器量不到。';
+      }
+    } else {
+      html += '<br>填入标题预测分（看板公式算）后，这里给出预测播放量倍数。';
+    }
+    pred.innerHTML = html;
+  }
   var weak = DIMS.map(function(d, i){
     return { d: d, s: parseInt(box.querySelector('input[data-i="' + i + '"]').value, 10) };
   }).filter(function(x){ return x.s < 7; }).sort(function(a,b){ return a.s - b.s; }).slice(0,3);
@@ -183,7 +218,28 @@ function calc(){
   }
 }
 box.addEventListener('input', calc);
+var STORIES = {
+  b1: {scores:{hook:9,face:9,genre:10,abuse:8,climax:8,memory:8,love:7,foreshadow:7,support:7,reunion:5,women:7,structure:7,micro:8}, titlePred:557179},
+  b2: {scores:{hook:8,face:7,genre:5,abuse:8,climax:7,memory:8,love:8,foreshadow:8,support:6,reunion:8,women:7,structure:6,micro:9}, titlePred:0},
+  b3: {scores:{hook:8,face:7,genre:4,abuse:8,climax:8,memory:9,love:9,foreshadow:9,support:6,reunion:9,women:7,structure:7,micro:9}, titlePred:527134, observed:0.054}
+};
+function fillStory(k){
+  var st = STORIES[k];
+  DIMS.forEach(function(d, i){
+    box.querySelector('input[data-i="' + i + '"]').value = st.scores[d.id];
+  });
+  document.getElementById('titlepred').value = st.titlePred || '';
+  calc();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function matchesStory(k){
+  if(!STORIES[k]) return false;
+  return DIMS.every(function(d,i){
+    return parseInt(box.querySelector('input[data-i="'+i+'"]').value,10) === STORIES[k].scores[d.id];
+  });
+}
 function fillBench(){
+  document.getElementById('titlepred').value='';
   DIMS.forEach(function(d, i){
     box.querySelector('input[data-i="' + i + '"]').value = d.bench;
   });
@@ -191,6 +247,7 @@ function fillBench(){
   window.scrollTo({top:0, behavior:'smooth'});
 }
 function resetAll(){
+  document.getElementById('titlepred').value='';
   DIMS.forEach(function(d, i){
     box.querySelector('input[data-i="' + i + '"]').value = 0;
   });
