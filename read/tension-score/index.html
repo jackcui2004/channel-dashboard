@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- 三维打分器 v4.0 · 2026-11-09 · 单篇分析版 -->
+<!-- 三维打分器 v5.0 · 2026-11-09 · 标题双分版 -->
 <title>故事张力 × 性擦边 × 专业词 — 三维打分器</title>
 <style>
   body { background:#171512; color:#d8d0bf; font-family:Georgia, "Songti SC", "STSong", serif; font-size:19px; line-height:1.9; margin:0; padding:0; }
@@ -43,6 +43,11 @@
   .posrow select { background:#171512; color:#e8dfc8; border:1px solid #3a3226; border-radius:6px; padding:4px 8px; font-size:15px; font-family:inherit; }
   .ev { font-size:16px; margin-top:10px; border-top:1px dashed #3a3226; padding-top:8px; }
   .ev b { color:#c9a86a; font-weight:normal; }
+  .titlecard { background:#201c17; border:1px solid #c9a86a; border-radius:10px; padding:16px 18px; margin:14px 0; font-size:16px; }
+  .titlecard h3 { color:#e8dfc8; font-size:18px; margin:0 0 8px; line-height:1.5; }
+  .titlecard .tline { color:#c9a86a; font-size:15px; margin-bottom:6px; }
+  .titlecard .tnote { color:#9a8f78; font-size:15px; line-height:1.7; }
+  .titlecard b { color:#c9a86a; font-weight:normal; }
   .evhint { color:#9a8f78; font-size:15px; }
   .tablewrap { overflow-x:auto; margin:16px 0; }
   table { width:100%; border-collapse:collapse; font-size:15px; min-width:680px; }
@@ -80,7 +85,7 @@
 </div>
 <div class="wrap">
   <h1>故事张力 × 性擦边 × 专业词</h1>
-  <div class="sub">三维打分器 v4（单篇分析版）· 17 个维度：14 个打分维 ＋ 3 个开局门控维 · 有效总分 ＝ 裸分 × 留人系数 · 首章爆点再乘位置系数 · 上面选一篇小说，下面就只看这一篇的剧情依据和分析 · 只量这三项的强度，不量故事整体好坏</div>
+  <div class="sub">三维打分器 v5（标题双分版）· 17 个维度：14 个打分维 ＋ 3 个开局门控维 · 有效总分 ＝ 裸分 × 留人系数 · 首章爆点再乘位置系数 · 上面选一篇小说，下面就只看这一篇的剧情依据和分析 · 只量这三项的强度，不量故事整体好坏</div>
 
   <div class="scorebox">
     <div class="num"><span id="total">0</span><span style="font-size:22px;"> / 140</span></div>
@@ -100,9 +105,12 @@
     <button onclick="resetAll()">全部清零</button>
   </div>
 
+  <div class="titlecard" id="titlecard"></div>
+
   <div class="diag"><b>为什么改（2026-11-09，v3）：开局爆点还要看它在第一章的第几分钟。</b>第一章 7–9 分钟音频，爆点在第 1 分钟和第 6 分钟完全是两回事——听众 2 分钟内就决定走不走。所以首章爆点再乘一个<b>位置系数</b>：开篇 0–2 分钟＝1.0；前半 2–4 分钟＝0.7；后半 4–6 分钟＝0.4；结尾 6 分钟以上＝0.2；第一章无爆点＝0。实测（按 150 词/分钟算）：《黑手党丈夫》抓痕 1.7 分钟出现，系数 1.0；《同桌》羞辱 3.7 分钟出现，系数 0.7；《女佣》第一章没有爆点（只有一个 8.5 分钟的 smirk），系数 0；《逆天邪神》序章跳崖 0 分钟，系数 1.0。留人系数算法不变：有效总分 ＝ 裸分 × 留人系数，留人系数＝（首章爆点有效分＋前三章密度＋兑现速度）÷ 30。新结果：《黑手党丈夫》100 × 0.87 ＝ <b>87 分</b>，《同桌》66 × 0.44 ＝ <b>29 分</b>，《女佣》61 × 0.30 ＝ <b>18 分</b>，《逆天邪神》129 × 1.00 ＝ <b>129 分</b>。</div>
   <div class="diag"><b>v3.1（2026-11-09）：</b>每个维度说明改成详细剧情＋得分点：四篇逐项对照，写清这篇的情节是什么、这分是怎么得的。分数本身没动，改的是说明。</div>
   <div class="diag"><b>v4（2026-11-09）：</b>分析改成一次只看一篇——上面选哪篇小说，下面 17 个维度就只显示这一篇的剧情依据和分析卡，不再四篇混在一起。对照表保留，用来横向比分数。新加《离婚换情人》：裸分 104 是三篇 mafia 里最高的，但有效分 78，输在开局。</div>
+  <div class="diag"><b>v5（2026-11-09）：</b>加了标题双分。标题预测分＝标题战力值^(4/3)×新鲜度^(3/4)×3^有引号（因果版，Spearman +0.580，破千线 50 万分）；标题模板分＝title_score.py 的 score_title（0–100，爆款线 ≥80，含承诺兑现门）。预测分按出生分算（新鲜度 1.0），四篇同一张热词表（2026-11-09 10:55，555 词，93 视频）才能直接比；热词表每小时刷新，跨表分数不能直接比。B4 模板 100 分满分、预测分只有 60,989——结构满分、热词太冷。B1 模板 5 分是承诺兑现门按字面词算的（剧本里叫 Dante 不叫 Don），不是标题真的标题党。</div>
   <div class="diag"><b>先说清楚：</b>低分≠烂故事。《同桌》是校园纯爱，低张力、低擦边是体裁选择，不是写崩了。这个打分器只量三项的强度——张力够不够绷、擦边够不够撩、专业词够不够真。拿它去量一本纯爱小说，就像拿拳击分数去量芭蕾。</div>
   <div class="diag"><b>分数怎么来的：</b>一部分是实测词频（三篇都是约 15,500 词，可直接比；《逆天邪神》是中文 795 万字，词频只作体系标杆）：张力词密度、kiss 次数、术语次数；一部分是逐章核对（第一章爆点位置按词数÷150 词/分钟算分钟数；前三章事件数逐章数过）；一部分是精读打分（钩子、压迫感、感官描写、分寸、自洽）。假阳性已剔除：dead silence、shot a glance、strip of light、shower of attention 这类都不算。</div>
 
@@ -137,6 +145,8 @@
     <tr class="sub"><td>专业词小计（/40）</td><td>40</td><td>23</td><td>15</td><td>19</td><td>30</td></tr>
     <tr class="sub"><td>裸分（/140）</td><td>129</td><td>100</td><td>61</td><td>66</td><td>104</td></tr>
     <tr><td><b>有效总分（/140）</b></td><td><b>129 · 三维封神</b></td><td><b>87 · 偏弱</b></td><td><b>18 · 三维偏弱</b></td><td><b>29 · 三维偏弱</b></td><td><b>78 · 三维偏弱</b></td></tr>
+    <tr><td>标题预测分（出生）</td><td>—</td><td>597,770（~1,129/天）</td><td>201,201（~192/天）</td><td>265,013（~301/天）</td><td>60,989（~28/天）</td></tr>
+    <tr><td>标题模板分（/100）</td><td>—</td><td>5</td><td>0</td><td>25</td><td>100</td></tr>
   </table>
   </div>
 
@@ -181,6 +191,7 @@
     <h3>《离婚换情人》 — 有效 78 分（裸分 104 × 留人系数 0.75）</h3>
     <div class="nmeta">张力 55/60 · 擦边 19/40 · 专业词 30/40 · 首章爆点 9 × 位置 0.4 ＝ 3.6 · 前三章密度 10 · 兑现速度 9</div>
     <p><b>情节：</b>Summer Vance，两个双胞胎 Leo 和 Mia 的妈妈；前夫 Dominic DeLuca，Five Families 的 Don。三年前他带怀孕 12 周的 Tiffany Reed 回家、当众宣布临时离婚，她打包四个皮箱离开。36 个月后他突然发来加密消息要复婚；董事会议室里他把 Hamptons 地契顶在她胸口羞辱她，要她躲 7 个月等 Tiffany 生下继承人。第六章揭穿：Dominic 功能性不育（严重非梗阻性无精症），是她替他背了 4 年“不孕”的黑锅；Tiffany 的孩子不可能是他的。第十二章揭穿政变：Anthony Cole 联合老 capo 们、DNA 检测、Tiffany 自白。第十三章 Anthony 带雇佣兵持步枪突袭，四名保镖死在血泊里。第十四章黎明五十辆警车加 FBI 突袭庄园，Dominic 满身干血坐在台阶上，Beretta 拆散了放在一边。双胞胎的生父书里没有明说（Dominic 追问时带着 wild, pleading hope）。</p>
+    <p><b>标题：</b>模板 100 分满分，但预测分只有 60,989（~28/天）——结构满分、热词太冷；按你的标题方法，把一句真台词放进引号搁最前面，预测分能 ×3。</p>
     <p><b>为什么这样：</b>裸分 104 是三篇 mafia 里最高的（张力 55/60，专业词 30/40，Don 19 次、syndicate 12 次），但留人系数 0.75 把它砍到 78。问题在开局：第一章是闪回，第一个完整爆点 5.0 分钟才出现，位置系数只有 0.4；前三章密度 10 和兑现速度 9 都很好，但首章爆点有效分只有 3.6。擦边 19/40 是短板（kiss 0 次）。</p>
     <p><b>怎么补：</b>第一章必须把离婚要求提前到开篇 2 分钟内（别用闪回，用现在时）；或者把 Ch2 的地契顶胸挪到第一章结尾。</p>
   </div>
@@ -214,6 +225,13 @@ var NOVELS = {
  b2: {name:'《你不过是他的女佣》', pos:0, scores:{firstch:3,first3:6,speed:3,stakes:5,density:2,hooks:6,pressure:5,escalation:5,hookpay:6,body:4,senses:5,scale:3,calibration:5,termdensity:2,system:2,accuracy:6,world:5}},
  b3: {name:'《同桌》英文版', pos:0.7, scores:{firstch:6,first3:6,speed:3,stakes:4,density:0,hooks:8,pressure:4,escalation:6,hookpay:9,body:3,senses:6,scale:2,calibration:5,termdensity:3,system:3,accuracy:7,world:6}},
  b4: {name:'《离婚换情人》', pos:0.4, scores:{firstch:9,first3:10,speed:9,stakes:10,density:10,hooks:9,pressure:9,escalation:9,hookpay:8,body:5,senses:6,scale:3,calibration:5,termdensity:7,system:7,accuracy:8,world:8}}
+};
+var TITLES = {
+ ntxs: {text:'《逆天邪神》（无英文标题）', pred:null, daily:null, template:null, note:'中文小说，没有英文 YouTube 标题，标题双分不适用。'},
+ b1: {text:'"Find A Lover," My Mafia Husband Ordered\u2014Then The Don Took His Wife', pred:597770, daily:1129, template:5, note:'模板 5 分：结构本身 80 分（S+V 30、身体/身份 15、破折号 15、钩子 10、画面 10），但承诺兑现门没过——payoff 词 find/ordered/don/wife 在剧本里 15 词内没挨在一起（剧本里叫 Dante 不叫 Don），扣回 payoff 分 55 再罚标题党 20。预测分 597,770 是出生分（当前热词表）；已发布 1.08 天，当前预测 536,987（~948/天），实际 10,031 播放——算法放大在起作用，预测分是相对排名不是绝对预报。'},
+ b2: {text:'You\u2019re Just His Maid \u2014 The Heiress Smirked, Then I Threw His Sweet Milk In The Trash', pred:201201, daily:192, template:0, note:'模板 0 分：物作主语 \u221215（Heiress 不认作主语），承诺兑现门没过（payoff 词在剧本里 15 词内没挨在一起），标题党 \u221220。预测分 201,201（~192/天）：战力值 9,500 不低，但没有引号（无 \u00d73），且 heiress/sweet/milk/trash 不在热词表里。'},
+ b3: {text:'"Girlfriend... or Maid?" She Laughed\u2014Then This Time He Took Her Hand', pred:265013, daily:301, template:25, note:'模板 25 分：就是那个“This Time”误判——模型只看 payoff 第一个名词短语，This Time 被当成主语，S+V 0、画面 0、物作主语 \u221215；去掉 This Time 同一标题 80 分。预测分基本不受影响（去 This Time 只差 3%）。已发布 0.31 天，当前预测 256,596（~286/天），实际 281 播放。'},
+ b4: {text:'Divorce Me For My Mistress \u2014 My Mafia Ex Sneered While Shoving A Deed Against My Chest', pred:60989, daily:28, template:100, note:'模板 100 分满分：S+V 30、身体/身份 15、破折号 15、钩子 10、画面 10、痛感 10、前提强 10，承诺兑现“是”（地契顶胸在 Ch2 真发生了）。但预测分只有 60,989（~28/天）：战力值 3,881 太冷，且没有引号（无 \u00d73）。结构满分、热词太冷——按你的标题方法，把一句真台词放进引号搁最前面，预测分能 \u00d73。'}
 };
 var box = document.getElementById('dims');
 function lvlText(s){
@@ -335,6 +353,21 @@ function showCard(){
   var nc = document.getElementById('nocard');
   if (nc) nc.style.display = CUR ? 'none' : '';
 }
+function updateTitle(){
+  var el = document.getElementById('titlecard');
+  if (!el) return;
+  if (!CUR || !TITLES[CUR]) { el.innerHTML = '选一篇小说，看它的标题预测分和标题模板分。'; return; }
+  var t = TITLES[CUR];
+  if (t.pred === null) {
+    el.innerHTML = '<h3>标题：' + t.text + '</h3><div class="tnote">' + t.note + '</div>';
+    return;
+  }
+  var over = t.pred >= 500000 ? '过了 50 万破千线' : '没过 50 万破千线';
+  el.innerHTML = '<h3>标题：' + t.text + '</h3>'
+    + '<div class="tline">标题预测分（出生）：<b>' + t.pred.toLocaleString('en-US') + '</b>（约 ' + t.daily.toLocaleString('en-US') + ' 播放/天）· ' + over + '</div>'
+    + '<div class="tline">标题模板分：<b>' + t.template + ' / 100</b>（爆款线 \u226580）</div>'
+    + '<div class="tnote">' + t.note + '</div>';
+}
 function selectStory(k){
   CUR = k;
   var st = NOVELS[k];
@@ -345,6 +378,7 @@ function selectStory(k){
   if (ps) ps.value = String(st.pos);
   updateEvidence();
   showCard();
+  updateTitle();
   calc();
   window.scrollTo({top:0, behavior:'smooth'});
 }
@@ -357,6 +391,7 @@ function resetAll(){
   if (ps) ps.value = '1.0';
   updateEvidence();
   showCard();
+  updateTitle();
   calc();
 }
 var fs = 19;
