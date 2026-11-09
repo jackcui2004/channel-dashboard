@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- 三维打分器 v1.1 · 2026-11-09 -->
+<!-- 三维打分器 v2.0 · 2026-11-09 · 留人系数版 -->
 <title>故事张力 × 性擦边 × 专业词 — 三维打分器</title>
 <style>
   body { background:#171512; color:#d8d0bf; font-family:Georgia, "Songti SC", "STSong", serif; font-size:19px; line-height:1.9; margin:0; padding:0; }
@@ -22,6 +22,8 @@
   .scorebox .verdict { font-size:15px; color:#9a8f78; margin-top:6px; line-height:1.7; }
   .pillars { font-size:16px; color:#c9a86a; margin-top:10px; line-height:1.8; }
   .pillars b { color:#e8dfc8; }
+  .gate { font-size:16px; color:#c9a86a; margin-top:6px; line-height:1.8; }
+  .gate b { color:#e8dfc8; }
   .btns { margin:14px 0; }
   .btns button { background:#201c17; color:#c9a86a; border:1px solid #3a3226; border-radius:8px; padding:8px 14px; margin:0 8px 8px 0; font-size:15px; cursor:pointer; font-family:inherit; }
   .diag { background:#201c17; border:1px solid #3a3226; border-radius:10px; padding:16px 18px; margin:14px 0; font-size:16px; }
@@ -29,6 +31,7 @@
   .pillar-h { color:#c9a86a; font-size:21px; margin:26px 0 4px; border-bottom:1px solid #3a3226; padding-bottom:4px; }
   .dim { background:#201c17; border:1px solid #3a3226; border-radius:10px; padding:14px 18px; margin:12px 0; }
   .dim.weak { border-color:#8a6d3b; }
+  .dim.gatedim { border-color:#5a4a2a; }
   .dim .head { display:flex; justify-content:space-between; align-items:baseline; }
   .dim .name { color:#e8dfc8; font-size:18px; }
   .dim .val { color:#c9a86a; font-size:18px; }
@@ -52,37 +55,45 @@
 </div>
 <div class="wrap">
   <h1>故事张力 × 性擦边 × 专业词</h1>
-  <div class="sub">三维打分器（独立版）· 12 个维度 × 10 分 ＝ 120 分 · 只量这三项的强度，不量故事整体好坏 · 和写法打分器分开用</div>
+  <div class="sub">三维打分器 v2（留人系数版）· 17 个维度：14 个打分维 ＋ 3 个开局门控维 · 有效总分 ＝ 裸分 × 留人系数 · 只量这三项的强度，不量故事整体好坏</div>
 
   <div class="scorebox">
-    <div class="num"><span id="total">0</span><span style="font-size:22px;"> / 120</span></div>
+    <div class="num"><span id="total">0</span><span style="font-size:22px;"> / 140</span></div>
     <div class="scorebar"><i id="bar"></i></div>
     <div class="grade" id="grade">还没打分</div>
-    <div class="verdict" id="verdict">拖动下面 12 个滑杆，0–10 分，实时出总分。</div>
+    <div class="verdict" id="verdict">拖动下面 17 个滑杆，0–10 分，实时出有效总分。</div>
     <div class="pillars" id="pillars"></div>
+    <div class="gate" id="gate"></div>
   </div>
 
   <div class="btns">
-    <button onclick="fillStory('ntxs')">填入《逆天邪神》基准分（110 分）</button>
-    <button onclick="fillStory('b1')">填入《黑手党丈夫让我找情人》（86 分）</button>
-    <button onclick="fillStory('b2')">填入《你不过是他的女佣》（53 分）</button>
-    <button onclick="fillStory('b3')">填入《同桌》英文版（55 分）</button>
+    <button onclick="fillStory('ntxs')">填入《逆天邪神》基准分（129 分）</button>
+    <button onclick="fillStory('b1')">填入《黑手党丈夫让我找情人》（87 分）</button>
+    <button onclick="fillStory('b2')">填入《你不过是他的女佣》（24 分）</button>
+    <button onclick="fillStory('b3')">填入《同桌》英文版（33 分）</button>
     <button onclick="resetAll()">全部清零</button>
   </div>
 
+  <div class="diag"><b>为什么改（2026-11-09，v2）：上一版是加法分，是错的。</b>维度不能直接叠加——后面的分得乘以前面留下来的人。听小说是从按下播放那一刻开始流失的：第一章没有爆点就没人继续看；12 章 3 个爆点，听众连第一个都没看到就关掉了，后面堆八十个也没用。所以新算法是<b>有效总分 ＝ 裸分 × 留人系数</b>：留人系数由开局三维决定（首章爆点＋前三章密度＋兑现速度 ÷ 30），裸分是后面 14 个维度的和。冲突密度也按新尺度重算：<b>1–2 章一个＝10 分（刚刚好）；2–3 章一个＝7 分（已经有点少了）；3–4 章一个＝3 分；4 章以上一个＝0 分</b>——《黑手党丈夫》2–3 章一个从 9 分降到 7 分，《同桌》12 章 3 个直接 0 分。新加 5 个维度：开局三维（首章爆点、前三章密度、兑现速度）＋升级节奏＋钩子回收率。结果：《黑手党丈夫》裸分 100 × 0.87 ＝ <b>87 分</b>，《同桌》66 × 0.50 ＝ <b>33 分</b>，《女佣》61 × 0.40 ＝ <b>24 分</b>，《逆天邪神》129 × 1.00 ＝ <b>129 分</b>。留人系数只用 2 个视频校准，等攒够 5–10 个视频再校。</div>
   <div class="diag"><b>先说清楚：</b>低分≠烂故事。《同桌》是校园纯爱，低张力、低擦边是体裁选择，不是写崩了。这个打分器只量三项的强度——张力够不够绷、擦边够不够撩、专业词够不够真。拿它去量一本纯爱小说，就像拿拳击分数去量芭蕾。</div>
-  <div class="diag"><b>分数怎么来的：</b>一部分是实测词频（三篇都是约 15,500 词，可直接比；《逆天邪神》是中文 795 万字，词频只作体系标杆）：张力词密度、kiss 次数、术语次数；一部分是精读打分（悬念钩子、对峙压迫感、感官描写、分寸、自洽）。假阳性已剔除：dead silence、shot a glance、strip of light、shower of attention 这类都不算。</div>
+  <div class="diag"><b>分数怎么来的：</b>一部分是实测词频（三篇都是约 15,500 词，可直接比；《逆天邪神》是中文 795 万字，词频只作体系标杆）：张力词密度、kiss 次数、术语次数；一部分是精读打分（钩子、压迫感、感官描写、分寸、自洽、前三章事件数）。假阳性已剔除：dead silence、shot a glance、strip of light、shower of attention 这类都不算。前三章事件数是逐章核对过的：《黑手党丈夫》第一章满爆点、第二章回溯、第三章慢 build，前三章只有 1 个强事件；《女佣》《同桌》前三章也都只有 1 个强事件、0 个爆点。</div>
 
   <div id="dims"></div>
 
   <h2 style="color:#e8dfc8; font-size:22px; margin-top:36px;">四篇实测对照表</h2>
   <table>
     <tr><th>维度（满分 10）</th><th>逆天邪神</th><th>黑手党丈夫</th><th>女佣</th><th>同桌英文版</th></tr>
+    <tr><td>首章爆点（门控）</td><td>10</td><td>10</td><td>3</td><td>6</td></tr>
+    <tr><td>前三章密度（门控）</td><td>10</td><td>6</td><td>6</td><td>6</td></tr>
+    <tr><td>兑现速度（门控）</td><td>10</td><td>10</td><td>3</td><td>3</td></tr>
+    <tr class="sub"><td>留人系数 R</td><td>1.00</td><td>0.87</td><td>0.40</td><td>0.50</td></tr>
     <tr><td>利害高度</td><td>10</td><td>9</td><td>5</td><td>4</td></tr>
-    <tr><td>冲突密度</td><td>10</td><td>9</td><td>5</td><td>4</td></tr>
+    <tr><td>冲突密度</td><td>10</td><td>7</td><td>2</td><td>0</td></tr>
     <tr><td>悬念钩子</td><td>10</td><td>7</td><td>6</td><td>8</td></tr>
     <tr><td>对峙压迫感</td><td>9</td><td>8</td><td>5</td><td>4</td></tr>
-    <tr class="sub"><td>张力小计（/40）</td><td>39</td><td>33</td><td>21</td><td>20</td></tr>
+    <tr><td>升级节奏</td><td>10</td><td>8</td><td>5</td><td>6</td></tr>
+    <tr><td>钩子回收率</td><td>9</td><td>8</td><td>6</td><td>9</td></tr>
+    <tr class="sub"><td>张力小计（/60）</td><td>58</td><td>47</td><td>29</td><td>31</td></tr>
     <tr><td>身体张力</td><td>8</td><td>8</td><td>4</td><td>3</td></tr>
     <tr><td>感官描写</td><td>8</td><td>7</td><td>5</td><td>6</td></tr>
     <tr><td>亲密尺度</td><td>5</td><td>7</td><td>3</td><td>2</td></tr>
@@ -93,25 +104,31 @@
     <tr><td>术语准确性</td><td>10</td><td>7</td><td>6</td><td>7</td></tr>
     <tr><td>世界观自洽</td><td>10</td><td>7</td><td>5</td><td>6</td></tr>
     <tr class="sub"><td>专业词小计（/40）</td><td>40</td><td>23</td><td>15</td><td>19</td></tr>
-    <tr><td><b>总分（/120）</b></td><td><b>110 · 三维封神</b></td><td><b>86 · 够用</b></td><td><b>53 · 三维偏弱</b></td><td><b>55 · 三维偏弱</b></td></tr>
+    <tr class="sub"><td>裸分（/140）</td><td>129</td><td>100</td><td>61</td><td>66</td></tr>
+    <tr><td><b>有效总分（/140）</b></td><td><b>129 · 三维封神</b></td><td><b>87 · 偏弱</b></td><td><b>24 · 三维偏弱</b></td><td><b>33 · 三维偏弱</b></td></tr>
   </table>
 
   <div class="diag" id="diag">打完分后，这里会列出最弱的三个维度，和对应的补法。</div>
 
-  <p><b>《黑手党丈夫让我找情人》86 分：</b>张力 33/40 是三篇最强（离婚 18 次、真血 6 次、掌掴 4 次、刀 2 次），擦边 30/40 也是最强（三场真吻）；短板在专业词 23/40——Don 只出现 3 次、syndicate 6 次，缺 capo、consigliere、omertà 这类中层词，mafia 是靠剧情撑的、不是靠词汇。补一张体系表最划算。</p>
-  <p><b>《你不过是他的女佣》53 分：</b>三项全弱。张力 21 分（冲突全是言语/社会性的，smirk 2 次、glare 1 次、slap 0 次），擦边 17 分（kiss 0 次），专业词 15 分（全篇只有 syndicate 3 次）。最弱是术语密度 2 分和体系完整度 2 分。</p>
-  <p><b>《同桌》英文版 55 分：</b>悬念钩子 8 分是三篇里单项亮点（七张纸条），感官描写 6 分也不差（牛奶、纸条、雨、街道）；但张力 20 分、擦边 16 分是三篇最低——kiss 0 次，牵手就是尺度天花板。这是体裁选择，真要补，先补利害高度（赌注从名誉抬到前途、家庭）。</p>
-  <p><b>《逆天邪神》110 分：</b>专业词 40 分满格（玄力 5828 次、神界 5678 次、玄脉 1437 次，一整套体系），张力 39 分（生死存亡，爆点 1–2 章一个），擦边 31 分（写美不写欲：娇躯 54、玉体 65、云雨 1、娇吟 0）。</p>
+  <p><b>《黑手党丈夫让我找情人》87 分（偏弱）：</b>裸分 100 不低，但留人系数 0.87 扣了 13 分。问题在前三章：第一章是满的（出轨揭穿＋掌掴＋“find a lover”，首章爆点 10 分），但第二章是回溯、第三章是慢 build，前三章只有一个强事件，前三章密度只有 6 分。冲突密度也按新尺度从 9 分降到 7 分——2–3 章一个已经“有点少了”。专业词还是短板（23/40）。它赢在标题和第一章，不赢在密度。</p>
+  <p><b>《你不过是他的女佣》24 分（三维偏弱）：</b>留人系数 0.40，第一章纯铺垫（首章爆点 3 分），前三章只有一个强事件（Victoria 的纸条），钩子拖到中后段才兑现（兑现速度 3 分）。裸分 61 也不高——张力全是言语/社会性的，kiss 0 次，专业词只有 syndicate 3 次。开局和中段一起掉队。</p>
+  <p><b>《同桌》英文版 33 分（三维偏弱）：</b>留人系数 0.50，第一章的羞辱钩子够强（首章爆点 6 分），但兑现太慢（第一章的羞辱第七章牛奶才还回来，兑现速度 3 分），冲突密度 0 分——12 章 3 个爆点，听众连第一个都没看到就走了。钩子回收率 9 分是亮点（纸条、牛奶、提前一条街最后都收回来了），但人都走了，回收率再高也没用——这就是相关系数的意思。</p>
+  <p><b>《逆天邪神》129 分（三维封神）：</b>留人系数 1.00，序章跳崖、前三章三个强事件、钩子当章兑现；裸分 129，专业词满格（玄力 5828 次、神界 5678 次）。</p>
 
-  <div class="diag"><b>这三项为什么单独打：</b>主打分器（13 维）里《黑手党丈夫》81.8 分、《同桌》74.5 分，只差 7.3 分；这三项是 86 对 55，差 31 分。张力、擦边、专业词才是拉开播放量差距的地方——主打分器把它们稀释了。两张表分开用：写法打分器看故事整体，三维打分器看这三项够不够硬。</div>
+  <div class="diag"><b>这三项为什么单独打：</b>主打分器（13 维）里《黑手党丈夫》81.8 分、《同桌》74.5 分，只差 7.3 分；这三项 v1 是 86 对 55，v2 留人系数版是 87 对 33。张力、擦边、专业词才是拉开播放量差距的地方——主打分器把它们稀释了。两张表分开用：写法打分器看故事整体，三维打分器看这三项够不够硬、开局留不留得住人。</div>
 </div>
 <button class="backtop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 <script>
 var DIMS = [
+ {id:'firstch', pillar:'开局留人（门控）', gate:true, name:'首章爆点', w:10, bench:10, desc:'第一章有没有一个完整的爆点（揭穿、掌掴、离婚线），还是纯铺垫。10分：第一章就交代一个完整爆点（《黑手党丈夫》第一章：出轨揭穿＋掌掴＋“find a lover”；《逆天邪神》序章跳崖）。0分：第一章全是背景介绍。', tip:'第一章必须见血：要么揭穿、要么动手、要么摊牌，别留到第二章。'},
+ {id:'first3', pillar:'开局留人（门控）', gate:true, name:'前三章密度', w:10, bench:10, desc:'前三章有几个强事件（爆点或强钩子）。10分：前三章 2 个以上；6分：1 个；0分：一个没有。实测：《黑手党丈夫》《女佣》《同桌》前三章都只有 1 个强事件。', tip:'前三章至少一个爆点，最好两个——听众的耐心只有三章。'},
+ {id:'speed', pillar:'开局留人（门控）', gate:true, name:'兑现速度', w:10, bench:10, desc:'第一个钩子多久兑现。10分：钩子和爆点在同一章（《黑手党丈夫》出轨钩子第一章就兑现成掌掴）；0分：钩子拖六章以上才兑现（《同桌》第一章的羞辱，第七章牛奶才还回来）。', tip:'钩子别过夜：立下一个钩子，三章内必须还一个。'},
  {id:'stakes', pillar:'故事张力', name:'利害高度', w:10, bench:10, desc:'赌注多大：生死、婚姻、家族存亡，还是面子、尴尬。10分标准：《逆天邪神》——动不动就是生死存亡、世界存亡；0分：赌注只是“今天会不会尴尬”。', tip:'把赌注写进第一章：输了会失去什么？越大越具体越好。'},
- {id:'density', pillar:'故事张力', name:'冲突密度', w:10, bench:10, desc:'每章有几个正面冲突/爆点（吵架、揭穿、打脸、动手）。10分：1–2章一个；《黑手党丈夫》2–3章一个；《同桌》12章只有3个。', tip:'数一数：每章至少一个小冲突，每三章一个大爆点。'},
+ {id:'density', pillar:'故事张力', name:'冲突密度', w:10, bench:10, desc:'每章几个爆点。非线性尺度：1–2 章一个＝10 分（刚刚好）；2–3 章一个＝7 分（已经有点少了）；3–4 章一个＝3 分；4 章以上一个＝0 分（听众连第一个都没看到就走了）。', tip:'数一数：爆点间隔超过 3 章，前面的人就跑了——先把爆点往前挪，别往后堆。'},
  {id:'hooks', pillar:'故事张力', name:'悬念钩子', w:10, bench:10, desc:'未解之谜吊着读者往下读（纸条是谁写的？秘密何时爆？他到底是谁？）。10分：章章有新问号，旧问号章章有回扣。', tip:'每章结尾留一个没答的问题，别一次全交代。'},
  {id:'pressure', pillar:'故事张力', name:'对峙压迫感', w:10, bench:9, desc:'身体张力、气味、动作、对峙的压迫感够不够“在场”：读者能不能闻到烟味、感到对方逼近。10分：对峙写得像在现场。', tip:'写对峙先写身体：呼吸、距离、眼神、手在哪，再写台词。'},
+ {id:'escalation', pillar:'故事张力', name:'升级节奏', w:10, bench:10, desc:'每个爆点是不是比上一个更大（羞辱→揭穿→打脸→公开处刑→翻盘）。10分：全程爬坡；0分：爆点一样大、甚至越写越小，听众中途就松了。', tip:'画一条线：每个爆点比上一个至少大一档。'},
+ {id:'hookpay', pillar:'故事张力', name:'钩子回收率', w:10, bench:9, desc:'立下的钩子最后兑现了几个。10分：个个有回扣；0分：钩子立完就忘，听众觉得被耍了。注意：人都走了，回收率再高也没用——它只乘在留人系数之后。', tip:'列一张钩子清单，写完对照着收。'},
  {id:'body', pillar:'性擦边', name:'身体张力', w:10, bench:8, desc:'身体靠近、碰触、眼神、呼吸的张力——没脱衣服也让人心跳。10分：一个眼神、一次擦肩就够撩。', tip:'用距离写欲望：他离她三步、一步、半步。'},
  {id:'senses', pillar:'性擦边', name:'感官描写', w:10, bench:8, desc:'气味、温度、质地、呼吸、心跳——五感写全了没有。10分：读者能闻到、摸到、感到烫。', tip:'每场亲密戏至少写两种感官：气味＋温度最管用。'},
  {id:'scale', pillar:'性擦边', name:'亲密尺度', w:10, bench:5, desc:'走多远：眼神 → 碰触 → 吻 → 床。10分：有真吻、床戏但不露骨；0分：全篇零接触。', tip:'尺度要和人物关系进度匹配，别第一章就上床、第十四章还在牵手。'},
@@ -122,10 +139,10 @@ var DIMS = [
  {id:'world', pillar:'专业词', name:'世界观自洽', w:10, bench:10, desc:'规则前后一致、有后果：家族等级、铁律、背叛的代价，写出来就要兑现。', tip:'立一条铁律，再让一个人违反它、付出代价，世界就立住了。'}
 ];
 var STORIES = {
- ntxs: {scores:{stakes:10,density:10,hooks:10,pressure:9,body:8,senses:8,scale:5,calibration:10,termdensity:10,system:10,accuracy:10,world:10}},
- b1: {scores:{stakes:9,density:9,hooks:7,pressure:8,body:8,senses:7,scale:7,calibration:8,termdensity:5,system:4,accuracy:7,world:7}},
- b2: {scores:{stakes:5,density:5,hooks:6,pressure:5,body:4,senses:5,scale:3,calibration:5,termdensity:2,system:2,accuracy:6,world:5}},
- b3: {scores:{stakes:4,density:4,hooks:8,pressure:4,body:3,senses:6,scale:2,calibration:5,termdensity:3,system:3,accuracy:7,world:6}}
+ ntxs: {scores:{firstch:10,first3:10,speed:10,stakes:10,density:10,hooks:10,pressure:9,escalation:10,hookpay:9,body:8,senses:8,scale:5,calibration:10,termdensity:10,system:10,accuracy:10,world:10}},
+ b1: {scores:{firstch:10,first3:6,speed:10,stakes:9,density:7,hooks:7,pressure:8,escalation:8,hookpay:8,body:8,senses:7,scale:7,calibration:8,termdensity:5,system:4,accuracy:7,world:7}},
+ b2: {scores:{firstch:3,first3:6,speed:3,stakes:5,density:2,hooks:6,pressure:5,escalation:5,hookpay:6,body:4,senses:5,scale:3,calibration:5,termdensity:2,system:2,accuracy:6,world:5}},
+ b3: {scores:{firstch:6,first3:6,speed:3,stakes:4,density:0,hooks:8,pressure:4,escalation:6,hookpay:9,body:3,senses:6,scale:2,calibration:5,termdensity:3,system:3,accuracy:7,world:6}}
 };
 var box = document.getElementById('dims');
 function lvlText(s){
@@ -136,19 +153,24 @@ function lvlText(s){
   if (s >= 3) return '偏弱';
   return '缺失';
 }
+var PTOT = {'开局留人（门控）':0, '故事张力':60, '性擦边':40, '专业词':40};
 (function render(){
   var html = '', lastPillar = '';
   DIMS.forEach(function(d, i){
-    if (d.pillar !== lastPillar) { html += '<div class="pillar-h">' + d.pillar + '（/40）</div>'; lastPillar = d.pillar; }
-    html += '<div class="dim" id="dim-' + d.id + '"><div class="head"><span class="name">' + d.name + '</span><span class="val"><span class="lvl"></span> <span class="pts"></span></span></div>'
+    if (d.pillar !== lastPillar) {
+      html += '<div class="pillar-h">' + d.pillar + (PTOT[d.pillar] ? '（/' + PTOT[d.pillar] + '）' : '（门控，不计入裸分）') + '</div>';
+      lastPillar = d.pillar;
+    }
+    var meta = d.gate ? '门控维 · 不计入裸分，决定留人系数' : '权重 10 · 《逆天邪神》基准 ' + d.bench + ' 分';
+    html += '<div class="dim' + (d.gate ? ' gatedim' : '') + '" id="dim-' + d.id + '"><div class="head"><span class="name">' + d.name + '</span><span class="val"><span class="lvl"></span> <span class="pts"></span></span></div>'
       + '<input type="range" min="0" max="10" step="1" value="0" data-i="' + i + '">'
-      + '<div class="meta"><span class="v">0 分</span> · 权重 10 · 《逆天邪神》基准 ' + d.bench + ' 分</div>'
+      + '<div class="meta"><span class="v">0 分</span> · ' + meta + '</div>'
       + '<div class="desc">' + d.desc + '</div></div>';
   });
   box.innerHTML = html;
 })();
 function calc(){
-  var total = 0, scored = 0;
+  var scored = 0, S = 0, gateSum = 0, gateN = 0;
   var pil = {'故事张力':0, '性擦边':0, '专业词':0};
   DIMS.forEach(function(d, i){
     var inp = box.querySelector('input[data-i="' + i + '"]');
@@ -158,30 +180,37 @@ function calc(){
     el.querySelector('.lvl').textContent = lvlText(s) + '（' + s + ' 分）';
     el.querySelector('.pts').textContent = '得 ' + s + ' 分';
     el.classList.toggle('weak', s < 7);
-    total += s;
-    pil[d.pillar] += s;
-    if (s > 0) scored++;
+    if (d.gate) { gateSum += s; gateN++; }
+    else { S += s; pil[d.pillar] += s; if (s > 0) scored++; }
   });
-  document.getElementById('total').textContent = total;
-  document.getElementById('bar').style.width = (total / 120 * 100) + '%';
-  document.getElementById('pillars').innerHTML = '故事张力 <b>' + pil['故事张力'] + ' / 40</b> · 性擦边 <b>' + pil['性擦边'] + ' / 40</b> · 专业词 <b>' + pil['专业词'] + ' / 40</b>';
+  var R = gateN ? gateSum / (gateN * 10) : 1;
+  var E = Math.round(S * R);
+  document.getElementById('total').textContent = E;
+  document.getElementById('bar').style.width = (E / 140 * 100) + '%';
+  document.getElementById('pillars').innerHTML = '故事张力 <b>' + pil['故事张力'] + ' / 60</b> · 性擦边 <b>' + pil['性擦边'] + ' / 40</b> · 专业词 <b>' + pil['专业词'] + ' / 40</b>';
+  document.getElementById('gate').innerHTML = '开局留人系数 <b>' + R.toFixed(2) + '</b>（首章爆点＋前三章密度＋兑现速度 ÷ 30）· 裸分 <b>' + S + ' / 140</b> · 有效总分 ＝ 裸分 × 留人系数';
   var g = document.getElementById('grade'), v = document.getElementById('verdict');
-  if (scored === 0) { g.textContent = '还没打分'; v.textContent = '拖动下面 12 个滑杆，0–10 分，实时出总分。'; }
-  else if (total >= 108) { g.textContent = '三维封神'; v.textContent = '三项全满，读者从头绷到尾、撩到尾，还信这个世界。'; }
-  else if (total >= 96) { g.textContent = '三维强劲'; v.textContent = '三项都硬，补一到两个最弱的维度就能往封神冲。'; }
-  else if (total >= 84) { g.textContent = '够用'; v.textContent = '能看，但至少有一项偏弱。先补最弱的维度，不要平均用力。'; }
-  else if (total >= 72) { g.textContent = '偏弱'; v.textContent = '有一项明显掉队，读者中途就松了。先修最弱的那一项。'; }
-  else { g.textContent = '三维偏弱'; v.textContent = '三项里至少两项不及格。先看是不是体裁问题——纯爱本来就不吃这三项；如果不是，先补最弱的那一项。'; }
-  var weak = DIMS.map(function(d, i){
+  if (scored === 0) { g.textContent = '还没打分'; v.textContent = '拖动下面 17 个滑杆，0–10 分，实时出有效总分。'; }
+  else if (E >= 126) { g.textContent = '三维封神'; v.textContent = '开局就把人钉死，后面越写越大，读者从头绷到尾。'; }
+  else if (E >= 112) { g.textContent = '三维强劲'; v.textContent = '开局留得住，后面也硬。补一到两个最弱的维度就能往封神冲。'; }
+  else if (E >= 98) { g.textContent = '够用'; v.textContent = '开局能留人，但后面至少有一项偏弱。先补最弱的维度。'; }
+  else if (E >= 84) { g.textContent = '偏弱'; v.textContent = '开局或中段掉队，读者中途就松了。先看留人系数——低于 0.6，先修开局三维，别补后面的。'; }
+  else { g.textContent = '三维偏弱'; v.textContent = '留人系数低，后面分数再高也没用。先修第一章和前三章。'; }
+  var weak = DIMS.filter(function(d){ return !d.gate; }).map(function(d){
+    var i = DIMS.indexOf(d);
     return { d: d, s: parseInt(box.querySelector('input[data-i="' + i + '"]').value, 10) };
   }).filter(function(x){ return x.s < 7; }).sort(function(a,b){ return a.s - b.s; }).slice(0,3);
   var dg = document.getElementById('diag');
   if (scored === 0) { dg.textContent = '打完分后，这里会列出最弱的三个维度，和对应的补法。'; }
-  else if (!weak.length) { dg.innerHTML = '没有短板，12 个维度全在 7 分以上。这已经是三维封神的底子了。'; }
   else {
-    dg.innerHTML = '最弱的三个维度：<br>' + weak.map(function(x, k){
-      return (k+1) + ' · <b>' + x.d.name + '（' + x.s + ' 分）</b>——' + x.d.tip;
-    }).join('<br>');
+    var head = '';
+    if (R < 0.6) { head = '留人系数只有 <b>' + R.toFixed(2) + '</b>——开局留不住人，后面堆再多爆点也没用，先修开局三维。<br>'; }
+    if (!weak.length) { dg.innerHTML = head + '没有短板，14 个打分维度全在 7 分以上。这已经是三维封神的底子了。'; }
+    else {
+      dg.innerHTML = head + '最弱的三个维度：<br>' + weak.map(function(x, k){
+        return (k+1) + ' · <b>' + x.d.name + '（' + x.s + ' 分）</b>——' + x.d.tip;
+      }).join('<br>');
+    }
   }
 }
 box.addEventListener('input', calc);
