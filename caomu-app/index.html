@@ -1,0 +1,603 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>草木签盒</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=ZCOOL+XiaoWei&family=Noto+Sans+SC:wght@400;500;700;900&display=swap">
+<style>
+/* Layout: white gift-box world. One phone-sized app; sticker-outlined cards on white, the six-drawer box as the hero of 签盒,
+   a draggable liquid-glass tab bar and draggable sheets with detents. Deliberately single (light) theme. */
+:root{
+  color-scheme:light;
+  --bg:#ffffff;
+  --soft:#f6f4fb;          /* lavender-white wells */
+  --ink:#2b2440;           /* outline + text */
+  --muted:#7d7690;
+  --line:rgba(43,36,64,.12);
+  --pink:#ff8fb3; --pink-d:#e8648f;
+  --mint:#7fd8b2; --mint-d:#3fae80;
+  --butter:#ffd86b; --sky:#8fcaff; --lilac:#bba6ff;
+  --accent:#3fae80;        /* go / done */
+  --paper:#fff6e2; --seal:#e5533f;
+  --glass:rgba(255,255,255,.55);
+  --display:"ZCOOL KuaiLe","ZCOOL XiaoWei","PingFang SC",sans-serif;
+  --verse:"ZCOOL XiaoWei","Songti SC",serif;
+  --ui:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Noto Sans SC",sans-serif;
+  --stroke:2.5px solid var(--ink);
+  --pop:3px 4px 0 var(--ink);
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--ui);-webkit-font-smoothing:antialiased;overflow:hidden;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;-webkit-user-select:none;user-select:none}
+button:focus-visible,input:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+.stage{height:100%;display:grid;place-items:center}
+.app{position:relative;width:100%;height:100%;overflow:hidden;background:var(--bg);isolation:isolate}
+@media (min-width:560px){
+  body{background:var(--soft) radial-gradient(var(--line) 1.5px,transparent 1.6px) 0 0/22px 22px}
+  .stage{padding-block:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .app{width:393px;height:min(852px,100%);border-radius:48px;border:3px solid var(--ink);box-shadow:8px 10px 0 var(--ink)}
+}
+
+/* ---------- views ---------- */
+.view{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;padding-bottom:112px}
+.nav{position:sticky;top:0;z-index:5;height:46px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;transition:background .2s}
+.nav span{opacity:0;transform:translateY(4px);transition:opacity .2s,transform .2s;font-family:var(--display);font-weight:400;font-size:19px}
+.view.scrolled .nav{background:rgba(255,255,255,.72);-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%);box-shadow:0 1px 0 var(--line)}
+.view.scrolled .nav span{opacity:1;transform:none}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.head{display:flex;flex-direction:column;gap:2px;padding-bottom:12px}
+.eyebrow{font-size:13px;font-weight:700;color:var(--muted)}
+.large{margin:0;font-family:var(--display);font-weight:400;font-size:clamp(30px,9vw,36px);line-height:1.1;letter-spacing:.02em}
+.stack{display:flex;flex-direction:column;gap:22px}
+
+/* sticker surfaces */
+.card{background:#fff;border:var(--stroke);border-radius:22px;box-shadow:var(--pop)}
+.group{display:flex;flex-direction:column;gap:8px;min-width:0}
+.group h3{margin:0;padding:0 4px;font-size:13px;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:6px}
+.foot{margin:0;padding:0 4px;font-size:13px;color:var(--muted);line-height:1.55}
+.list{background:#fff;border:var(--stroke);border-radius:20px;box-shadow:var(--pop);overflow:hidden}
+.row{display:flex;align-items:center;gap:12px;min-height:48px;padding:10px 14px;position:relative;width:100%;text-align:left;min-width:0}
+.row+.row::before{content:"";position:absolute;top:0;right:0;left:var(--inset,14px);height:1.5px;background:var(--line)}
+button.row:active{background:var(--soft)}
+.grow{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.t{font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.s{font-size:14px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.r{display:flex;flex-direction:column;align-items:flex-end;gap:4px;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;flex:0 0 auto}
+.ava{width:46px;height:46px;border-radius:14px;flex:0 0 auto;display:grid;place-items:center;font-family:var(--display);font-size:22px;border:var(--stroke);color:var(--ink);box-shadow:2px 2px 0 var(--ink)}
+.ava.sm{width:32px;height:32px;border-radius:10px;font-size:16px;border-width:2px;box-shadow:1.5px 1.5px 0 var(--ink)}
+.tag{font-size:11.5px;font-weight:800;padding:2px 8px;border-radius:999px;border:2px solid var(--ink);background:#fff;white-space:nowrap}
+.tag.warn{background:var(--butter)}
+.tag.ok{background:var(--mint)}
+.tag.seal{background:var(--pink)}
+.tag.ex{background:var(--soft);border-color:var(--line);color:var(--muted)}
+.chev{width:8px;height:14px;color:var(--muted);flex:0 0 auto}
+
+/* buttons */
+.cta{height:52px;padding:0 26px;border-radius:999px;background:var(--pink);border:var(--stroke);box-shadow:var(--pop);font-family:var(--display);font-size:20px;letter-spacing:.06em;
+  display:inline-flex;align-items:center;gap:8px;transition:transform .12s,box-shadow .12s}
+.cta:active{transform:translate(3px,4px);box-shadow:0 0 0 var(--ink)}
+.cta.mint{background:var(--mint)}
+.cta[disabled]{opacity:.45;pointer-events:none}
+.ghost{height:46px;padding:0 18px;border-radius:999px;background:#fff;border:var(--stroke);box-shadow:2px 3px 0 var(--ink);font-weight:800;font-size:15px}
+.ghost:active{transform:translate(2px,3px);box-shadow:none}
+.btnRow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
+/* sparkles */
+.spark{position:absolute;font-size:14px;color:var(--butter);-webkit-text-stroke:1.2px var(--ink);animation:tw 2.4s ease-in-out infinite;pointer-events:none}
+@keyframes tw{0%,100%{transform:scale(.6) rotate(0);opacity:.5}50%{transform:scale(1.15) rotate(20deg);opacity:1}}
+
+/* ---------- 今日: 签筒 ---------- */
+.hero{position:relative;padding:20px 16px 18px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;overflow:hidden;
+  background:#fff linear-gradient(180deg,#fff0f6,#fff 70%)}
+.hero .q{font-family:var(--display);font-size:28px;letter-spacing:.08em}
+.hero .hint{font-size:13px;color:var(--muted);font-weight:700}
+.tubeWrap{height:196px;width:100%;display:grid;place-items:end center}
+.tube{position:relative;width:116px;height:160px;transform-origin:50% 100%}
+.tube .body{position:absolute;left:0;right:0;bottom:0;height:116px;border:var(--stroke);border-radius:14px 14px 22px 22px;background:var(--butter);z-index:2;display:grid;place-items:center;box-shadow:var(--pop)}
+.tube .body::before{content:"";position:absolute;left:-6px;right:-6px;top:-10px;height:18px;border:var(--stroke);border-radius:50%;background:#7a5a2c}
+.tube .body::after{content:"";position:absolute;left:0;right:0;top:40px;height:14px;background:var(--pink);border-block:2.5px solid var(--ink)}
+.tube .body b{position:relative;z-index:1;font-family:var(--display);font-weight:400;font-size:22px;background:#fff;border:2px solid var(--ink);border-radius:10px;padding:2px 8px;margin-top:34px}
+.stick{position:absolute;bottom:64px;width:12px;height:92px;border:2px solid var(--ink);border-radius:5px 5px 2px 2px;background:var(--seal);z-index:1;transition:transform .5s cubic-bezier(.2,1.5,.4,1)}
+.stick::after{content:"";position:absolute;left:1px;right:1px;top:4px;height:18px;border-radius:2px;background:#ffe9a8}
+.stick.up{transform:translateY(-62px)!important;z-index:1}
+.tube.shake{animation:shake .9s ease-in-out}
+@keyframes shake{0%,100%{transform:rotate(0)}15%{transform:rotate(-10deg)}30%{transform:rotate(9deg)}45%{transform:rotate(-8deg)}60%{transform:rotate(6deg)}75%{transform:rotate(-3deg)}}
+.tube.shake .stick{animation:jig .15s linear 6 alternate}
+@keyframes jig{to{transform:translateY(-7px)}}
+
+.hours{display:flex;gap:8px;overflow-x:auto;padding:2px 6px 8px 2px;scrollbar-width:none}
+.hours::-webkit-scrollbar{display:none}
+.hr{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 0;width:52px;border-radius:14px;background:#fff;border:2px solid var(--ink);font-size:11.5px;font-weight:700;color:var(--muted)}
+.hr b{font-family:var(--display);font-weight:400;font-size:20px;color:var(--ink)}
+.hr.now{background:var(--mint);color:var(--ink);box-shadow:2px 3px 0 var(--ink)}
+
+/* ---------- 签 paper ---------- */
+.qian{background:var(--paper);border:var(--stroke);box-shadow:var(--pop);border-radius:20px;padding:18px 16px 16px;position:relative;display:flex;flex-direction:column;gap:10px;text-align:left;min-width:0;
+  background-image:radial-gradient(rgba(229,83,63,.08) 1.2px,transparent 1.3px);background-size:14px 14px}
+.qian .meta{font-size:12px;font-weight:700;color:#a08660;padding-right:56px}
+.qian h2{margin:0;font-family:var(--display);font-weight:400;font-size:clamp(30px,10vw,38px);letter-spacing:.06em;line-height:1.1;padding-right:56px}
+.qian .verse{font-family:var(--verse);font-size:19px;letter-spacing:.08em;color:#5b4630}
+.qian .seal{position:absolute;right:14px;top:14px;writing-mode:vertical-rl;background:var(--seal);color:#fff;border:2px solid var(--ink);font-family:var(--display);font-size:17px;letter-spacing:.25em;padding:8px 5px;border-radius:6px;transform:rotate(4deg);box-shadow:2px 2px 0 var(--ink)}
+.qian hr{border:0;border-top:2px dashed rgba(43,36,64,.25);margin:2px 0;width:100%}
+.qian dl{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:7px 12px;font-size:14.5px;align-items:baseline}
+.qian dt{color:#a08660;font-size:12.5px;font-weight:700}
+.qian dd{margin:0;min-width:0}
+.qian .dose{font-family:var(--display);font-size:22px;color:var(--seal)}
+.qian .yj{display:flex;gap:8px;align-items:flex-start;font-size:14px;min-width:0}
+.qian .yj i{font-style:normal;width:22px;height:22px;border-radius:50%;border:2px solid var(--ink);display:grid;place-items:center;font-size:11px;font-weight:800;flex:0 0 auto}
+.reveal{animation:rise .6s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(50px) scale(.9) rotate(-3deg)}}
+
+/* ---------- 签盒: the gift box ---------- */
+.boxStage{position:relative;padding:34px 10px 14px;display:grid;place-items:center;overflow:hidden;
+  background:#fff linear-gradient(180deg,#eef7ff,#fff 75%)}
+.gift{position:relative;width:min(100%,300px)}
+.bow{position:absolute;left:50%;top:-30px;width:110px;height:46px;transform:translateX(-50%);z-index:3;pointer-events:none}
+.bow i{position:absolute;top:4px;width:50px;height:36px;border:var(--stroke);background:var(--pink);border-radius:50% 50% 50% 50%/60% 60% 40% 40%}
+.bow i:first-child{left:4px;transform:rotate(-14deg);border-radius:60% 30% 40% 60%}
+.bow i:nth-child(2){right:4px;transform:rotate(14deg);border-radius:30% 60% 60% 40%}
+.bow b{position:absolute;left:50%;top:14px;width:22px;height:22px;transform:translateX(-50%);border:var(--stroke);border-radius:8px;background:var(--pink-d)}
+.lid{position:relative;z-index:2;height:34px;margin:0 -8px;border:var(--stroke);border-radius:12px;background:var(--mint);box-shadow:var(--pop);display:grid;place-items:center;
+  font-family:var(--display);font-size:17px;letter-spacing:.3em}
+.lid::before{content:"";position:absolute;left:50%;top:-2.5px;bottom:-2.5px;width:26px;transform:translateX(-50%);background:var(--pink);border-inline:2.5px solid var(--ink)}
+.lid span{position:relative;background:#fff;border:2px solid var(--ink);border-radius:8px;padding:0 6px 0 10px}
+.cab{position:relative;margin-top:-4px;border:var(--stroke);border-top:0;border-radius:0 0 18px 18px;background:#fffdf7;box-shadow:var(--pop);padding:14px 10px 12px;
+  display:grid;grid-template-columns:1fr 1fr;grid-template-rows:62px 62px 62px;gap:10px}
+.cab::after{content:"";position:absolute;left:18px;right:18px;bottom:-12px;height:10px;background:linear-gradient(90deg,var(--ink) 0 18px,transparent 18px calc(100% - 18px),var(--ink) calc(100% - 18px));border-radius:0 0 6px 6px}
+.dr{position:relative;border:var(--stroke);border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-width:0;
+  box-shadow:inset 0 -5px 0 rgba(0,0,0,.1),2px 3px 0 var(--ink);transition:transform .35s cubic-bezier(.2,1.6,.4,1),box-shadow .2s;padding:4px}
+.dr .n{font-family:var(--display);font-size:clamp(15px,4.6vw,19px);line-height:1.1;white-space:nowrap}
+.dr .c{font-size:11px;font-weight:800;opacity:.75;font-variant-numeric:tabular-nums}
+.dr .knob{position:absolute;bottom:6px;width:16px;height:6px;border:2px solid var(--ink);border-radius:4px;background:#fff}
+.dr.round .knob{display:none}
+.dr .low{position:absolute;top:-9px;right:-6px;transform:rotate(8deg)}
+.dr:active,.dr.out{transform:translateY(-4px) scale(1.07) rotate(-1.5deg);box-shadow:inset 0 -5px 0 rgba(0,0,0,.1),4px 7px 0 var(--ink);z-index:2}
+.dr.pulse{animation:pl .6s}
+@keyframes pl{40%{transform:scale(1.1) rotate(2deg)}}
+
+/* ---------- log ---------- */
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;padding:12px 8px}
+.day{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:var(--muted);min-width:0}
+.day i{width:30px;height:30px;border-radius:50%;border:2px dashed var(--line);display:grid;place-items:center;font-style:normal;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.day.on i{border:2px solid var(--ink);background:var(--mint);color:var(--ink);font-weight:800}
+.day.today span{color:var(--pink-d)}
+.streak{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+.streak b{font-family:var(--display);font-weight:400;font-size:28px;color:var(--ink)}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--soft);border:2px solid var(--ink);border-radius:14px;padding:3px;position:relative}
+.seg button{height:32px;border-radius:10px;font-size:14px;font-weight:800;position:relative;z-index:1}
+.seg::before{content:"";position:absolute;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);border-radius:10px;background:var(--butter);border:2px solid var(--ink);transition:transform .3s cubic-bezier(.3,1.4,.5,1)}
+.seg[data-v="1"]::before{transform:translateX(100%)}
+
+/* ---------- settings ---------- */
+.switch{appearance:none;-webkit-appearance:none;width:52px;height:32px;border-radius:999px;background:var(--soft);border:2px solid var(--ink);position:relative;cursor:pointer;transition:background .2s;flex:0 0 auto;margin:0}
+.switch::after{content:"";position:absolute;top:2px;left:2px;width:24px;height:24px;border-radius:50%;background:#fff;border:2px solid var(--ink);transition:transform .3s cubic-bezier(.3,1.5,.5,1)}
+.switch:checked{background:var(--mint)}
+.switch:checked::after{transform:translateX(20px)}
+input[type=time]{font:inherit;font-size:15px;font-weight:700;border:2px solid var(--ink);border-radius:10px;background:#fff;color:var(--ink);padding:3px 6px;flex:0 0 auto}
+.t.red{color:var(--seal)}
+.t.link{color:var(--mint-d)}
+
+/* ---------- liquid-glass tab bar (drag the lens between tabs) ---------- */
+.tabs{position:absolute;z-index:20;left:max(14px,env(safe-area-inset-left,0px));right:max(14px,env(safe-area-inset-right,0px));bottom:14px;height:66px;border-radius:999px;
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:5px;touch-action:none;
+  background:var(--glass);-webkit-backdrop-filter:blur(18px) saturate(200%);backdrop-filter:blur(18px) saturate(200%);
+  border:2px solid var(--ink);box-shadow:var(--pop),inset 0 2px 0 rgba(255,255,255,.9)}
+.lens{position:absolute;top:5px;bottom:5px;left:5px;width:calc((100% - 10px)/4);border-radius:999px;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,224,236,.75));border:2px solid var(--ink);
+  box-shadow:inset 0 -3px 0 rgba(255,143,179,.35),0 2px 0 rgba(43,36,64,.15);
+  transition:transform .5s cubic-bezier(.3,1.45,.45,1),scale .25s,border-radius .25s}
+.tabs.drag .lens{transition:scale .2s cubic-bezier(.3,1.6,.5,1);scale:1.18 1.3;background:rgba(255,255,255,.35);border-color:rgba(43,36,64,.5);
+  -webkit-backdrop-filter:blur(2px) saturate(220%) contrast(1.1);backdrop-filter:blur(2px) saturate(220%) contrast(1.1);box-shadow:0 8px 20px rgba(43,36,64,.18),inset 0 2px 6px rgba(255,255,255,.9)}
+.tab{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:11px;font-weight:800;color:var(--muted);border-radius:999px;min-width:0;transition:color .2s,transform .2s}
+.tab svg{width:25px;height:25px}
+.tab[aria-selected="true"]{color:var(--ink)}
+.tabs.drag .tab.hover{transform:scale(1.12);color:var(--ink)}
+.tab .dot{position:absolute;top:6px;right:calc(50% - 20px);width:11px;height:11px;border-radius:50%;background:var(--seal);border:2px solid var(--ink)}
+
+/* ---------- sheet with detents ---------- */
+.scrim{position:absolute;inset:0;z-index:30;background:rgba(43,36,64,.28);opacity:0;pointer-events:none;transition:opacity .3s}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:absolute;z-index:31;left:0;right:0;bottom:0;height:90%;display:flex;flex-direction:column;background:#fff;border:var(--stroke);border-bottom:0;border-radius:30px 30px 0 0;
+  transform:translateY(105%);transition:transform .5s cubic-bezier(.2,1.15,.3,1);box-shadow:0 -6px 0 rgba(43,36,64,.08)}
+.sheet .grab{flex:0 0 auto;height:30px;display:grid;place-items:center;cursor:grab;touch-action:none}
+.sheet .grab::before{content:"";width:44px;height:6px;border-radius:3px;background:var(--ink);opacity:.25}
+.sheet .sb{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:4px max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:16px}
+.sheet .x{position:absolute;right:14px;top:12px;width:34px;height:34px;border-radius:50%;background:#fff;border:2px solid var(--ink);display:grid;place-items:center;z-index:2}
+.sheet .x svg{width:12px;height:12px}
+.sheetHead{display:flex;gap:12px;align-items:center;padding-right:44px;touch-action:none;min-width:0}
+.sheetHead h2{margin:0;font-family:var(--display);font-weight:400;font-size:24px}
+.sheetHead p{margin:2px 0 0;color:var(--muted);font-size:13.5px;font-weight:700}
+.stepper{display:flex;align-items:center;border:2px solid var(--ink);border-radius:12px;height:34px;flex:0 0 auto;background:#fff;overflow:hidden}
+.stepper button{width:32px;height:30px;font-size:18px;font-weight:800;line-height:1}
+.stepper button:active{background:var(--butter)}
+.stepper output{min-width:24px;text-align:center;font-weight:800;font-variant-numeric:tabular-nums;font-size:15px}
+
+.toast{position:absolute;z-index:40;left:50%;top:14px;transform:translate(-50%,-30px);opacity:0;pointer-events:none;max-width:calc(100% - 32px);
+  padding:9px 16px;border-radius:999px;font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:#fff;border:2px solid var(--ink);box-shadow:2px 3px 0 var(--ink);
+  transition:opacity .25s,transform .4s cubic-bezier(.3,1.5,.5,1)}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+
+<div class="stage">
+<main class="app" id="app">
+
+  <!-- 今日 -->
+  <section class="view" id="v-today">
+    <div class="nav"><span>今日一签</span></div>
+    <div class="gut stack">
+      <div class="head"><span class="eyebrow" id="dateLine"></span><h1 class="large">今日一签</h1></div>
+      <div id="todayCard"></div>
+      <div class="group"><h3>十二时辰 · 此时宜喝</h3><div class="hours" id="hours"></div></div>
+      <div class="group"><h3>签盒余量</h3><div class="list" id="miniStock" style="--inset:60px"></div></div>
+    </div>
+  </section>
+
+  <!-- 签盒 -->
+  <section class="view" id="v-box" hidden>
+    <div class="nav"><span>我的签盒</span></div>
+    <div class="gut stack">
+      <div class="head"><span class="eyebrow">六格 · 点一格就弹出来</span><h1 class="large">我的签盒</h1></div>
+      <div class="card boxStage">
+        <span class="spark" style="left:8%;top:18%">✦</span><span class="spark" style="right:9%;top:30%;animation-delay:.8s">✦</span><span class="spark" style="left:12%;bottom:14%;animation-delay:1.5s;color:var(--pink)">✦</span>
+        <div class="gift">
+          <div class="bow"><i></i><i></i><b></b></div>
+          <div class="lid"><span>草木签盒</span></div>
+          <div class="cab" id="cab"></div>
+        </div>
+      </div>
+      <div class="group"><h3>每一格里有什么</h3><div class="list" id="boxList" style="--inset:74px"></div></div>
+    </div>
+  </section>
+
+  <!-- 记录 -->
+  <section class="view" id="v-log" hidden>
+    <div class="nav"><span>记录</span></div>
+    <div class="gut stack">
+      <div class="head"><span class="eyebrow">喝过的每一签</span><h1 class="large">记录</h1></div>
+      <div class="group"><div class="card week" id="week"></div><p class="foot streak" id="streak"></p></div>
+      <div class="seg" id="seg" data-v="0"><button type="button" data-v="0">喝过的</button><button type="button" data-v="1">全部抽签</button></div>
+      <div id="logList" class="stack"></div>
+    </div>
+  </section>
+
+  <!-- 设置 -->
+  <section class="view" id="v-me" hidden>
+    <div class="nav"><span>设置</span></div>
+    <div class="gut stack">
+      <div class="head"><span class="eyebrow">草木签盒</span><h1 class="large">设置</h1></div>
+      <div class="list"><div class="row" style="padding-block:14px">
+        <div class="ava" style="background:var(--mint)">草</div>
+        <div class="grow"><span class="t">我的签盒</span><span class="s" id="meSub"></span></div></div></div>
+      <div class="group"><h3>声音与触感</h3><div class="list">
+        <label class="row"><span class="grow"><span class="t">交互音效</span><span class="s">点按、摇签、弹抽屉都有声音</span></span><input type="checkbox" class="switch" id="sSound"></label>
+        <label class="row"><span class="grow"><span class="t">抽中时震动</span><span class="s">支持震动的安卓手机</span></span><input type="checkbox" class="switch" id="sHaptic"></label>
+      </div></div>
+      <div class="group"><h3>提醒</h3><div class="list">
+        <label class="row"><span class="grow"><span class="t">每日抽签提醒</span></span><input type="checkbox" class="switch" id="sRemind"></label>
+        <label class="row"><span class="grow"><span class="t">提醒时间</span></span><input type="time" id="sTime"></label>
+      </div><p class="foot">原型里只记住设置，不会真的推送。</p></div>
+      <div class="group"><h3>抽签</h3><div class="list">
+        <label class="row"><span class="grow"><span class="t">只抽有存货的</span><span class="s">没货的那味不会被抽到</span></span><input type="checkbox" class="switch" id="sStock"></label>
+        <label class="row"><span class="grow"><span class="t">按时辰挑签</span><span class="s">早上多抽提神，晚上多抽安神</span></span><input type="checkbox" class="switch" id="sHour"></label>
+      </div></div>
+      <div class="group"><div class="list">
+        <button class="row" type="button" id="redraw"><span class="grow"><span class="t link">重新抽今天的签</span></span></button>
+        <button class="row" type="button" id="wipe"><span class="grow"><span class="t red" id="wipeT">清空记录并恢复默认</span></span></button>
+      </div><p class="foot">一日一签，抓一味来喝。签文只是生活小建议，身体不适请咨询医生。</p></div>
+    </div>
+  </section>
+
+  <nav class="tabs" role="tablist" id="tabs" aria-label="主导航">
+    <span class="lens" id="lens"></span>
+    <button class="tab" role="tab" data-v="today" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 21h9M8.5 21l.8-10h5.4l.8 10"/><path d="M10.5 11V4M12.5 11V2.5M14 11V5"/></svg>今日<i class="dot" id="dot" hidden></i></button>
+    <button class="tab" role="tab" data-v="box" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><rect x="3.5" y="9" width="17" height="11.5" rx="2.5"/><rect x="2.5" y="6" width="19" height="4" rx="1.5"/><path d="M12 6v14.5M12 6C10 2.5 6.5 3 7.5 5.5 8.3 7 12 6 12 6zM12 6c2-3.5 5.5-3 4.5-.5C15.7 7 12 6 12 6z"/></svg>签盒</button>
+    <button class="tab" role="tab" data-v="log" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>记录</button>
+    <button class="tab" role="tab" data-v="me" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>设置</button>
+  </nav>
+
+  <div class="scrim" id="scrim"></div>
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="详情">
+    <div class="grab" id="grab"></div>
+    <button class="x" type="button" id="closeSheet" aria-label="关闭"><svg viewBox="0 0 12 12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>
+    <div class="sb" id="sheetBody"></div>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+</main>
+</div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- data ---------- */
+const BOXES=[
+ {id:'coffee',name:'咖啡',sub:'提神',color:'#d9b08c',unit:'包'},
+ {id:'honey',name:'蜂蜜',sub:'润喉',color:'#ffd86b',unit:'勺'},
+ {id:'goji',name:'枸杞原浆',sub:'明目',color:'#ff8f8f',unit:'袋'},
+ {id:'tea',name:'花草茶',sub:'清 · 安',color:'#9fe0b2',unit:'包'},
+ {id:'warm',name:'暖身冲饮',sub:'暖身',color:'#ffb48a',unit:'包'},
+ {id:'vc',name:'维C泡腾',sub:'气泡',color:'#8fcaff',unit:'片'},
+];
+const ITEMS=[
+ {id:'drip',box:'coffee',name:'挂耳咖啡',dose:'一包',how:'92℃ 热水慢慢注 200ml',verse:'晨雾未散，先醒一醒',effect:'提神，上午开工前喝。',yi:'早上、开会前',ji:'下午三点后少喝，免得睡不着',when:[4,5]},
+ {id:'inst',box:'coffee',name:'速溶咖啡',dose:'一包',how:'150ml 热水冲开',verse:'事多且急，一杯先行',effect:'快速提神，赶工时来一杯。',yi:'赶工时',ji:'空腹别喝',when:[5,6]},
+ {id:'lemon',box:'honey',name:'蜂蜜柠檬',dose:'一勺',how:'温水冲，别用开水',verse:'口干舌燥，一勺润之',effect:'润喉，说了一天话之后喝。',yi:'讲话多的一天',ji:'一岁以下宝宝不能吃蜂蜜',when:[7,8]},
+ {id:'hwater',box:'honey',name:'蜂蜜水',dose:'一勺',how:'温水冲开',verse:'晨起一杯，温温润润',effect:'早起润一润。',yi:'早起',ji:'血糖高的人少喝',when:[3,4]},
+ {id:'goji',box:'goji',name:'枸杞原浆',dose:'一袋',how:'直接喝，或兑温水',verse:'夜深伤目，一袋还神',effect:'传统上用来滋补肝肾、明目，熬夜后常喝。',yi:'熬夜第二天',ji:'感冒发热、腹泻时',when:[4]},
+ {id:'juhua',box:'tea',name:'菊花茶',dose:'一包',how:'沸水焖 5 分钟',verse:'目倦则歇，一菊清明',effect:'清肝明目，盯了一整天屏幕后喝。',yi:'午后、用眼久',ji:'脾胃虚寒的人少喝',when:[8]},
+ {id:'chamo',box:'tea',name:'洋甘菊茶',dose:'一包',how:'沸水焖 5 分钟',verse:'灯灭之前，先安心神',effect:'安神放松，帮助入睡。',yi:'睡前一小时',ji:'对菊科过敏的人别喝',when:[10,11,0]},
+ {id:'rose',box:'tea',name:'玫瑰花茶',dose:'一包',how:'沸水焖 3 分钟',verse:'心绪纷纷，一朵舒之',effect:'气味舒缓，心里闷的时候喝。',yi:'情绪低落时',ji:'孕期先问医生',when:[7,8]},
+ {id:'mint',box:'tea',name:'薄荷茶',dose:'一包',how:'沸水焖 3 分钟',verse:'饭后微腻，一叶清之',effect:'清爽解腻，饭后喝。',yi:'午饭后',ji:'胃寒的人少喝',when:[6,7]},
+ {id:'ginger',box:'warm',name:'红枣姜茶',dose:'一包',how:'热水冲开，趁热喝',verse:'风寒在外，暖意在内',effect:'暖身驱寒，手脚冰凉时喝。',yi:'淋雨、受凉后',ji:'上火、口腔溃疡时少喝',when:[9]},
+ {id:'longan',box:'warm',name:'桂圆红枣茶',dose:'一包',how:'热水冲开',verse:'天色渐凉，一盏添暖',effect:'温暖甜润，冷天喝。',yi:'天冷、加班晚归',ji:'上火时少喝',when:[9,10]},
+ {id:'barley',box:'warm',name:'大麦茶',dose:'一包',how:'沸水泡 3 分钟',verse:'饭香之后，一盏麦香',effect:'解腻，没有咖啡因，晚上也能喝。',yi:'晚饭后',ji:'无特别禁忌',when:[9,10,11]},
+ {id:'vc',box:'vc',name:'维C泡腾片',dose:'一片',how:'200ml 凉水，气泡散完再喝',verse:'气泡升起，精神也起',effect:'补充维生素 C。',yi:'换季、出差',ji:'一天一片就够',when:[6,7]},
+];
+ITEMS.forEach((it,i)=>it.no=i+1);
+const byId=Object.fromEntries(ITEMS.map(i=>[i.id,i])), boxOf=Object.fromEntries(BOXES.map(b=>[b.id,b]));
+const SHI=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+const shiIdx=h=>Math.floor(((h+1)%24)/2);
+const GRADES=[['上上签',.3],['上签',.45],['中签',.25]];
+
+/* ---------- state ---------- */
+const pad2=n=>String(n).padStart(2,'0');
+const dkey=d=>`${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+const daysAgo=n=>{const d=new Date();d.setDate(d.getDate()-n);return d};
+const hhmm=()=>{const d=new Date();return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`};
+const WK='日一二三四五六';
+function defaults(){
+  const stock={drip:6,inst:4,lemon:8,hwater:10,goji:2,juhua:9,chamo:5,rose:3,mint:4,ginger:6,longan:1,barley:12,vc:0};
+  const seed=[[1,'chamo','上上签','22:10'],[2,'juhua','上签','15:40'],[3,'ginger','中签','18:20'],[5,'drip','上签','08:50'],[6,'mint','上上签','12:35']];
+  return {stock,today:null,log:seed.map(([n,id,g,t])=>({d:dkey(daysAgo(n)),t,id,grade:g,drank:true,ex:true})),
+    set:{remind:true,time:'15:00',onlyStock:true,byHour:true,haptic:true,sound:true}};
+}
+let S;try{S=JSON.parse(localStorage.getItem('caomu-app-v2'))}catch(e){}
+if(!S||!S.stock)S=defaults();
+if(S.set.sound===undefined)S.set.sound=true;
+const save=()=>{try{localStorage.setItem('caomu-app-v2',JSON.stringify(S))}catch(e){}};
+const TODAY=dkey(new Date());
+if(S.today&&S.today.d!==TODAY)S.today=null;
+
+/* ---------- sound: tiny synth, no files ---------- */
+const snd=(()=>{let ctx=null,out=null;
+  function init(){if(ctx)return ctx;const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;ctx=new C();out=ctx.createGain();out.gain.value=.55;out.connect(ctx.destination);return ctx}
+  function tone(f,t0,dur,{type='sine',vol=.3,to=null,attack=.004}={}){const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;o.frequency.setValueAtTime(f,t0);
+    if(to)o.frequency.exponentialRampToValueAtTime(to,t0+dur*.8);g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(vol,t0+attack);g.gain.exponentialRampToValueAtTime(.0001,t0+dur);
+    o.connect(g);g.connect(out);o.start(t0);o.stop(t0+dur+.05)}
+  function noise(t0,dur,{f=2000,q=1,vol=.2,type='bandpass',to=null}={}){const n=ctx.createBufferSource(),len=Math.ceil(ctx.sampleRate*dur),b=ctx.createBuffer(1,len,ctx.sampleRate),d=b.getChannelData(0);
+    for(let i=0;i<len;i++)d[i]=Math.random()*2-1;n.buffer=b;const fl=ctx.createBiquadFilter();fl.type=type;fl.frequency.setValueAtTime(f,t0);if(to)fl.frequency.exponentialRampToValueAtTime(to,t0+dur);fl.Q.value=q;
+    const g=ctx.createGain();g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(vol,t0+.01);g.gain.exponentialRampToValueAtTime(.0001,t0+dur);n.connect(fl);fl.connect(g);g.connect(out);n.start(t0)}
+  const P={
+    tap(t){tone(1500,t,.05,{vol:.12})},
+    tab(t){tone(880,t,.07,{vol:.18,to:1320})},
+    tick(t){tone(2400,t,.025,{vol:.07,type:'triangle'})},
+    pop(t){tone(420,t,.12,{vol:.35,to:980})},                       // bubble, like a sent message
+    sent(t){tone(520,t,.09,{vol:.28,to:1040});tone(1040,t+.07,.12,{vol:.18,to:1560})},
+    on(t){tone(700,t,.06,{vol:.18,to:1100})},
+    off(t){tone(900,t,.06,{vol:.15,to:520})},
+    plus(t){tone(1100,t,.05,{vol:.14,type:'triangle'})},
+    minus(t){tone(760,t,.05,{vol:.14,type:'triangle'})},
+    open(t){noise(t,.25,{f:500,to:2600,vol:.12})},
+    close(t){noise(t,.2,{f:2400,to:500,vol:.08})},
+    drawer(t){noise(t,.22,{f:300,to:1200,q:1.4,vol:.25});tone(180,t+.2,.16,{vol:.4,to:70})},
+    shake(t){for(let i=0;i<14;i++)tone(900+Math.random()*1200,t+i*.06+Math.random()*.02,.03,{vol:.12,type:'triangle'})},
+    chime(t){[1047,1319,1568,2093].forEach((f,i)=>tone(f,t+i*.08,.9,{vol:.13,type:'triangle'}))},
+    drink(t){for(let i=0;i<5;i++)tone(380+i*110+Math.random()*60,t+i*.07,.1,{vol:.18,to:900+i*120});[523,659,784].forEach(f=>tone(f,t+.4,1,{vol:.08}))},
+    err(t){tone(300,t,.12,{vol:.2,type:'square',to:220});tone(240,t+.13,.14,{vol:.18,type:'square',to:180})},
+  };
+  return name=>{if(!S.set.sound)return;const c=init();if(!c)return;if(c.state==='suspended')c.resume();try{P[name](c.currentTime+.01)}catch(e){}};
+})();
+
+/* ---------- helpers ---------- */
+let toastT;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2000)}
+function buzz(p){if(!S.set.haptic)return;try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}}
+const boxStock=b=>ITEMS.filter(i=>i.box===b).reduce((a,i)=>a+(S.stock[i.id]||0),0);
+function relDay(d){const t=new Date(d+'T00:00');const diff=Math.round((new Date(TODAY+'T00:00')-t)/864e5);
+  if(diff===0)return'今天';if(diff===1)return'昨天';if(diff<7)return'周'+WK[t.getDay()];return`${t.getMonth()+1}月${t.getDate()}日`}
+const ava=(b,sm)=>`<div class="ava${sm?' sm':''}" style="background:${b.color}" aria-hidden="true">${esc(b.name[0])}</div>`;
+const chev='<svg class="chev" viewBox="0 0 8 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l6 6-6 6"/></svg>';
+const lowTag=n=>n<=2?`<span class="tag warn">${n?'快没了':'空了'}</span>`:'';
+
+function qianHTML(it,grade,mini){
+  const b=boxOf[it.box];
+  return `<article class="qian">
+    <span class="meta">第 ${pad2(it.no)} 签 · ${esc(b.name)}格 · ${SHI[shiIdx(new Date().getHours())]}时</span>
+    <h2>${esc(it.name)}</h2><div class="verse">${esc(it.verse)}</div>
+    <span class="seal">${esc(grade)}</span><hr>
+    <dl><dt>用量</dt><dd>一次 <span class="dose">${esc(it.dose)}</span> 就够</dd><dt>冲法</dt><dd>${esc(it.how)}</dd>${mini?'':`<dt>作用</dt><dd>${esc(it.effect)}</dd>`}</dl>
+    ${mini?'':`<div class="yj"><i style="background:var(--mint)">宜</i><span>${esc(it.yi)}</span></div><div class="yj"><i style="background:var(--pink)">忌</i><span>${esc(it.ji)}</span></div>`}
+  </article>`;
+}
+
+/* ---------- draw ---------- */
+function draw(){
+  const shi=shiIdx(new Date().getHours());
+  const pool=ITEMS.filter(i=>!S.set.onlyStock||(S.stock[i.id]||0)>0);
+  if(!pool.length){snd('err');toast('签盒空了，先去补点货');return null}
+  const w=pool.map(i=>S.set.byHour?(i.when.includes(shi)?5:i.when.some(x=>Math.abs(x-shi)<=1)?2:1):1);
+  let r=Math.random()*w.reduce((a,b)=>a+b,0),k=0;while(r>w[k]){r-=w[k];k++}
+  let g=Math.random(),grade='中签';for(const[n,p]of GRADES){if(g<p){grade=n;break}g-=p}
+  return {d:TODAY,t:hhmm(),id:pool[k].id,grade,drank:false};
+}
+
+/* ---------- 今日 ---------- */
+function renderToday(){
+  const now=new Date(),cur=shiIdx(now.getHours());
+  $('#dateLine').textContent=`${now.getMonth()+1}月${now.getDate()}日 周${WK[now.getDay()]} · ${SHI[cur]}时`;
+  const c=$('#todayCard');
+  if(!S.today){
+    const sticks=[-36,-24,-12,0,12,24,36].map((x,i)=>`<span class="stick${i===3?' pick':''}" style="left:calc(50% + ${x-6}px);transform:translateY(${[8,0,12,-4,6,-2,10][i]}px) rotate(${(x/11).toFixed(1)}deg)"></span>`).join('');
+    c.innerHTML=`<div class="card hero"><span class="spark" style="left:12%;top:26%">✦</span><span class="spark" style="right:14%;top:42%;animation-delay:1s;color:var(--pink)">✦</span>
+      <div class="q">今天喝什么？</div>
+      <div class="tubeWrap"><div class="tube" id="tube">${sticks}<div class="body"><b>草木</b></div></div></div>
+      <button class="cta" type="button" id="shakeBtn">摇一签</button>
+      <span class="hint">一日一签，抓一味来喝</span></div>`;
+    $('#shakeBtn').onclick=shake;
+  }else{
+    const it=byId[S.today.id],b=boxOf[it.box],left=S.stock[it.id]||0;
+    c.innerHTML=`<div class="stack" style="gap:14px">${qianHTML(it,S.today.grade,true)}
+      <div class="btnRow">${S.today.drank
+        ?`<span class="tag ok" style="font-size:14px;padding:10px 16px">已喝 · ${esc(S.today.drankAt||'')}</span><button class="ghost" type="button" id="openQ">看签文</button>`
+        :`<button class="cta mint" type="button" id="drinkBtn" ${left?'':'disabled'}>就喝这个</button><button class="ghost" type="button" id="openQ">看签文</button>`}</div>
+      ${!S.today.drank&&!left?`<p class="foot" style="text-align:center">${esc(b.name)}格里的${esc(it.name)}没货了，去签盒补一点。</p>`:''}</div>`;
+    $('#openQ').onclick=()=>{snd('tap');openQian(S.today,false)};
+    const db=$('#drinkBtn');if(db)db.onclick=drink;
+  }
+  $('#hours').innerHTML=SHI.map((s,i)=>{const fit=ITEMS.find(it=>it.when[0]===i)||ITEMS.find(it=>it.when.includes(i));
+    return `<div class="hr${i===cur?' now':''}"><b>${s}</b>${fit?esc(fit.name.slice(0,2)):'歇'}</div>`}).join('');
+  requestAnimationFrame(()=>{const n=$('#hours .now'),h=$('#hours');if(n&&h.clientWidth)h.scrollLeft=n.offsetLeft-h.clientWidth/2+26});
+  $('#miniStock').innerHTML=BOXES.map(b=>{const n=boxStock(b.id);
+    return `<button class="row" type="button" data-box="${b.id}">${ava(b,true)}<span class="grow"><span class="t">${esc(b.name)}</span></span>
+      <span class="r">${n?`${n} ${b.unit}`:''}</span>${lowTag(n)}${chev}</button>`}).join('');
+  $$('#miniStock [data-box]').forEach(r=>r.onclick=()=>{snd('tap');openBox(r.dataset.box)});
+  $('#dot').hidden=!!S.today;
+}
+function shake(){
+  const tube=$('#tube'),btn=$('#shakeBtn');if(!tube||btn.disabled)return;
+  const res=draw();if(!res)return;
+  btn.disabled=true;tube.classList.add('shake');snd('shake');buzz([30,60,30,60,30]);
+  setTimeout(()=>{tube.classList.remove('shake');tube.querySelector('.pick').classList.add('up');snd('pop');buzz(80)},900);
+  setTimeout(()=>{S.today=res;S.log.push({...res});save();snd('chime');openQian(res,true);renderAll()},1450);
+}
+function drink(){
+  const it=byId[S.today.id];if(!(S.stock[it.id]>0))return;
+  S.stock[it.id]--;S.today.drank=true;S.today.drankAt=hhmm();
+  const e=[...S.log].reverse().find(l=>l.d===TODAY&&l.id===S.today.id);if(e){e.drank=true;e.t=S.today.drankAt}
+  save();renderAll();snd('drink');buzz(40);toast(`记下了 · 已连续 ${streak()} 天`);
+}
+
+/* ---------- 签盒 ---------- */
+// grid placement mirrors the real box: coffee | honey / goji | tea / warm | vc
+const PLACE={coffee:'1/1',honey:'1/2',goji:'2/1',tea:'2/2',warm:'3/1',vc:'3/2'};
+function renderBox(){
+  $('#cab').innerHTML=BOXES.map(b=>{const n=boxStock(b.id),[r,c]=PLACE[b.id].split('/');
+    return `<button class="dr" type="button" data-box="${b.id}" style="background:${b.color};grid-row:${r};grid-column:${c}" aria-label="${esc(b.name)}，余 ${n} ${b.unit}">
+      <span class="n">${esc(b.name)}</span><span class="c">余 ${n} ${b.unit}</span><span class="knob"></span>${n<=2?`<span class="low">${lowTag(n)}</span>`:''}</button>`}).join('');
+  $$('#cab .dr').forEach(d=>d.onclick=()=>{d.classList.add('out');snd('drawer');buzz(15);setTimeout(()=>{openBox(d.dataset.box);d.classList.remove('out')},260)});
+  $('#boxList').innerHTML=BOXES.map(b=>{
+    const items=ITEMS.filter(i=>i.box===b.id),last=[...S.log].reverse().find(l=>l.drank&&byId[l.id].box===b.id),n=boxStock(b.id);
+    const sub=last?`${byId[last.id].name} · ${relDay(last.d)}喝过`:items.map(i=>i.name).join('、');
+    return `<button class="row" type="button" data-box="${b.id}">${ava(b)}<span class="grow"><span class="t">${esc(b.name)}</span><span class="s">${esc(sub)}</span></span>
+      <span class="r"><span>${n} ${b.unit}</span>${n<=2?lowTag(n):`<span class="tag ok">${items.length} 味</span>`}</span></button>`}).join('');
+  $$('#boxList [data-box]').forEach(r=>r.onclick=()=>{snd('tap');openBox(r.dataset.box)});
+}
+
+/* ---------- 记录 ---------- */
+function streak(){let n=0;for(let i=0;i<400;i++){const k=dkey(daysAgo(i));if(S.log.some(l=>l.d===k&&l.drank))n++;else if(i>0)break}return n}
+function renderLog(){
+  $('#week').innerHTML=[6,5,4,3,2,1,0].map(n=>{const d=daysAgo(n),k=dkey(d),on=S.log.some(l=>l.d===k&&l.drank);
+    return `<div class="day${on?' on':''}${n===0?' today':''}"><span>${n===0?'今':WK[d.getDay()]}</span><i>${d.getDate()}</i></div>`}).join('');
+  $('#streak').innerHTML=`<b>${streak()}</b> 天连续喝到 · 共 ${S.log.filter(l=>l.drank).length} 杯`;
+  const v=$('#seg').dataset.v,L=S.log.filter(l=>v==='1'||l.drank).slice().reverse(),groups={};
+  L.forEach(l=>(groups[l.d]=groups[l.d]||[]).push(l));
+  const keys=Object.keys(groups).sort().reverse();
+  $('#logList').innerHTML=keys.length?keys.map(k=>{const rd=relDay(k);return `<div class="group"><h3>${rd}${rd.includes('月')?'':' · '+(+k.slice(5,7))+'月'+(+k.slice(8))+'日'}</h3>
+    <div class="list" style="--inset:60px">${groups[k].map(l=>{const it=byId[l.id],b=boxOf[it.box];
+      return `<button class="row" type="button" data-log="${S.log.indexOf(l)}">${ava(b,true)}<span class="grow"><span class="t">${esc(it.name)}</span><span class="s">${esc(it.verse)}</span></span>
+      <span class="r"><span>${l.t}</span><span style="display:flex;gap:4px">${l.ex?'<span class="tag ex">示例</span>':''}${l.drank?'':'<span class="tag ex">没喝</span>'}<span class="tag seal">${esc(l.grade)}</span></span></span></button>`}).join('')}</div></div>`}).join('')
+    :`<div class="list"><div class="row"><span class="grow"><span class="t">还没有记录</span><span class="s">回到“今日”摇一签，喝了就记在这里。</span></span></div></div>`;
+  $$('#logList [data-log]').forEach(r=>r.onclick=()=>{snd('tap');openQian(S.log[+r.dataset.log],false)});
+}
+
+/* ---------- 设置 ---------- */
+function renderMe(){
+  $('#meSub').textContent=`${ITEMS.length} 味 · 共 ${ITEMS.reduce((a,i)=>a+(S.stock[i.id]||0),0)} 份存货`;
+  $('#sRemind').checked=S.set.remind;$('#sTime').value=S.set.time;$('#sTime').disabled=!S.set.remind;
+  $('#sStock').checked=S.set.onlyStock;$('#sHour').checked=S.set.byHour;$('#sHaptic').checked=S.set.haptic;$('#sSound').checked=S.set.sound;
+}
+function renderAll(){renderToday();renderBox();renderLog();renderMe()}
+
+/* ---------- sheet with detents: drag the handle or header ---------- */
+const sheet=$('#sheet');let sheetOpen=false,detent=0;
+const H=()=>sheet.offsetHeight, DET=()=>[0,Math.round(H()*.38)];   // large, medium
+function setY(y,anim){sheet.style.transition=anim?'':'none';sheet.style.transform=`translateY(${y}px)`}
+function openSheet(html,startMedium){
+  $('#sheetBody').innerHTML=html;$('#sheetBody').scrollTop=0;$('#scrim').classList.add('on');sheetOpen=true;
+  detent=startMedium?1:0;requestAnimationFrame(()=>setY(DET()[detent],true));snd('open');
+}
+function closeSheet(){if(!sheetOpen)return;sheetOpen=false;$('#scrim').classList.remove('on');sheet.style.transition='';sheet.style.transform='';snd('close')}
+$('#scrim').onclick=closeSheet;$('#closeSheet').onclick=closeSheet;
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet()});
+(()=>{let y0=null,base=0,last=0,lt=0,v=0;
+  const down=e=>{if(e.target.closest('button'))return;y0=e.clientY;base=DET()[detent];last=e.clientY;lt=performance.now();v=0;sheet.style.transition='none';e.currentTarget.setPointerCapture(e.pointerId)};
+  const move=e=>{if(y0==null)return;let y=base+e.clientY-y0;if(y<0)y=-Math.pow(-y,.7);setY(y);const now=performance.now();v=(e.clientY-last)/Math.max(1,now-lt);last=e.clientY;lt=now};
+  const up=e=>{if(y0==null)return;const y=base+e.clientY-y0;y0=null;const d=DET();
+    if(v>.9||y>d[1]+H()*.2){closeSheet();return}
+    const target=v<-.6?0:v>.6?1:(Math.abs(y-d[0])<Math.abs(y-d[1])?0:1);
+    if(target!==detent)snd('tick');detent=target;setY(d[detent],true)};
+  ['#grab','#sheetBody'].forEach(s=>{const el=$(s);
+    el.addEventListener('pointerdown',e=>{if(s==='#sheetBody'&&!e.target.closest('.sheetHead'))return;down(e)});
+    el.addEventListener('pointermove',move);el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up)});
+})();
+function openQian(l,fresh){
+  const it=byId[l.id];
+  openSheet(`<div class="sheetHead">${ava(boxOf[it.box])}<div style="min-width:0"><h2>${fresh?'抽中了！':esc(it.name)}</h2><p>${esc(l.d.slice(5).replace('-','月'))}日 ${esc(l.t)} · ${esc(l.grade)}</p></div></div>
+    <div class="${fresh?'reveal':''}">${qianHTML(it,l.grade,false)}</div>
+    ${fresh?`<div class="btnRow"><button class="cta mint" type="button" id="sDrink">就喝这个</button><button class="ghost" type="button" id="sLater">待会儿再喝</button></div>`:''}`);
+  if(fresh){$('#sDrink').onclick=()=>{closeSheet();drink()};$('#sLater').onclick=closeSheet}
+}
+function openBox(id){
+  const b=boxOf[id],items=ITEMS.filter(i=>i.box===id);
+  const subline=()=>`${b.sub} · ${items.length} 味 · 余 ${boxStock(id)} ${b.unit}`;
+  openSheet(`<div class="sheetHead">${ava(b)}<div style="min-width:0"><h2>${esc(b.name)}</h2><p id="boxSub">${subline()}</p></div></div>
+    <div class="list">${items.map(i=>`<div class="row"><span class="grow"><span class="t">${esc(i.name)}</span><span class="s">${esc(i.verse)}</span></span>
+      <div class="stepper"><button type="button" data-d="-1" data-i="${i.id}" aria-label="减少${esc(i.name)}">−</button><output>${S.stock[i.id]||0}</output><button type="button" data-d="1" data-i="${i.id}" aria-label="增加${esc(i.name)}">+</button></div></div>`).join('')}</div>
+    <p class="foot">喝掉一份会自动减一；补货时在这里加。往上拖可以展开，往下拖收起。</p>`,true);
+  $('#sheetBody').onclick=e=>{const t=e.target.closest('[data-d]');if(!t)return;
+    const k=t.dataset.i,d=+t.dataset.d,nv=Math.max(0,Math.min(99,(S.stock[k]||0)+d));
+    if(nv===S.stock[k]){snd('err');return}
+    S.stock[k]=nv;save();snd(d>0?'plus':'minus');buzz(10);
+    t.parentNode.querySelector('output').textContent=nv;$('#boxSub').textContent=subline();renderToday();renderBox();renderMe()};
+}
+
+/* ---------- draggable liquid-glass tab bar ---------- */
+const ORDER=['today','box','log','me'];let curTab='today';
+function go(v,quiet){
+  ORDER.forEach(k=>$('#v-'+k).hidden=k!==v);
+  $$('.tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.v===v));
+  $('#lens').style.transform=`translateX(${ORDER.indexOf(v)*100}%)`;
+  if(v!==curTab&&!quiet){snd('tab');buzz(8)}
+  curTab=v;try{localStorage.setItem('caomu-tab',v)}catch(e){}
+}
+(()=>{const bar=$('#tabs'),lens=$('#lens');let sx=null,moved=false,idx=0;
+  const slot=()=>(bar.clientWidth-10)/4;
+  const at=x=>Math.max(0,Math.min(3,Math.floor((x-bar.getBoundingClientRect().left-5)/slot())));
+  bar.addEventListener('pointerdown',e=>{sx=e.clientX;moved=false;idx=at(e.clientX);bar.setPointerCapture(e.pointerId)});
+  bar.addEventListener('pointermove',e=>{if(sx==null)return;
+    if(!moved&&Math.abs(e.clientX-sx)>6){moved=true;bar.classList.add('drag');snd('tick')}
+    if(!moved)return;
+    const x=e.clientX-bar.getBoundingClientRect().left-5-slot()/2,max=slot()*3;
+    lens.style.transform=`translateX(${Math.max(-8,Math.min(max+8,x))}px)`;
+    const i=at(e.clientX);if(i!==idx){idx=i;snd('tick');buzz(5)}
+    $$('.tab').forEach((t,k)=>t.classList.toggle('hover',k===i))});
+  const end=e=>{if(sx==null)return;sx=null;bar.classList.remove('drag');$$('.tab').forEach(t=>t.classList.remove('hover'));
+    const i=moved?at(e.clientX):at(e.clientX);go(ORDER[i]);if(moved&&ORDER[i]===curTab)snd('pop')};
+  bar.addEventListener('pointerup',end);bar.addEventListener('pointercancel',()=>{sx=null;bar.classList.remove('drag');go(curTab,true)});
+  bar.addEventListener('keydown',e=>{const t=e.target.closest('.tab');if(t&&(e.key==='Enter'||e.key===' ')){e.preventDefault();go(t.dataset.v)}});
+})();
+$$('.view').forEach(v=>v.addEventListener('scroll',()=>v.classList.toggle('scrolled',v.scrollTop>40),{passive:true}));
+
+/* ---------- controls ---------- */
+$('#seg').onclick=e=>{const b=e.target.closest('button');if(!b||$('#seg').dataset.v===b.dataset.v)return;$('#seg').dataset.v=b.dataset.v;snd('tick');renderLog()};
+const bind=(id,key)=>$(id).addEventListener('change',e=>{const on=e.target.type==='checkbox'?e.target.checked:e.target.value;S.set[key]=on;save();renderMe();
+  if(e.target.type==='checkbox'){if(key==='sound'&&on)S.set.sound=true;snd(on?'on':'off')}
+  if(key==='remind')toast(S.set.remind?`每天 ${S.set.time} 提醒你抽签`:'提醒已关闭')});
+bind('#sRemind','remind');bind('#sTime','time');bind('#sStock','onlyStock');bind('#sHour','byHour');bind('#sHaptic','haptic');bind('#sSound','sound');
+$('#redraw').onclick=()=>{if(S.today&&S.today.drank)S.stock[S.today.id]++;
+  S.log=S.log.filter(l=>l.d!==TODAY);S.today=null;save();renderAll();go('today');snd('pop');toast('签已放回筒里')};
+let wipeArm=false;
+$('#wipe').onclick=()=>{if(!wipeArm){wipeArm=true;snd('err');$('#wipeT').textContent='再点一次确认清空';setTimeout(()=>{wipeArm=false;$('#wipeT').textContent='清空记录并恢复默认'},3000);return}
+  wipeArm=false;S=defaults();save();renderAll();go('today');snd('sent');toast('已恢复默认')};
+
+renderAll();
+let start='today';try{const t=localStorage.getItem('caomu-tab');if(ORDER.includes(t))start=t}catch(e){}
+go(start,true);
+})();
+</script>
+
+</body></html>
