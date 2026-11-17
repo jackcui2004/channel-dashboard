@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>仓鼠囤粮 · Hamster Hoard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    background: #FFF6E8;
+    font-family: "ZCOOL KuaiLe", "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: #5B3A29;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  #app { max-width: 480px; margin: 0 auto; min-height: 100%; padding: 10px 12px 28px; }
+  header { display: flex; align-items: center; justify-content: space-between; padding: 6px 2px 10px; }
+  .logo { display: flex; align-items: center; gap: 8px; }
+  .logo canvas { width: 38px; height: 38px; }
+  .logo h1 { font-size: 26px; letter-spacing: 2px; font-weight: 400; }
+  .logo small { display: block; font-size: 11px; letter-spacing: 3px; color: #B08D6A; margin-top: -4px; }
+  .icon-btn {
+    width: 40px; height: 40px; border-radius: 12px; border: 2px solid #E8C39E;
+    background: #FFFDF6; font-size: 19px; cursor: pointer; color: #5B3A29;
+    display: flex; align-items: center; justify-content: center; font-family: inherit;
+  }
+  .icon-btn:active { transform: scale(0.92); }
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ---- menu ---- */
+  .chapter { margin-top: 14px; }
+  .chapter h2 { font-size: 19px; font-weight: 400; color: #8A5A33; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .chapter h2::after { content: ""; flex: 1; height: 2px; background: #F0DDBB; border-radius: 2px; }
+  .level-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .level-card {
+    background: #FFFDF6; border: 2px solid #E8C39E; border-radius: 14px;
+    padding: 6px 2px 5px; text-align: center; cursor: pointer; position: relative;
+  }
+  .level-card:active { transform: scale(0.94); }
+  .level-card canvas { width: 100%; border-radius: 8px; display: block; }
+  .level-card .lv-name { font-size: 13px; margin-top: 3px; line-height: 1.1; }
+  .level-card .lv-stars { font-size: 11px; color: #F5A623; letter-spacing: 1px; height: 14px; }
+  .level-card.locked { opacity: 0.45; cursor: default; filter: grayscale(0.7); }
+  .level-card .lock { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  .menu-foot { text-align: center; color: #B08D6A; font-size: 13px; margin-top: 22px; line-height: 1.7; }
+
+  /* ---- game ---- */
+  .game-bar { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+  .game-bar .lv-title { font-size: 19px; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .game-bar .lv-title .diff { font-size: 12px; color: #fff; background: #E8A87C; border-radius: 8px; padding: 2px 7px; margin-left: 4px; vertical-align: 2px; }
+  .pill {
+    background: #FFFDF6; border: 2px solid #E8C39E; border-radius: 12px;
+    padding: 7px 10px; font-size: 15px; white-space: nowrap; font-family: inherit; color: #5B3A29;
+  }
+  button.pill { cursor: pointer; }
+  button.pill:active { transform: scale(0.93); }
+  button.pill:disabled { opacity: 0.45; }
+  #board-wrap { position: relative; }
+  #board { width: 100%; display: block; border-radius: 18px; touch-action: none; }
+  #tip-bubble {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    background: #5B3A29; color: #FFF6E8; border-radius: 14px; padding: 9px 14px;
+    font-size: 16px; text-align: center; max-width: 88%; z-index: 5; display: none;
+    box-shadow: 0 4px 14px rgba(91,58,41,.3); pointer-events: none; line-height: 1.4;
+  }
+  #tip-bubble::after {
+    content: ""; position: absolute; left: 50%; bottom: -8px; transform: translateX(-50%);
+    border: 8px solid transparent; border-top-color: #5B3A29; border-bottom: none;
+  }
+  #toast {
+    position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%) translateY(20px);
+    background: rgba(91,58,41,.92); color: #FFF6E8; padding: 10px 18px; border-radius: 999px;
+    font-size: 16px; opacity: 0; transition: all .25s; pointer-events: none; z-index: 50; white-space: nowrap;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ---- overlay ---- */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(91,58,41,.45); z-index: 40;
+    display: none; align-items: center; justify-content: center; padding: 20px;
+  }
+  .overlay.show { display: flex; }
+  .panel {
+    background: #FFFDF6; border-radius: 22px; border: 3px solid #E8C39E;
+    padding: 26px 24px 22px; text-align: center; width: 100%; max-width: 330px;
+    box-shadow: 0 14px 40px rgba(91,58,41,.35); animation: pop .3s ease;
+  }
+  @keyframes pop { from { transform: scale(.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .panel h2 { font-size: 26px; font-weight: 400; margin-bottom: 4px; }
+  .panel .stars-big { font-size: 38px; letter-spacing: 6px; color: #F5A623; margin: 6px 0 2px; min-height: 48px; }
+  .panel .stars-big .off { color: #E8DCC8; }
+  .panel p { color: #B08D6A; font-size: 15px; line-height: 1.6; margin-bottom: 16px; }
+  .btn-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .big-btn {
+    font-family: inherit; font-size: 18px; padding: 11px 22px; border-radius: 999px; cursor: pointer;
+    border: 2px solid #E8C39E; background: #FFF6E8; color: #5B3A29;
+  }
+  .big-btn.primary { background: #FFB84D; border-color: #F5A623; color: #5B3A29; font-size: 19px; padding: 11px 26px; }
+  .big-btn:active { transform: scale(.94); }
+  .shake { animation: shake .3s; }
+  @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="logo">
+      <canvas id="logo-hamster" width="76" height="76"></canvas>
+      <div><h1>仓鼠囤粮</h1><small>HAMSTER HOARD</small></div>
+    </div>
+    <button class="icon-btn" id="sound-btn" title="声音">🔊</button>
+  </header>
+
+  <section id="menu-screen" class="screen active"></section>
+
+  <section id="game-screen" class="screen">
+    <div class="game-bar">
+      <button class="icon-btn" id="back-btn" title="选关">‹</button>
+      <div class="lv-title"><span id="lv-name"></span><span class="diff" id="lv-diff"></span></div>
+      <span class="pill">剩余 <b id="remain-count">0</b></span>
+      <button class="pill" id="hint-btn">💡 <span id="hint-count">2</span></button>
+      <button class="pill" id="speed-btn">1x</button>
+      <button class="icon-btn" id="restart-btn" title="重玩">↻</button>
+    </div>
+    <div id="board-wrap">
+      <canvas id="board"></canvas>
+      <div id="tip-bubble"></div>
+    </div>
+  </section>
+</div>
+
+<div id="toast"></div>
+
+<div class="overlay" id="win-overlay">
+  <div class="panel">
+    <h2>囤满啦！🎉</h2>
+    <div class="stars-big" id="win-stars"></div>
+    <p id="win-text"></p>
+    <div class="btn-row">
+      <button class="big-btn" id="win-menu-btn">选关</button>
+      <button class="big-btn" id="win-replay-btn">重玩</button>
+      <button class="big-btn primary" id="win-next-btn">下一关 →</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="fail-overlay">
+  <div class="panel">
+    <h2>槽位堵住啦 😵</h2>
+    <p>五个槽都被吃不到的颜色占满了。<br>换个放盒子的顺序试试，先放外层的颜色。</p>
+    <div class="btn-row">
+      <button class="big-btn" id="fail-menu-btn">选关</button>
+      <button class="big-btn primary" id="fail-retry-btn">再试一次</button>
+    </div>
+  </div>
+</div>
+
+<script src="levels.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
